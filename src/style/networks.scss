@@ -82,22 +82,6 @@
     margin-right: 8px;
   }
 
-  .voyages {
-    background-color: #f2ee0a;
-  }
-
-  .enslaved {
-    background-color: #906866;
-  }
-
-  .enslavers {
-    background-color: #46a88c;
-  }
-
-  .connection {
-    background-color: #ab47bc;
-  }
-
   .div-box-line {
     display: flex;
     align-items: center;
@@ -110,26 +94,6 @@
     border-radius: 8px;
     flex-shrink: 0; /* Prevent lines from shrinking */
     margin-right: 8px;
-  }
-
-  .captain {
-    background-color: rgb(55, 163, 154);
-  }
-
-  .owner {
-    background-color: #5468ff;
-  }
-
-  .shipper {
-    background-color: rgb(44, 160, 44);
-  }
-
-  .consignor {
-    background-color: rgb(31, 120, 180);
-  }
-
-  .shipper-consignor {
-    background-color: rgb(255, 127, 14);
   }
 
   /* Text styling for better responsiveness */

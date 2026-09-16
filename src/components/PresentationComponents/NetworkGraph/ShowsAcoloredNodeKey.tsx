@@ -2,55 +2,65 @@ import { useSelector } from 'react-redux';
 
 import { RootState } from '@/redux/store';
 import '@/style/networks.scss';
+import { edgeRoleColors, nodeClassColors } from '@/utils/functions/networkPalette';
 import { translatedConnection } from '@/utils/functions/translationLanguages';
 
-const ShowsAcoloredNodeKey = () => {
+type ShowsAcoloredNodeKeyProps = {
+  edgeRoles?: string[];
+  nodeClasses?: string[];
+};
+
+const ShowsAcoloredNodeKey = ({
+  edgeRoles = [],
+  nodeClasses = [],
+}: ShowsAcoloredNodeKeyProps) => {
   const { languageValue } = useSelector(
     (state: RootState) => state.getLanguages,
   );
   const translated = translatedConnection(languageValue);
+  const roleColors = edgeRoleColors(edgeRoles);
+
+  const nodeKeys = [
+    { nodeClass: 'voyages', label: translated.voyages },
+    { nodeClass: 'enslavers', label: translated.enslavers },
+    { nodeClass: 'enslaved', label: translated.enslavedPeople },
+    { nodeClass: 'enslavement_relations', label: translated.connection },
+  ];
+
+  const visibleNodeKeys = nodeKeys.filter(({ nodeClass }) =>
+    nodeClasses.includes(nodeClass),
+  );
+
+  if (visibleNodeKeys.length === 0 && edgeRoles.length === 0) {
+    return null;
+  }
+
   return (
     <div className="colored-box">
       <div className="div-box-left">
-        <div className="div-box">
-          <div className="circle voyages"></div>
-          <p>{translated.voyages}</p>
-        </div>
-        <div className="div-box">
-          <div className="circle enslavers"></div>
-          <p>{translated.enslavers}</p>
-        </div>
-        <div className="div-box">
-          <div className="circle enslaved"></div>
-          <p>{translated.enslavedPeople}</p>
-        </div>
-        <div className="div-box">
-          <div className="circle connection"></div>
-          <p>{translated.connection}</p>
-        </div>
+        {visibleNodeKeys.map(({ nodeClass, label }) => (
+          <div className="div-box" key={nodeClass}>
+            <div
+              className="circle"
+              style={{ backgroundColor: nodeClassColors[nodeClass] }}
+            ></div>
+            <p title={label}>{label}</p>
+          </div>
+        ))}
       </div>
-      <div className="div-box-right">
-        <div className="div-box-line">
-          <div className="line-edges captain"></div>
-          <p>{translated.captain}</p>
+      {edgeRoles.length > 0 && (
+        <div className="div-box-right">
+          {edgeRoles.map((role) => (
+            <div className="div-box-line" key={role}>
+              <div
+                className="line-edges"
+                style={{ backgroundColor: roleColors[role] }}
+              ></div>
+              <p title={role}>{role}</p>
+            </div>
+          ))}
         </div>
-        <div className="div-box-line">
-          <div className="line-edges owner"></div>
-          <p>{translated.owner}</p>
-        </div>
-        <div className="div-box-line">
-          <div className="line-edges shipper"></div>
-          <p>{translated.shipper}</p>
-        </div>
-        <div className="div-box-line">
-          <div className="line-edges consignor"></div>
-          <p>{translated.consignor}</p>
-        </div>
-        <div className="div-box-line">
-          <div className="line-edges shipper-consignor"></div>
-          <p>{translated.consignor}</p>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

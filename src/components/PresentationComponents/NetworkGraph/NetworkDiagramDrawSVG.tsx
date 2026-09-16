@@ -1,15 +1,19 @@
 import * as d3 from 'd3';
 import { forceLink, zoomIdentity } from 'd3';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Edges, Nodes } from '@/share/InterfaceTypePastNetworks';
-import { ENSLAVEMENTNODE, RADIUSNODE, classToColor } from '@/share/CONST_DATA';
+import { ENSLAVEMENTNODE, RADIUSNODE } from '@/share/CONST_DATA';
 import ShowsAcoloredNodeKey from './ShowsAcoloredNodeKey';
 import { AppDispatch, RootState } from '@/redux/store';
 import { useDispatch, useSelector } from 'react-redux';
+import { createdLabelNodeHover } from '@/utils/functions/createdLabelNodeHover';
 import {
-  createStrokeColor,
-  createdLabelNodeHover,
-} from '@/utils/functions/createdLabelNodeHover';
+  collectEdgeRoles,
+  collectNodeClasses,
+  edgeColor,
+  edgeRoleColors,
+  nodeColor,
+} from '@/utils/functions/networkPalette';
 import {
   setNetWorksID,
   setNetWorksKEY,
@@ -24,6 +28,10 @@ type NetworkDiagramProps = {
 };
 
 const CLICK_DELAY = 300;
+const CHARGE_STRENGTH = -400;
+const LINK_DISTANCE = 105;
+const NODE_STROKE_WIDTH = '1';
+const EDGE_STROKE_WIDTH = '2';
 
 const endpointId = (endpoint: string | Nodes): string =>
   typeof endpoint === 'string' ? endpoint : endpoint?.uuid;
@@ -79,6 +87,8 @@ export const NetworkDiagramDrawSVG = ({
     edges: validEdges,
   });
   const netWorkDataRef = useRef(netWorkData);
+  const [edgeRoles, setEdgeRoles] = useState<string[]>([]);
+  const [nodeClasses, setNodeClasses] = useState<string[]>([]);
 
   const clearClickTimeout = () => {
     if (clickTimeout.current !== undefined) {
@@ -187,6 +197,19 @@ export const NetworkDiagramDrawSVG = ({
       labels = networkGroup.append('g').attr('id', 'labels');
     }
 
+    const roles = collectEdgeRoles(graph.current.edges);
+    const roleColors = edgeRoleColors(roles);
+    setEdgeRoles((current) =>
+      current.join('|') === roles.join('|') ? current : roles,
+    );
+
+    const presentNodeClasses = collectNodeClasses(graph.current.nodes);
+    setNodeClasses((current) =>
+      current.join('|') === presentNodeClasses.join('|')
+        ? current
+        : presentNodeClasses,
+    );
+
     // Links
     const linkSelection = link
       .selectAll<SVGLineElement, Edges>('line')
@@ -198,13 +221,12 @@ export const NetworkDiagramDrawSVG = ({
       .enter()
       .append('line')
       .attr('class', 'link-graph')
-      .attr('stroke-width', '3.5')
       .style('cursor', 'pointer');
 
     linksGraphRef.current = linkEnter.merge(linkSelection);
-    linksGraphRef.current.attr('stroke', (edge: Edges) =>
-      createStrokeColor(edge),
-    );
+    linksGraphRef.current
+      .attr('stroke-width', EDGE_STROKE_WIDTH)
+      .attr('stroke', (edge: Edges) => edgeColor(edge, roleColors));
 
     // Nodes
     const nodeSelection = node
@@ -221,13 +243,9 @@ export const NetworkDiagramDrawSVG = ({
       .attr('class', 'nodes')
       .attr('stroke', '#fff')
       .style('cursor', 'pointer')
-      .attr('stroke-width', '2')
+      .attr('stroke-width', NODE_STROKE_WIDTH)
       .attr('r', RADIUSNODE)
-      .attr('fill', (d: Nodes) => {
-        return (
-          classToColor[d.node_class as keyof typeof classToColor] || 'gray'
-        );
-      });
+      .attr('fill', (d: Nodes) => nodeColor(d.node_class));
 
     nodesGraphRef.current.on('click', (event: MouseEvent, d: Nodes) => {
       event.preventDefault();
@@ -387,9 +405,9 @@ export const NetworkDiagramDrawSVG = ({
           'link',
           forceLink<Nodes, Edges>(graph.current.edges)
             .id((uuid) => uuid.uuid)
-            .distance(105),
+            .distance(LINK_DISTANCE),
         )
-        .force('charge', d3.forceManyBody().strength(-30))
+        .force('charge', d3.forceManyBody().strength(CHARGE_STRENGTH))
         .force(
           'center',
           d3
@@ -454,7 +472,7 @@ export const NetworkDiagramDrawSVG = ({
         height={height}
         id="networkCanvas labelsContainer"
       ></svg>
-      <ShowsAcoloredNodeKey />
+      <ShowsAcoloredNodeKey edgeRoles={edgeRoles} nodeClasses={nodeClasses} />
     </>
   );
 };
