@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 import MetaTag from '@/components/MetaTag/MetaTag';
 import VoyageCard from '@/components/PresentationComponents/Cards/Cards';
+import CardModal from '@/components/PresentationComponents/Cards/CardModal';
 import MAPS from '@/components/PresentationComponents/Map/MAPS';
 import { fetchVoyageCard } from '@/fetch/voyagesFetch/fetchVoyageCard';
 import { usePageRouter } from '@/hooks/usePageRouter';
@@ -27,11 +28,12 @@ import { generateEnslavedDescription, generateEnslavedTitle } from './generateEn
 
 const TabsSelect = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { currentBlockName, voyageURLID: ID } = usePageRouter();
+  const { currentBlockName, voyageURLID: ID, endpointPath } = usePageRouter();
   const { variable, nodeTypeClass, cardRowID } = useSelector(
     (state: RootState) => state.getCardFlatObjectData,
   );
 
+  const pageEntityClass = endpointPath || nodeTypeClass;
   const voyageId = cardRowID || ID;
   const initialTitle = voyageId
     ? `Voyage ${voyageId} - SlaveVoyages Database`
@@ -69,17 +71,21 @@ const TabsSelect = () => {
   };
 
   useEffect(() => {
-    if (currentBlockName === 'network') {
-      dispatch(setNetWorksID(Number(ID)));
-      const networkKEY = nodeTypeClass === 'voyage' ? 'voyages' : nodeTypeClass;
-      dispatch(setNetWorksKEY(networkKEY));
-    }
-    
+    if (currentBlockName !== 'network') return;
+    dispatch(setNetWorksID(Number(ID)));
+    dispatch(
+      setNetWorksKEY(
+        pageEntityClass === 'voyage' ? 'voyages' : pageEntityClass,
+      ),
+    );
+  }, [dispatch, currentBlockName, ID, pageEntityClass]);
+
+  useEffect(() => {
     const fetchData = async () => {
       const targetID = cardRowID || ID;
       if (!targetID) return;
       
-      const fetchFn = fetchMap[nodeTypeClass];
+      const fetchFn = fetchMap[pageEntityClass];
       if (!fetchFn) return;
 
       try {
@@ -88,17 +94,17 @@ const TabsSelect = () => {
 
         if (response?.data) {
           // Get the appropriate generators for this entity type
-          const titleGenerator = titleGenerators[nodeTypeClass];
-          const descriptionGenerator = descriptionGenerators[nodeTypeClass];
+          const titleGenerator = titleGenerators[pageEntityClass];
+          const descriptionGenerator = descriptionGenerators[pageEntityClass];
 
           // Generate SEO-optimized title and description
           const title = titleGenerator 
             ? titleGenerator(response.data, String(targetID))
-            : `${nodeTypeClass} ${targetID} - SlaveVoyages Database`;
+            : `${pageEntityClass} ${targetID} - SlaveVoyages Database`;
             
           const description = descriptionGenerator
             ? descriptionGenerator(response.data, String(targetID))
-            : `Explore detailed historical records for ${nodeTypeClass} ${targetID}.`;
+            : `Explore detailed historical records for ${pageEntityClass} ${targetID}.`;
 
           setPageTitle(title);
           setPageDescription(description);
@@ -109,17 +115,18 @@ const TabsSelect = () => {
     };
 
     fetchData();
-  }, [dispatch, nodeTypeClass, cardRowID, ID]);
+  }, [dispatch, pageEntityClass, cardRowID, ID]);
 
   const onChange = (key: string) => {
     dispatch(setValueVariable(key));
     dispatch(setCurrentBlockName(key));
     if (key === 'network') {
       dispatch(setNetWorksID(Number(ID)));
-      const networkKEY = nodeTypeClass === 'voyage' ? 'voyages' : nodeTypeClass;
+      const networkKEY =
+        pageEntityClass === 'voyage' ? 'voyages' : pageEntityClass;
       dispatch(setNetWorksKEY(networkKEY));
     }
-    navigate(`/${nodeTypeClass}/${ID}#${key.toLowerCase()}`);
+    navigate(`/${pageEntityClass}/${ID}#${key.toLowerCase()}`);
   };
 
   const items: TabsProps['items'] = [
@@ -172,6 +179,7 @@ const TabsSelect = () => {
         type="card"
         className="tab-container"
       />
+      <CardModal />
     </div>
   );
 };
