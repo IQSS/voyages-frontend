@@ -32,6 +32,11 @@ const CHARGE_STRENGTH = -400;
 const LINK_DISTANCE = 105;
 const NODE_STROKE_WIDTH = '1';
 const EDGE_STROKE_WIDTH = '2';
+const CALLOUT_RING_OFFSET = 5;
+const CALLOUT_RING_STROKE_WIDTH = '1';
+const CALLOUT_RING_COLOR = '#e01e37';
+const CALLOUT_COLOR = '#fff';
+const CALLOUT_LABEL_HALO = 'rgba(0, 0, 0, 0.65)';
 
 const endpointId = (endpoint: string | Nodes): string =>
   typeof endpoint === 'string' ? endpoint : endpoint?.uuid;
@@ -43,9 +48,11 @@ export const NetworkDiagramDrawSVG = ({
   width,
   height,
 }: NetworkDiagramProps) => {
-  const { data: netWorkData } = useSelector(
-    (state: RootState) => state.getPastNetworksGraphData,
-  );
+  const {
+    data: netWorkData,
+    networkID,
+    networkKEY,
+  } = useSelector((state: RootState) => state.getPastNetworksGraphData);
   const edges: Edges[] = (netWorkData.edges ?? []).map((d) => ({ ...d }));
   const nodes: Nodes[] = (netWorkData.nodes ?? []).map((d) => ({ ...d }));
 
@@ -62,6 +69,14 @@ export const NetworkDiagramDrawSVG = ({
   const simulationRef = useRef<d3.Simulation<Nodes, Edges> | null>(null);
   const isDraggingRef = useRef(false);
   const clickTimeout = useRef<NodeJS.Timeout | undefined>();
+  const calloutUuidsRef = useRef<Set<string>>(new Set());
+  const seedNodeRef = useRef({ id: networkID, nodeClass: networkKEY });
+  const calloutRingsRef = useRef<d3.Selection<
+    SVGCircleElement,
+    Nodes,
+    SVGGElement,
+    unknown
+  > | null>(null);
 
   const linksGraphRef = useRef<d3.Selection<
     SVGLineElement,
@@ -89,6 +104,9 @@ export const NetworkDiagramDrawSVG = ({
   const netWorkDataRef = useRef(netWorkData);
   const [edgeRoles, setEdgeRoles] = useState<string[]>([]);
   const [nodeClasses, setNodeClasses] = useState<string[]>([]);
+
+  const isCalloutNode = (node: Nodes) =>
+    calloutUuidsRef.current.has(node.uuid);
 
   const clearClickTimeout = () => {
     if (clickTimeout.current !== undefined) {
@@ -152,6 +170,10 @@ export const NetworkDiagramDrawSVG = ({
 
     if (newNodes.length === 0 && newEdges.length === 0) return;
 
+    if (origin?.uuid) {
+      calloutUuidsRef.current.add(origin.uuid);
+    }
+
     graph.current = {
       nodes: [...graph.current.nodes, ...newNodes],
       edges: [...graph.current.edges, ...newEdges],
@@ -167,6 +189,10 @@ export const NetworkDiagramDrawSVG = ({
       .attr('x2', (d) => (d.target as Nodes).x!)
       .attr('y2', (d) => (d.target as Nodes).y!);
     nodesGraphRef.current?.attr('transform', (d) => `translate(${d.x},${d.y})`);
+    calloutRingsRef.current?.attr(
+      'transform',
+      (d) => `translate(${d.x},${d.y})`,
+    );
     nodeLabelsRef.current
       ?.attr('x', (node) => node.x! + 17)
       .attr('y', (node) => node.y!);
@@ -195,6 +221,23 @@ export const NetworkDiagramDrawSVG = ({
     let labels = networkGroup.select<SVGGElement>('#labels');
     if (labels.empty()) {
       labels = networkGroup.append('g').attr('id', 'labels');
+    }
+
+    let callouts = networkGroup.select<SVGGElement>('#callouts');
+    if (callouts.empty()) {
+      callouts = networkGroup.append('g').attr('id', 'callouts');
+    }
+
+    const seed = seedNodeRef.current;
+    if (seed.id !== null && seed.nodeClass) {
+      const seedNode = graph.current.nodes.find(
+        (candidate) =>
+          candidate.id === Number(seed.id) &&
+          candidate.node_class === seed.nodeClass,
+      );
+      if (seedNode?.uuid) {
+        calloutUuidsRef.current.add(seedNode.uuid);
+      }
     }
 
     const roles = collectEdgeRoles(graph.current.edges);
@@ -246,6 +289,25 @@ export const NetworkDiagramDrawSVG = ({
       .attr('stroke-width', NODE_STROKE_WIDTH)
       .attr('r', RADIUSNODE)
       .attr('fill', (d: Nodes) => nodeColor(d.node_class));
+
+    const calloutSelection = callouts
+      .selectAll<SVGCircleElement, Nodes>('circle')
+      .data(graph.current.nodes.filter(isCalloutNode), (d) => d.uuid);
+
+    calloutSelection.exit().remove();
+
+    const calloutEnter = calloutSelection
+      .enter()
+      .append('circle')
+      .attr('class', 'callout-ring');
+
+    calloutRingsRef.current = calloutEnter.merge(calloutSelection);
+    calloutRingsRef.current
+      .attr('r', RADIUSNODE + CALLOUT_RING_OFFSET)
+      .attr('fill', 'none')
+      .attr('stroke', CALLOUT_RING_COLOR)
+      .attr('stroke-width', CALLOUT_RING_STROKE_WIDTH)
+      .style('pointer-events', 'none');
 
     nodesGraphRef.current.on('click', (event: MouseEvent, d: Nodes) => {
       event.preventDefault();
@@ -319,6 +381,19 @@ export const NetworkDiagramDrawSVG = ({
       .append('text')
       .attr('class', 'label');
     nodeLabelsRef.current = labelEnter.merge(labelSelection);
+    nodeLabelsRef.current
+      .attr('text-anchor', 'start')
+      .attr('alignment-baseline', 'middle')
+      .attr('font-size', 15)
+      .attr('font-weight', 'bold')
+      .attr('fill', CALLOUT_COLOR)
+      .attr('paint-order', 'stroke')
+      .attr('stroke', CALLOUT_LABEL_HALO)
+      .attr('stroke-width', 3)
+      .style('pointer-events', 'none')
+      .text((node) =>
+        isCalloutNode(node) ? (createdLabelNodeHover(node) ?? '') : '',
+      );
 
     /** Requested from JM-0116  
            * Right now, we are hiding the labels on enslavers and enslaved, and only showing those labels on rollover. 
@@ -442,11 +517,13 @@ export const NetworkDiagramDrawSVG = ({
   useEffect(() => {
     if (netWorkDataRef.current === netWorkData) return;
     netWorkDataRef.current = netWorkData;
+    calloutUuidsRef.current = new Set();
+    seedNodeRef.current = { id: networkID, nodeClass: networkKEY };
     simulationRef.current?.stop();
     simulationRef.current = null;
     graph.current = { nodes: nodes, edges: validEdges };
     updateNetwork();
-  }, [netWorkData, updateNetwork]);
+  }, [netWorkData, updateNetwork, networkID, networkKEY]);
 
   useEffect(() => {
     const svgCleanup = () => {
