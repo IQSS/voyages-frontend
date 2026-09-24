@@ -25,6 +25,7 @@ import FooterModal from '@/components/commonComponents/FooterModal';
 import { PaperDraggableLinkEntityAddComponent } from '@/components/SelectorComponents/Cascading/PaperDraggable';
 import { useDebounce } from '@/hooks/useDebounce';
 import { StyleDialog } from '@/styleMUI';
+import { namePropertyLabel } from '@/utils/contribute/linkedEntityName';
 
 import { EntityForm, EntityFormProps } from './EntityForm';
 
@@ -37,11 +38,32 @@ export interface LinkedEntityPropertyComponentProps {
   onChange: EntityFormProps['onChange'];
 }
 
+/**
+ * A request to add a new entity named by text typed into the dropdown's
+ * search. `seq` changes with every request, so asking twice for the same text
+ * still opens the dialog.
+ */
+export interface AddFromSearchRequest {
+  text: string;
+  seq: number;
+}
+
 const LinkedEntityAddNewComponent = (
   props: LinkedEntityPropertyComponentProps &
-    EntityFormProps & { comments?: string },
+    EntityFormProps & {
+      comments?: string;
+      addFromSearch?: AddFromSearchRequest;
+    },
 ) => {
-  const { property, entity, lastChange, comments, onChange, ...other } = props;
+  const {
+    property,
+    entity,
+    lastChange,
+    comments,
+    onChange,
+    addFromSearch,
+    ...other
+  } = props;
   const { linkedEntitySchema, uid } = property;
 
   const [open, setOpen] = useState(false);
@@ -91,6 +113,26 @@ const LinkedEntityAddNewComponent = (
       }),
     [onChange, entity, uid, comments],
   );
+
+  // "Add …" from a search that found nothing: a new entity named by what was
+  // typed, recorded at once (the editor asked for exactly this) and opened so
+  // the rest of it can be filled in. Without it, text typed into the search
+  // was dropped with a bare "No data" (DD-0559).
+  useEffect(() => {
+    const text = addFromSearch?.text.trim();
+    if (!text) return;
+    const added = materializeNew(linkedSchema, crypto.randomUUID());
+    const nameLabel = namePropertyLabel(linkedSchema);
+    if (nameLabel) {
+      added.data[nameLabel] = text;
+    }
+    setLocalChanges(undefined);
+    setAddedEntity(added);
+    editAdded(added);
+    setOpen(true);
+    // Only a new request opens the dialog; the rest are read at that moment.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addFromSearch?.seq]);
 
   const handleAddOrModify = useCallback(() => {
     if (addedEntity === undefined) {
