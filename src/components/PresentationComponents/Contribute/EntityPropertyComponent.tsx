@@ -123,6 +123,7 @@ export const EntityPropertyComponent = ({
           lastChange={lastChange}
           onChange={other.onChange}
           readOnly={other.readOnly}
+          commentsLocked={other.commentsLocked}
           error={error}
         />
       );
@@ -137,6 +138,7 @@ export const EntityPropertyComponent = ({
           lastChange={lastChange}
           onChange={other.onChange}
           readOnly={other.readOnly}
+          commentsLocked={other.commentsLocked}
           error={error}
         />
       );

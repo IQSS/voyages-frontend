@@ -19,6 +19,7 @@ import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
+import { loadingCellSelector } from '@/components/PresentationComponents/Contribute/commons/LoadingCell';
 import { useColumnDefs } from '@/components/PresentationComponents/Contribute/commons/useColumnDefs';
 import { ReviewMode } from '@/components/PresentationComponents/Contribute/ContributionForm';
 import {
@@ -355,6 +356,8 @@ export const useEditorialPlatformTable = () => {
       resizable: true,
       filter: false,
       cellStyle: { paddingTop: '12px', fontSize: '13px' },
+      // Rows still loading show a placeholder bar, not the columns' defaults.
+      cellRendererSelector: loadingCellSelector,
     }),
     [],
   );

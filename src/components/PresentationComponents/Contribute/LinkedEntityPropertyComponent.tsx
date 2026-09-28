@@ -34,7 +34,14 @@ export interface LinkedEntityPropertyComponentProps {
 export const LinkedEntityPropertyComponent = (
   props: LinkedEntityPropertyComponentProps & EntityFormProps,
 ) => {
-  const { property, entity, lastChange, onChange, readOnly = false } = props;
+  const {
+    property,
+    entity,
+    lastChange,
+    onChange,
+    readOnly = false,
+    commentsLocked = false,
+  } = props;
   const [comments, setComments] = useState<string | undefined>();
   // What is typed into the search, and the last "Add …" asked of it.
   const [searchText, setSearchText] = useState('');
@@ -285,6 +292,7 @@ export const LinkedEntityPropertyComponent = (
         property={property}
         current={lastChange?.comments}
         onComment={handleCommentChange}
+        readOnly={readOnly || commentLocked}
       />
     </>
   );

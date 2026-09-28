@@ -18,6 +18,7 @@ export interface DatasetPropertyFieldProps {
   lastChange?: DirectPropertyChange;
   onChange: EntityFormProps['onChange'];
   readOnly?: boolean;
+  commentsLocked?: boolean;
   error?: boolean;
 }
 
@@ -38,9 +39,13 @@ export const DatasetPropertyField = ({
   lastChange,
   onChange,
   readOnly = false,
+  commentsLocked = false,
   error = false,
 }: DatasetPropertyFieldProps) => {
   const [comments, setComments] = useState<string | undefined>();
+  // No comment where the value it would travel with is unknown (see
+  // EntityFormProps.commentsLocked): it would record a clear.
+  const commentLocked = commentsLocked && !lastChange;
   const stored = lastChange ? lastChange.changed : entity.data[property.label];
 
   // A new voyage arrives carrying the 0 `materializeNew` seeds into mandatory
@@ -106,7 +111,7 @@ export const DatasetPropertyField = ({
         property={property}
         current={lastChange?.comments}
         onComment={handleComment}
-        readOnly={readOnly}
+        readOnly={readOnly || commentLocked}
       />
     </>
   );

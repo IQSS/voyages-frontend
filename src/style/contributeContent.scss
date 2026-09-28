@@ -312,6 +312,14 @@
   color: #fff !important;
 }
 
+// The colours above are forced, so a disabled button (read-only form) would
+// still look clickable without this.
+.button-save-contribute:disabled,
+.button-save-contribute.Mui-disabled {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+}
+
 .button-submit-contribute {
   background-color: #0958d9 !important;
   border-color: #0958d9 !important;

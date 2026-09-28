@@ -18,6 +18,7 @@ export interface SexPropertyFieldProps {
   lastChange?: DirectPropertyChange;
   onChange: EntityFormProps['onChange'];
   readOnly?: boolean;
+  commentsLocked?: boolean;
   error?: boolean;
 }
 
@@ -35,13 +36,22 @@ export const SexPropertyField = ({
   lastChange,
   onChange,
   readOnly = false,
+  commentsLocked = false,
   error = false,
 }: SexPropertyFieldProps) => {
   const [comments, setComments] = useState<string | undefined>();
+  // No comment where the value it would travel with is unknown (see
+  // EntityFormProps.commentsLocked): it would record a clear.
+  const commentLocked = commentsLocked && !lastChange;
   const stored = lastChange ? lastChange.changed : entity.data[property.label];
 
+  // A new Enslaved arrives carrying the 0 `materializeNew` seeds into numbers,
+  // which is neither Male nor Female. Nothing was chosen, so nothing is shown
+  // or recorded as chosen -- the same rule as DatasetPropertyField.
+  const nothingChosen =
+    !lastChange && entity.entityRef.type === 'new' && stored === 0;
   const value =
-    stored === null || stored === undefined || stored === ''
+    nothingChosen || stored === null || stored === undefined || stored === ''
       ? undefined
       : Number(stored);
 
@@ -102,7 +112,7 @@ export const SexPropertyField = ({
         property={property}
         current={lastChange?.comments}
         onComment={handleComment}
-        readOnly={readOnly}
+        readOnly={readOnly || commentLocked}
       />
     </>
   );

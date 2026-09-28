@@ -578,6 +578,12 @@ export const ContributionForm = (props: ContributionFormProps) => {
                   readOnly={isReadOnlyMode}
                   errorPropertyUids={missingAcceptUids}
                   errorHint={requiredFieldHint}
+                  // A voyage loaded from the server is 'original'; only the
+                  // stand-in for one that failed to load is 'lazy'.
+                  commentsLocked={
+                    props.entity.entityRef.type === 'existing' &&
+                    props.entity.state === 'lazy'
+                  }
                 />
               </Form>
             </div>

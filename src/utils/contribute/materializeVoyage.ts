@@ -69,4 +69,4 @@ export const unloadedExistingRoot = (
 
 /** What an editor is told when the voyage behind a contribution won't load. */
 export const voyageLoadWarning = (id: string | number) =>
-  `Voyage #${id} could not be loaded from the database, so its current values are not shown. The form lists this contribution's changes only.`;
+  `Voyage #${id} could not be loaded from the database, so its current values are not shown. The form lists this contribution's changes only, and fields without a change take no comments.`;

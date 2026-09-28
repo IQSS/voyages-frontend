@@ -213,6 +213,8 @@ export const EntityTableRow = ({
               <EntityForm
                 key={entity.entityRef.id}
                 {...other}
+                // A new entity's values are known: its fields take comments.
+                commentsLocked={false}
                 schema={schema}
                 entity={entity}
                 changes={rowChanges}

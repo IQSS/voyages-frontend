@@ -14,6 +14,7 @@ import { Form, message } from 'antd';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { loadingCellSelector } from '@/components/PresentationComponents/Contribute/commons/LoadingCell';
 import { useColumnNewVoyagesDefs } from '@/components/PresentationComponents/Contribute/commons/useColumnDefs';
 import { ReviewMode } from '@/components/PresentationComponents/Contribute/ContributionForm';
 import {
@@ -83,6 +84,8 @@ export const useContributeNewVoyages = () => {
       resizable: true,
       filter: false,
       cellStyle: { paddingTop: '12px', fontSize: '13px' },
+      // Rows still loading show a placeholder bar, not the columns' defaults.
+      cellRendererSelector: loadingCellSelector,
     }),
     [],
   );

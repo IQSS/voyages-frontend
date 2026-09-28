@@ -49,6 +49,13 @@ export interface EntityFormProps {
    */
   visiblePropertyUids?: string[];
   errorPropertyUids?: string[];
+  /**
+   * The entity's stored values are unknown -- an existing voyage that failed
+   * to load. A comment has to travel with the field's value, so on a field
+   * whose value is unknown it would record a clear of the stored one; such
+   * fields take no comments.
+   */
+  commentsLocked?: boolean;
   /** Shown under a field listed in `errorPropertyUids`. */
   errorHint?: string;
 }
@@ -81,6 +88,7 @@ export const EntityForm = ({
   editableWhenReadOnly,
   visiblePropertyUids,
   errorPropertyUids,
+  commentsLocked = false,
   errorHint = 'Please fill out this field before accepting.',
 }: EntityFormProps) => {
   const properties = useMemo(
@@ -112,6 +120,7 @@ export const EntityForm = ({
               onChange={onChange}
               accessLevel={accessLevel}
               readOnly={readOnly && !editableWhenReadOnly?.includes(p.uid)}
+              commentsLocked={commentsLocked}
               error={isError}
             />
           </>
@@ -137,6 +146,7 @@ export const EntityForm = ({
       readOnly,
       editableWhenReadOnly,
       errorPropertyUids,
+      commentsLocked,
       errorHint,
     ],
   );

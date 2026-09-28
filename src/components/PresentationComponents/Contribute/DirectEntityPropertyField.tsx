@@ -20,6 +20,7 @@ export interface DirectEntityPropertyFieldProps {
   onChange: EntityFormProps['onChange'];
   error?: boolean;
   readOnly?: boolean;
+  commentsLocked?: boolean;
 }
 
 export const lowerCaseFirstLetter = (s: string) =>
@@ -32,9 +33,13 @@ export const DirectEntityPropertyField = ({
   onChange,
   error = false,
   readOnly = false,
+  commentsLocked = false,
 }: DirectEntityPropertyFieldProps) => {
   const { kind, label } = property;
   const [comments, setComments] = useState<string | undefined>();
+  // No comment where the value it would travel with is unknown (see
+  // EntityFormProps.commentsLocked): it would record a clear.
+  const commentLocked = commentsLocked && !lastChange;
 
   /**
    * A mandatory number on a new entity arrives showing `0`, because
@@ -150,7 +155,7 @@ export const DirectEntityPropertyField = ({
         property={property}
         current={lastChange?.comments}
         onComment={setComments}
-        readOnly={readOnly}
+        readOnly={readOnly || commentLocked}
       />
     </>
   );
