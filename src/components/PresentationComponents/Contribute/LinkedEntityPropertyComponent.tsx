@@ -43,6 +43,9 @@ export const LinkedEntityPropertyComponent = (
     commentsLocked = false,
   } = props;
   const [comments, setComments] = useState<string | undefined>();
+  // No comment where the value it would travel with is unknown (see
+  // EntityFormProps.commentsLocked): it would record a clear.
+  const commentLocked = commentsLocked && !lastChange;
   // What is typed into the search, and the last "Add …" asked of it.
   const [searchText, setSearchText] = useState('');
   const [addFromSearch, setAddFromSearch] = useState<
