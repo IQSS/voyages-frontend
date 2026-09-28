@@ -8,7 +8,7 @@ import {
   LinkedEntityProperty,
   getSchema,
 } from '@slavevoyages/voyages-contribute';
-import { Alert, Select, Spin, Tooltip } from 'antd';
+import { Alert, Button, Select, Spin, Tooltip, Typography } from 'antd';
 
 import { useSchemaEnumeration } from '@/hooks/useEnumeration';
 import { useTreeSelectContributeLocation } from '@/hooks/useTreeSelectContributeLocation';
@@ -17,7 +17,9 @@ import TreeSelectedEntity from './commonContribute/TreeSelectedEntity';
 import { lowerCaseFirstLetter } from './DirectEntityPropertyField';
 import { EntityFormProps } from './EntityForm';
 import { EntityPropertyChangeCommentBox } from './EntityPropertyChangeCommentBox';
-import LinkedEntityAddNewDialogComponent from './LinkedEntityAddNewDialogComponent';
+import LinkedEntityAddNewDialogComponent, {
+  AddFromSearchRequest,
+} from './LinkedEntityAddNewDialogComponent';
 import { LinkedEntityOwnedPropertyComponent } from './LinkedEntityOwnedPropertyComponent';
 
 import '@/style/contributeContent.scss';
@@ -41,9 +43,11 @@ export const LinkedEntityPropertyComponent = (
     commentsLocked = false,
   } = props;
   const [comments, setComments] = useState<string | undefined>();
-  // No comment where the value it would travel with is unknown (see
-  // EntityFormProps.commentsLocked): it would record a clear.
-  const commentLocked = commentsLocked && !lastChange;
+  // What is typed into the search, and the last "Add …" asked of it.
+  const [searchText, setSearchText] = useState('');
+  const [addFromSearch, setAddFromSearch] = useState<
+    AddFromSearchRequest | undefined
+  >();
   const { uid, mode, label, linkedEntitySchema } = property;
   const value = lastChange
     ? lastChange.changed
@@ -189,6 +193,37 @@ export const LinkedEntityPropertyComponent = (
     ),
   }));
 
+  const typed = searchText.trim();
+  const notFoundContent =
+    mode === EntityLinkEditMode.Create && !readOnly && typed !== '' ? (
+      <div style={{ padding: '4px 8px' }}>
+        <Typography.Text type="secondary" style={{ display: 'block' }}>
+          No {lowerCaseFirstLetter(label)} matches “{typed}”.
+        </Typography.Text>
+        <Button
+          type="link"
+          size="small"
+          style={{
+            padding: 0,
+            maxWidth: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+          // Keep focus in the select until the click lands.
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            setAddFromSearch((prev) => ({
+              text: typed,
+              seq: (prev?.seq ?? 0) + 1,
+            }));
+            setSearchText('');
+          }}
+        >
+          + Add “{typed}”
+        </Button>
+      </div>
+    ) : undefined;
+
   let displaySelected;
 
   if (property.linkedEntitySchema === 'Location') {
@@ -225,6 +260,10 @@ export const LinkedEntityPropertyComponent = (
         options={styledOptions}
         onChange={handleChange}
         showSearch
+        searchValue={searchText}
+        onSearch={setSearchText}
+        onBlur={() => setSearchText('')}
+        notFoundContent={notFoundContent}
         styles={{
           popup: { root: { maxHeight: 400, overflow: 'auto', zIndex: 9999 } },
         }}
@@ -243,7 +282,11 @@ export const LinkedEntityPropertyComponent = (
     <>
       {displaySelected}
       {mode === EntityLinkEditMode.Create && (
-        <LinkedEntityAddNewDialogComponent {...props} comments={comments} />
+        <LinkedEntityAddNewDialogComponent
+          {...props}
+          comments={comments}
+          addFromSearch={addFromSearch}
+        />
       )}
       <EntityPropertyChangeCommentBox
         property={property}
