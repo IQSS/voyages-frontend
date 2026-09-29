@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   LinkedEntitySelectionChange,
@@ -9,6 +9,7 @@ import {
   getSchema,
 } from '@slavevoyages/voyages-contribute';
 import { Alert, Button, Select, Spin, Tooltip, Typography } from 'antd';
+import type { RefSelectProps } from 'antd/es/select';
 
 import { useSchemaEnumeration } from '@/hooks/useEnumeration';
 import { useTreeSelectContributeLocation } from '@/hooks/useTreeSelectContributeLocation';
@@ -48,6 +49,10 @@ export const LinkedEntityPropertyComponent = (
   const commentLocked = commentsLocked && !lastChange;
   // What is typed into the search, and the last "Add …" asked of it.
   const [searchText, setSearchText] = useState('');
+  // To close the dropdown once "Add …" is clicked: the button keeps focus in
+  // the select (so its click lands), which otherwise left the menu open over
+  // the form, now listing every entry because the search was cleared.
+  const selectRef = useRef<RefSelectProps>(null);
   const [addFromSearch, setAddFromSearch] = useState<
     AddFromSearchRequest | undefined
   >();
@@ -220,6 +225,7 @@ export const LinkedEntityPropertyComponent = (
               seq: (prev?.seq ?? 0) + 1,
             }));
             setSearchText('');
+            selectRef.current?.blur();
           }}
         >
           + Add “{typed}”
@@ -256,6 +262,7 @@ export const LinkedEntityPropertyComponent = (
   } else {
     displaySelected = (
       <Select
+        ref={selectRef}
         className={`truncate-select ${lastChange ? 'changedEntityProperty' : ''}`}
         value={value?.entityRef.id}
         placeholder={`Select ${lowerCaseFirstLetter(label)}`}
