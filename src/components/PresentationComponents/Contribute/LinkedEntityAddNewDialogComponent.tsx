@@ -16,6 +16,7 @@ import {
   getSchema,
   materializeNew,
   EntityChange,
+  PropertyChange,
   applyUpdate,
   cloneEntity,
 } from '@slavevoyages/voyages-contribute';
@@ -25,6 +26,11 @@ import FooterModal from '@/components/commonComponents/FooterModal';
 import { PaperDraggableLinkEntityAddComponent } from '@/components/SelectorComponents/Cascading/PaperDraggable';
 import { useDebounce } from '@/hooks/useDebounce';
 import { StyleDialog } from '@/styleMUI';
+import {
+  linkedChangesFromData,
+  mergePropertyChanges,
+  nameChange,
+} from '@/utils/contribute/linkedEntityChanges';
 import { namePropertyLabel } from '@/utils/contribute/linkedEntityName';
 
 import { EntityForm, EntityFormProps } from './EntityForm';
@@ -100,8 +106,10 @@ const LinkedEntityAddNewComponent = (
     );
   }, [lastChange?.changed]);
 
+  // The new entity's fields go out as `linkedChanges` alongside it: they are
+  // what publication writes (see mergePropertyChanges). A clear sends none.
   const editAdded = useCallback(
-    (e: MaterializedEntity | null) =>
+    (e: MaterializedEntity | null, linkedChanges?: PropertyChange[]) =>
       onChange({
         type: 'update',
         entityRef: entity.entityRef,
@@ -111,10 +119,29 @@ const LinkedEntityAddNewComponent = (
             property: uid,
             comments,
             changed: e,
+            ...(e ? { linkedChanges: linkedChanges ?? [] } : {}),
           },
         ],
       }),
     [onChange, entity, uid, comments],
+  );
+
+  // The field changes already sent for the entity being edited, so a later
+  // edit -- or reopening it with Modify -- adds to them instead of replacing
+  // them.
+  // An entity emitted before these were sent has only its `data`; its changes
+  // are rebuilt from that, so editing one field of it keeps the others.
+  const sentLinkedChanges = useCallback(
+    (e: MaterializedEntity | undefined): PropertyChange[] => {
+      if (!e || lastChange?.changed?.entityRef.id !== e.entityRef.id) {
+        return [];
+      }
+      return (
+        lastChange.linkedChanges ??
+        linkedChangesFromData(linkedSchema, lastChange.changed, getSchema)
+      );
+    },
+    [lastChange, linkedSchema],
   );
 
   // "Add …" from a search that found nothing: a new entity named by what was
@@ -129,9 +156,10 @@ const LinkedEntityAddNewComponent = (
     if (nameLabel) {
       added.data[nameLabel] = text;
     }
+    const named = nameChange(linkedSchema, text);
     setLocalChanges(undefined);
     setAddedEntity(added);
-    editAdded(added);
+    editAdded(added, named ? [named] : []);
     setOpen(true);
     // Only a new request opens the dialog; the rest are read at that moment.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -186,8 +214,14 @@ const LinkedEntityAddNewComponent = (
       return;
     }
     const modified = cloneEntity(addedEntity);
-    editAdded(applyUpdate(modified, debouncedChanges.changes));
-  }, [debouncedChanges, editAdded, addedEntity]);
+    editAdded(
+      applyUpdate(modified, debouncedChanges.changes),
+      mergePropertyChanges(
+        sentLinkedChanges(addedEntity),
+        debouncedChanges.changes,
+      ),
+    );
+  }, [debouncedChanges, editAdded, addedEntity, sentLinkedChanges]);
 
   const handleClear = useCallback(() => {
     editAdded(null);
