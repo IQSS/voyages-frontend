@@ -30,6 +30,8 @@ interface optionsProps {
 
 export interface TreeSelectedEntityProps {
   handleChange: (item: string | number | null) => void;
+  /** Called when the selection is cleared with the x. */
+  onClear?: () => void;
   value: MaterializedEntity | null;
   label: string;
   lastChange: LinkedEntitySelectionChange | undefined;
@@ -40,6 +42,7 @@ export interface TreeSelectedEntityProps {
 
 const TreeSelectedEntity: React.FC<TreeSelectedEntityProps> = ({
   handleChange,
+  onClear,
   value,
   label,
   lastChange,
@@ -133,6 +136,7 @@ const TreeSelectedEntity: React.FC<TreeSelectedEntityProps> = ({
     onChange: handleChange,
     showSearch: true,
     allowClear: true,
+    onClear,
     disabled,
     styles: {
       popup: {
