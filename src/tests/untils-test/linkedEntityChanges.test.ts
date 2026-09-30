@@ -103,6 +103,46 @@ describe('linkedChanges of an entity added with "Add new"', () => {
   });
 });
 
+describe('editing an entity a previous layer created', () => {
+  test('adding its short reference keeps the fields it already had', () => {
+    // A contributor's new source: titled, no short reference (editor-only).
+    const src = materializeNew(source, 'src-1');
+    src.data['Title'] = 'T';
+    const before = validate({
+      kind: 'linked',
+      property: SOURCE_LINK,
+      changed: src,
+      linkedChanges: linkedChangesFromData(source, src, getSchema),
+    });
+    expect(shortRefMissing(before)).toHaveLength(1);
+
+    // The editor reopens it and picks an existing short reference.
+    const picked = {
+      entityRef: { schema: shortRef.name, id: 7, type: 'existing' as const },
+      data: { Name: 'SR' },
+      state: 'lazy' as const,
+    };
+    const after = validate({
+      kind: 'linked',
+      property: SOURCE_LINK,
+      changed: src,
+      linkedChanges: mergePropertyChanges(
+        linkedChangesFromData(source, src, getSchema),
+        [
+          {
+            kind: 'linked',
+            property: uidOf(source, 'Short reference'),
+            changed: picked,
+          },
+        ],
+      ),
+    });
+    expect(shortRefMissing(after)).toEqual([]);
+    expect(written(after, 'src-1')).toContainEqual(['title', 'T']);
+    expect(written(after, 'src-1')).toContainEqual(['short_ref_id', 7]);
+  });
+});
+
 describe('mergePropertyChanges', () => {
   test('a later change to a field replaces the earlier one; others stay', () => {
     const a = { kind: 'direct', property: 'a', changed: 1 } as PropertyChange;

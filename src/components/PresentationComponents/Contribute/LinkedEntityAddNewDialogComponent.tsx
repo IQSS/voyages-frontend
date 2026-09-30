@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 
 import { Close } from '@mui/icons-material';
 import {
@@ -14,6 +14,7 @@ import {
   MaterializedEntity,
   LinkedEntityProperty,
   getSchema,
+  isMaterializedEntity,
   materializeNew,
   EntityChange,
   PropertyChange,
@@ -87,24 +88,27 @@ const LinkedEntityAddNewComponent = (
   // so strip it.
   const dragHandleId = `draggable-dialog-title-contribute-${useId().replace(/:/g, '')}`;
 
+  // The new entity the field currently holds, if any: from this layer's change,
+  // or from an earlier one (the contribution, a previous review) via the
+  // entity's data. Either can be reopened with Modify.
+  const current = lastChange ? lastChange.changed : entity.data[property.label];
+  const currentNew =
+    current && isMaterializedEntity(current) && current.entityRef.type === 'new'
+      ? current
+      : undefined;
+
   const onClose = useCallback(() => {
     setOpen(false);
     // Re-sync with what is actually selected. If "Add new" was opened over an
     // existing reference and closed without entering anything, the fresh entity
     // was never emitted, so drop it and let the existing selection (and the
     // button) stand.
-    const selected = lastChange?.changed;
-    setAddedEntity(
-      selected && selected.entityRef.type === 'new' ? selected : undefined,
-    );
-  }, [lastChange?.changed]);
+    setAddedEntity(currentNew);
+  }, [currentNew]);
 
   useEffect(() => {
-    const selected = lastChange?.changed;
-    setAddedEntity(
-      selected && selected.entityRef.type === 'new' ? selected : undefined,
-    );
-  }, [lastChange?.changed]);
+    setAddedEntity(currentNew);
+  }, [currentNew]);
 
   // The new entity's fields go out as `linkedChanges` alongside it: they are
   // what publication writes (see mergePropertyChanges). A clear sends none.
@@ -133,15 +137,15 @@ const LinkedEntityAddNewComponent = (
   // are rebuilt from that, so editing one field of it keeps the others.
   const sentLinkedChanges = useCallback(
     (e: MaterializedEntity | undefined): PropertyChange[] => {
-      if (!e || lastChange?.changed?.entityRef.id !== e.entityRef.id) {
+      if (!e || currentNew?.entityRef.id !== e.entityRef.id) {
         return [];
       }
       return (
-        lastChange.linkedChanges ??
-        linkedChangesFromData(linkedSchema, lastChange.changed, getSchema)
+        lastChange?.linkedChanges ??
+        linkedChangesFromData(linkedSchema, currentNew, getSchema)
       );
     },
-    [lastChange, linkedSchema],
+    [lastChange, currentNew, linkedSchema],
   );
 
   // "Add …" from a search that found nothing: a new entity named by what was
@@ -205,14 +209,19 @@ const LinkedEntityAddNewComponent = (
 
   const debouncedChanges = useDebounce(localChanges, 1000);
 
+  // Each set of edits is emitted once. The effect also re-runs when the form
+  // re-renders with the emitted value, which must not emit it again.
+  const emitted = useRef<EntityChange | undefined>(undefined);
   useEffect(() => {
     if (
       !debouncedChanges ||
+      emitted.current === debouncedChanges ||
       addedEntity?.entityRef.id !== debouncedChanges.entityRef.id ||
       debouncedChanges.type !== 'update'
     ) {
       return;
     }
+    emitted.current = debouncedChanges;
     const modified = cloneEntity(addedEntity);
     editAdded(
       applyUpdate(modified, debouncedChanges.changes),

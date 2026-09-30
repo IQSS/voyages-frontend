@@ -185,8 +185,13 @@ export const ContributionForm = (props: ContributionFormProps) => {
       return [] as { uid: string; label: string }[];
     }
     const assigned = new Set<string>();
+    // In review mode the form reports the open review's changes through
+    // `contribution.changeSet`, so the contribution's own are read from
+    // `originalChanges`.
     const everyChange = [
-      ...(contribution?.changeSet?.changes ?? []),
+      ...(isReviewMode
+        ? originalChanges
+        : (contribution?.changeSet?.changes ?? [])),
       ...(reviews ?? []).flatMap((r) => r.changeSet?.changes ?? []),
       ...reviewChanges,
     ];
@@ -215,7 +220,14 @@ export const ContributionForm = (props: ContributionFormProps) => {
       )
       .filter((p) => !assigned.has(p.uid))
       .map((p) => ({ uid: p.uid, label: p.label }));
-  }, [stackedEntity, contribution, reviews, reviewChanges]);
+  }, [
+    stackedEntity,
+    contribution,
+    reviews,
+    reviewChanges,
+    isReviewMode,
+    originalChanges,
+  ]);
 
   const missingBeforeAccept = useMemo(
     () => missingAcceptProps.map((p) => p.label),

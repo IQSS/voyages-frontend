@@ -178,6 +178,22 @@ export const LinkedEntityPropertyComponent = (
     });
   };
 
+  // The dropdown's clear (x). handleChange ignores an empty selection, because
+  // it also runs on mount with none, so clearing is recorded here.
+  const handleClear = () =>
+    onChange({
+      type: 'update',
+      entityRef: entity.entityRef,
+      changes: [
+        {
+          kind: 'linked',
+          property: uid,
+          comments: comments ?? lastChange?.comments,
+          changed: null,
+        },
+      ],
+    });
+
   // useEffect only if external `value` updates should trigger a change
   useEffect(() => {
     handleChange(value?.entityRef.id ?? null);
@@ -251,6 +267,7 @@ export const LinkedEntityPropertyComponent = (
     displaySelected = (
       <TreeSelectedEntity
         handleChange={handleChange}
+        onClear={handleClear}
         value={value}
         label={label}
         options={options}
@@ -269,6 +286,8 @@ export const LinkedEntityPropertyComponent = (
         style={{ width: 'calc(100% - 20px)' }}
         options={styledOptions}
         onChange={handleChange}
+        allowClear
+        onClear={handleClear}
         showSearch
         searchValue={searchText}
         onSearch={setSearchText}
