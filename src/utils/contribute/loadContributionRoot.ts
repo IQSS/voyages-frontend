@@ -1,4 +1,5 @@
 import {
+  Contribution,
   getSchema,
   MaterializedEntity,
 } from '@slavevoyages/voyages-contribute';
@@ -40,5 +41,29 @@ export const loadContributionRoot = async (
   return {
     entity: unloadedExistingRoot(schema, id),
     warning: voyageLoadWarning(id),
+  };
+};
+
+/** A contributor's contribution with the entity its form opens on. */
+export const contributionForEdit = async <T extends Contribution>(
+  data: T,
+): Promise<{
+  formEntity: MaterializedEntity;
+  selectedContribution: T;
+  warning?: string;
+}> => {
+  const isExisting = data.root.type === 'existing';
+  const { entity, warning } = await loadContributionRoot(
+    data.root.schema,
+    data.root.id,
+    isExisting,
+  );
+  return {
+    formEntity: entity,
+    selectedContribution: {
+      ...data,
+      root: { ...data.root, type: isExisting ? 'existing' : 'new' },
+    },
+    warning,
   };
 };

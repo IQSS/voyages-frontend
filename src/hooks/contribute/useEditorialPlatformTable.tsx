@@ -42,6 +42,7 @@ import {
 } from '@/fetch/contributeFetch/publishApi';
 import { submitReview } from '@/fetch/contributeFetch/submitReview';
 import { updateContributionStatus } from '@/fetch/contributeFetch/updateContributionStatus';
+import { useContributionNav } from '@/hooks/contribute/useContributionNav';
 import { useBatchManagement } from '@/hooks/useBatchManagement';
 import { useSearchEditRequestsFilters } from '@/hooks/useSearchEditRequestsFilters';
 import { RootState } from '@/redux/store';
@@ -53,6 +54,15 @@ import {
   summarise,
 } from '@/utils/contribute/bulkDecision';
 import { loadColumnVisibility } from '@/utils/contribute/columnVisibilityStore';
+import {
+  ContributionNavList,
+  idsFromGrid,
+  saveNavList,
+} from '@/utils/contribute/contributionNav';
+import {
+  loadContribution,
+  prefetchContribution,
+} from '@/utils/contribute/contributionPrefetch';
 import { loadContributionRoot } from '@/utils/contribute/loadContributionRoot';
 import {
   materializeContributionRoot,
@@ -61,6 +71,7 @@ import {
 const REQUESTS_PATH = '/contribute/editor_main/requests';
 
 const BLOCK_SIZE = 50;
+const NAV_SOURCE = 'editorial';
 const SEARCH_DEBOUNCE_DELAY = 500;
 
 // AG Grid column ids the backend can order by, mapped to its column names.
@@ -158,7 +169,13 @@ export const useEditorialPlatformTable = () => {
     reason: string;
   } | null>(null);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const totalCountRef = useRef(0);
+  totalCountRef.current = totalCount;
   const [isLoading, setIsLoading] = useState(false);
+  // The root entity loaded along with the contribution, for the entity effect.
+  const prefetchedRootRef = useRef<
+    { id: string; entity: MaterializedEntity; warning?: string } | undefined
+  >(undefined);
 
   // ── Form + grid refs ───────────────────────────────────────────────────────
   const [form] = Form.useForm();
@@ -182,6 +199,9 @@ export const useEditorialPlatformTable = () => {
   );
 
   // ── Infinite row model datasource ─────────────────────────────────────────
+  // What the grid last fetched with, for Previous / Next on a contribution.
+  const lastQueryRef = useRef<Record<string, string | undefined>>({});
+
   // Use refs so the datasource closure (created once) always reads fresh values
   const filtersRef = useRef(filters);
   filtersRef.current = filters;
@@ -200,6 +220,7 @@ export const useEditorialPlatformTable = () => {
         const sortBy = sort ? SORTABLE_COL_MAP[sort.colId] : undefined;
         const sortOrder = sortBy ? (sort.sort as 'asc' | 'desc') : undefined;
         const userSortActive = Boolean(sortBy);
+        lastQueryRef.current = { filterQuery, sortBy, sortOrder };
         try {
           const response = await fetchContributionsData(
             page,
@@ -300,8 +321,12 @@ export const useEditorialPlatformTable = () => {
 
     const load = async () => {
       setIsLoading(true);
+      // Another contribution (Previous / Next): drop the last one's entity.
+      setFetchedEntity(undefined);
+      setEntityLoadWarning(undefined);
       try {
-        const data = await fetchContributionByIdForEditor(id);
+        const { contribution: data, root } = await loadContribution(id);
+        prefetchedRootRef.current = { id, ...root };
         const contribution = transformContributionData(data);
         setActive(contribution);
         setCurrentStatus(contribution.status);
@@ -330,6 +355,17 @@ export const useEditorialPlatformTable = () => {
     const fetchEntity = async () => {
       const changes = active.changeSet?.changes;
       if (!changes?.length) return;
+      // Loaded with the contribution (see loadContribution).
+      const loaded = prefetchedRootRef.current;
+      prefetchedRootRef.current = undefined;
+      if (
+        loaded?.id === active.id &&
+        String(loaded.entity.entityRef.id) === String(changes[0].entityRef.id)
+      ) {
+        setFetchedEntity(loaded.entity);
+        setEntityLoadWarning(loaded.warning);
+        return;
+      }
 
       const entityRef = changes[0].entityRef;
       const isExistingVoyage = active.root.type === 'existing';
@@ -418,12 +454,13 @@ export const useEditorialPlatformTable = () => {
     return undefined;
   }, [active, fetchedEntity]);
 
-  const shouldShowDetail = Boolean(
-    id &&
-    active &&
-    (active as TransformedContribution).id === id &&
-    active.changeSet,
-  );
+  // While Previous / Next loads the next one, the current one stays shown.
+  const shouldShowDetail = Boolean(id && active && active.changeSet);
+  // Moving to another contribution: until it and its entity have loaded.
+  const isMoving =
+    isLoading ||
+    Boolean(active && id && (active as TransformedContribution).id !== id) ||
+    Boolean(active?.root.type === 'existing' && !fetchedEntity);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
   // The search box is decoupled from the committed filter: `searchInput` keeps
@@ -593,10 +630,47 @@ export const useEditorialPlatformTable = () => {
       setContributionId(data.id);
       setSavedContributionState(data);
       setMode(ReviewMode.ReadOnly);
+      saveNavList({
+        source: NAV_SOURCE,
+        ids: idsFromGrid(gridRef.current?.api),
+        total: totalCountRef.current,
+        pageSize: BLOCK_SIZE,
+        query: lastQueryRef.current,
+      });
       navigate(`/contribute/editor_main/requests/${data.id}`);
     },
     [navigate],
   );
+
+  const fetchNavPage = useCallback(
+    async (list: ContributionNavList, page: number) => {
+      const { filterQuery, sortBy, sortOrder } = list.query;
+      const response = await fetchContributionsData(
+        page,
+        list.pageSize,
+        filterQuery ?? '',
+        sortBy,
+        sortOrder as 'asc' | 'desc' | undefined,
+      );
+      const rows: TransformedContribution[] = (response.data ?? []).map(
+        transformContributionData,
+      );
+      // The grid's own order: unsorted blocks put submitted rows first.
+      return (sortBy ? rows : sortBlock(rows)).map((r) => r.id);
+    },
+    [],
+  );
+
+  const contributionNav = useContributionNav({
+    source: NAV_SOURCE,
+    currentId: id,
+    fetchPage: fetchNavPage,
+    onOpen: (nextId) => navigate(`/contribute/editor_main/requests/${nextId}`),
+    // An edited, uncommitted review.
+    isDirty: mode === ReviewMode.Review && active !== savedContributionState,
+    busy: isMoving,
+    prefetch: prefetchContribution,
+  });
 
   const handleBackClick = useCallback(
     (e?: React.MouseEvent) => {
@@ -741,6 +815,8 @@ export const useEditorialPlatformTable = () => {
   }, []);
 
   return {
+    contributionNav,
+    isMoving,
     // Grid
     gridRef,
     datasource,

@@ -35,7 +35,12 @@ import {
 import { usePageRouter } from '@/hooks/usePageRouter';
 import { RootState } from '@/redux/store';
 import { hasEditorRole } from '@/utils/auth/hasEditorRole';
-import { combineEntityChanges } from '@/utils/contribute/contributionChanges';
+import {
+  addedRows,
+  combineEntityChanges,
+  dropLayerOrphans,
+  withoutListRemovals,
+} from '@/utils/contribute/contributionChanges';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
 
 /** Where a contributor lands once a submission has been accepted. */
@@ -210,9 +215,12 @@ export const useContributionForm = ({
       const stackedEntityClone = cloneEntity(entity);
       const expandedEntity = expandMaterialized(stackedEntityClone);
 
+      // The layer being edited -- the open review, or the contributor's own
+      // change set -- is applied without its list removals, so a removed row
+      // stays visible and can be restored.
       let allChanges: EntityChange[] = isReviewMode
         ? [...originalChanges]
-        : [...(changeSet?.changes || [])];
+        : withoutListRemovals(changeSet?.changes || []);
 
       reviews.forEach((review) => {
         if (review.changeSet.changes?.length > 0) {
@@ -221,7 +229,7 @@ export const useContributionForm = ({
       });
 
       if (isReviewMode && reviewChanges.length > 0) {
-        allChanges = [...allChanges, ...reviewChanges];
+        allChanges = [...allChanges, ...withoutListRemovals(reviewChanges)];
       }
 
       const filteredChanges = combineEntityChanges(allChanges)
@@ -421,8 +429,13 @@ export const useContributionForm = ({
     (newChange: EntityChange, asReview = false) => {
       setIsSaveChange(false);
       if (isReviewMode || asReview) {
-        const next = addToChangeSet(reviewChanges, newChange);
-        dropOrphans(next);
+        const next = dropLayerOrphans(
+          addToChangeSet(reviewChanges, newChange),
+          addedRows([
+            ...originalChanges,
+            ...reviews.flatMap((r) => r.changeSet.changes ?? []),
+          ]),
+        );
         const combined = combineEntityChanges(next);
         setReviewChanges(combined);
         onChange?.({
@@ -447,6 +460,8 @@ export const useContributionForm = ({
       contribution,
       isReviewMode,
       reviewChanges,
+      originalChanges,
+      reviews,
       changeSet,
       localChanges,
       onChange,

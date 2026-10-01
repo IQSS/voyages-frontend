@@ -38,6 +38,7 @@ import BatchManagement from '../BatchComponent/BatchManagement';
 import BatchAssignmentModal from '../BatchComponent/Modal/BatchAssignmentModal';
 import { ActiveFiltersTag } from '../commons/ActiveFiltersTag';
 import { ColumnsControl } from '../commons/ColumnsControl';
+import ContributionNavBar from '../commons/ContributionNavBar';
 import { FilterPanel } from '../commons/FilterPanel';
 import { FilterToggleButton } from '../commons/FilterToggleButton';
 import ListEditorialPlatForm from '../commons/ListEditorialPlatForm';
@@ -133,6 +134,8 @@ const EditorialPlatformTable: React.FC<EditorialPlatformTableProps> = ({
     setBulkResult,
     decisionBlocked,
     dismissDecisionBlocked,
+    contributionNav,
+    isMoving,
   } = useEditorialPlatformTable();
 
   const bulkActionsMenuItems = [
@@ -220,7 +223,8 @@ const EditorialPlatformTable: React.FC<EditorialPlatformTableProps> = ({
   ];
 
   // ── Loading overlay (deep link / page refresh) ───────────────────────────
-  if (isLoading) {
+  // Previous / Next keeps the current contribution shown instead.
+  if (isLoading && !shouldShowDetail) {
     return (
       <div style={{ position: 'relative', height: 'calc(100vh - 200px)' }}>
         <CustomLoadingOverlay />
@@ -232,12 +236,12 @@ const EditorialPlatformTable: React.FC<EditorialPlatformTableProps> = ({
   if (shouldShowDetail) {
     return (
       <div style={{ width: '100%' }}>
+        <ContributionNavBar {...contributionNav} />
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: 16,
           }}
         >
           <PageBackHeader
@@ -301,9 +305,18 @@ const EditorialPlatformTable: React.FC<EditorialPlatformTableProps> = ({
           />
         )}
 
-        <div className="contribute-content">
+        <div
+          className="contribute-content"
+          // Dimmed while Previous / Next loads the next contribution.
+          style={{
+            opacity: isMoving ? 0.5 : 1,
+            pointerEvents: isMoving ? 'none' : undefined,
+            transition: 'opacity 0.15s',
+          }}
+        >
           {empty && active?.changeSet && (
             <ContributionForm
+              key={active.id}
               entity={empty}
               contribution={active}
               onChange={(contribution) => {

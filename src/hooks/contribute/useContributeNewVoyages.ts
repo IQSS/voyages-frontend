@@ -30,7 +30,8 @@ import { usePageRouter } from '@/hooks/usePageRouter';
 import { useSearchEditRequestsFilters } from '@/hooks/useSearchEditRequestsFilters';
 import { useVoyageContribution } from '@/hooks/useVoyageContribution';
 import { RootState } from '@/redux/store';
-import { loadContributionRoot } from '@/utils/contribute/loadContributionRoot';
+import { idsFromGrid, saveNavList } from '@/utils/contribute/contributionNav';
+import { contributionForEdit } from '@/utils/contribute/loadContributionRoot';
 import { getDisplayButtons } from '@/utils/functions/contribuitePath';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
 
@@ -120,6 +121,9 @@ export const useContributeNewVoyages = () => {
   // sees the current one.
   const buildQueryRef = useRef(buildNewVoyagesFilterQuery);
   buildQueryRef.current = buildNewVoyagesFilterQuery;
+  // What the grid last fetched with, for Previous / Next on a contribution.
+  const lastQueryRef = useRef('');
+  const totalRef = useRef(0);
 
   const datasource = useMemo<IDatasource>(
     () => ({
@@ -139,6 +143,7 @@ export const useContributeNewVoyages = () => {
         Object.entries(sortParams(params.sortModel)).forEach(([k, v]) =>
           query.set(k, v),
         );
+        lastQueryRef.current = query.toString();
         try {
           const response = await fetchContributionsDataByAuthor(
             query.toString(),
@@ -146,7 +151,8 @@ export const useContributeNewVoyages = () => {
           const rows = (response?.data || []).map(transformContributionData);
           const total =
             typeof response?.total === 'number' ? response.total : -1;
-          setTotalContributions(total > 0 ? total : rows.length);
+          totalRef.current = total > 0 ? total : rows.length;
+          setTotalContributions(totalRef.current);
           params.successCallback(rows, total);
         } catch {
           params.failCallback();
@@ -179,28 +185,23 @@ export const useContributeNewVoyages = () => {
   const handleEditContribution = useCallback(
     async (data: TransformedContribution) => {
       if (!data) return;
-      const isExistingVoyage = data.root.type === 'existing';
-      const { entity: entityToUse, warning } = await loadContributionRoot(
-        data.root.schema,
-        data.root.id,
-        isExistingVoyage,
-      );
+      saveNavList({
+        source: 'welcome',
+        ids: idsFromGrid(gridRef.current?.api),
+        total: totalRef.current,
+        pageSize: WIP_BLOCK_SIZE,
+        query: { query: lastQueryRef.current },
+      });
+      const { formEntity, selectedContribution, warning } =
+        await contributionForEdit<Contribution>(data);
       if (warning) message.warning(warning, 8);
 
-      const editableContribution: Contribution = {
-        ...data,
-        root: {
-          ...data.root,
-          type: (isExistingVoyage ? 'existing' : 'new') as 'existing' | 'new',
-        },
-      };
-
-      updateFormEntity(entityToUse);
-      setSelectedContribution(editableContribution);
+      updateFormEntity(formEntity);
+      setSelectedContribution(selectedContribution);
       navigate(`/contribute/interim/new/${data.id}`, {
         state: {
-          formEntity: entityToUse,
-          selectedContribution: editableContribution,
+          formEntity,
+          selectedContribution,
           formMode: ReviewMode.Edit,
         },
       });
