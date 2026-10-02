@@ -59,7 +59,7 @@ const EditExistingVoyage: React.FC<EditExistingVoyageProps> = ({
         if (conflict.hasConflict && conflict.status !== undefined) {
           const { content } = getConflictErrorMessage(conflict.status);
           Modal.warning({
-            title: `This Voyage ID ${voyageId} has already been submitted for evaluation.`,
+            title: `Voyage ID ${voyageId} already has an open contribution.`,
             content,
             okText: 'OK',
           });
@@ -172,6 +172,7 @@ const EditExistingVoyage: React.FC<EditExistingVoyageProps> = ({
             key={String(entity.entityRef.id)}
             entity={entity}
             contribution={contribution}
+            contributionId={contribution.id}
             onChange={handleContributionChange}
             mode={ReviewMode.Edit}
             currentStatus={ContributionStatus.WorkInProgress}

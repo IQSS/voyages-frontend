@@ -40,6 +40,7 @@ import {
 } from 'antd';
 
 import { useContributionForm } from '@/hooks/contribute/useContributionForm';
+import { useVoyageIdConflict } from '@/hooks/contribute/useVoyageIdConflict';
 import { imputeContribution } from '@/utils/impute/imputeContribution';
 import { isImputeAvailable } from '@/utils/impute/runImpute';
 
@@ -53,6 +54,11 @@ import { TransformedContribution } from './utils/transformContributionData';
 const { Text } = Typography;
 
 // ── Exported types & constants (used by other components) ───────────────────
+
+const VOYAGE_ID_UID = 'Voyage_voyage_id';
+const VOYAGE_ID_LABEL =
+  getSchema('Voyage').properties.find((p) => p.uid === VOYAGE_ID_UID)?.label ??
+  'Voyage ID';
 
 export enum ReviewMode {
   Create = 'create',
@@ -146,6 +152,7 @@ export const ContributionForm = (props: ContributionFormProps) => {
     stackedEntity,
     accessLevelOptions,
     displayedChanges,
+    formChanges,
     isShowStartReview,
     isShowStartReviewDisable,
     initAccessLevel,
@@ -233,10 +240,27 @@ export const ContributionForm = (props: ContributionFormProps) => {
     () => missingAcceptProps.map((p) => p.label),
     [missingAcceptProps],
   );
-  const missingAcceptUids = useMemo(
-    () => missingAcceptProps.map((p) => p.uid),
-    [missingAcceptProps],
+  // A new voyage's Voyage ID must not be one already taken.
+  const assignedId = stackedEntity?.data[VOYAGE_ID_LABEL];
+  const voyageIdCheck = useVoyageIdConflict(
+    assignedId === null || assignedId === undefined ? '' : String(assignedId),
+    props.contributionId,
+    isEditor && stackedEntity?.entityRef.type === 'new',
   );
+  const voyageIdConflict = voyageIdCheck.fieldError;
+
+  const missingAcceptUids = useMemo(
+    () => [
+      ...missingAcceptProps.map((p) => p.uid),
+      ...(voyageIdConflict ? [VOYAGE_ID_UID] : []),
+    ],
+    [missingAcceptProps, voyageIdConflict],
+  );
+  const errorHints = useMemo<Record<string, string>>(() => {
+    const hints: Record<string, string> = {};
+    if (voyageIdConflict) hints[VOYAGE_ID_UID] = voyageIdConflict;
+    return hints;
+  }, [voyageIdConflict]);
 
   // The required editor values are locked until a review is started, so on the
   // read-only screen the editor is pointed at Start Review, not told to fill
@@ -250,18 +274,32 @@ export const ContributionForm = (props: ContributionFormProps) => {
   // commit other fixes first -- but not silently: acceptance stays blocked
   // until they are filled, so say so and offer the way back.
   const handleCommitReviewChecked = useCallback(() => {
-    if (missingBeforeAccept.length === 0) {
+    if (missingBeforeAccept.length === 0 && !voyageIdConflict) {
       handleCommitReview();
       return;
     }
     Modal.confirm({
-      title: `${missingList} ${missingBeforeAccept.length === 1 ? 'is' : 'are'} still empty`,
-      content: `This new voyage cannot be accepted until ${missingList} ${missingBeforeAccept.length === 1 ? 'is' : 'are'} filled in.`,
+      title:
+        missingBeforeAccept.length > 0
+          ? `${missingList} ${missingBeforeAccept.length === 1 ? 'is' : 'are'} still empty`
+          : voyageIdCheck.taken
+            ? 'This Voyage ID is already taken'
+            : 'This Voyage ID could not be checked',
+      content:
+        missingBeforeAccept.length > 0
+          ? `This new voyage cannot be accepted until ${missingList} ${missingBeforeAccept.length === 1 ? 'is' : 'are'} filled in.`
+          : `${voyageIdConflict} This new voyage cannot be accepted until its Voyage ID is checked and free.`,
       okText: 'Commit anyway',
-      cancelText: 'Go back and fill in',
+      cancelText: 'Go back and fix',
       onOk: handleCommitReview,
     });
-  }, [missingBeforeAccept, missingList, handleCommitReview]);
+  }, [
+    missingBeforeAccept,
+    missingList,
+    voyageIdConflict,
+    voyageIdCheck.taken,
+    handleCommitReview,
+  ]);
 
   const handleImpute = async () => {
     if (!props.contributionId) return;
@@ -581,7 +619,7 @@ export const ContributionForm = (props: ContributionFormProps) => {
                   key={props.entity.entityRef.id}
                   schema={schema}
                   entity={stackedEntity}
-                  changes={displayedChanges}
+                  changes={formChanges}
                   onChange={onChangesUpdate}
                   expandedMenu={expandedMenu}
                   setExpandedMenu={setExpandedMenu}
@@ -590,6 +628,7 @@ export const ContributionForm = (props: ContributionFormProps) => {
                   readOnly={isReadOnlyMode}
                   errorPropertyUids={missingAcceptUids}
                   errorHint={requiredFieldHint}
+                  errorHints={errorHints}
                   // A voyage loaded from the server is 'original'; only the
                   // stand-in for one that failed to load is 'lazy'.
                   commentsLocked={
@@ -717,6 +756,9 @@ export const ContributionForm = (props: ContributionFormProps) => {
         currentStatus === ContributionStatus.Rejected) && (
         <ContributionEditDecision
           missingBeforeAccept={missingBeforeAccept}
+          acceptBlockers={
+            voyageIdCheck.acceptBlocker ? [voyageIdCheck.acceptBlocker] : []
+          }
           handleEditorialDecisionSubmit={handleEditorialDecisionSubmit}
           setSelectedDecision={setSelectedDecision}
           selectedDecision={selectedDecision}

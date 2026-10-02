@@ -89,6 +89,7 @@ import GeoTreeSelected from '../../FilterComponents/GeoTreeSelect/GeoTreeSelecte
 import { RadioSelected } from '../RadioSelected/RadioSelected';
 import { SelectSearchDropdownEnslaversNameRole } from '../SelectDrowdown/SelectSearchDropdownEnslaversNameRole';
 import { SelectSearchDropdownList } from '../SelectDrowdown/SelectSearchDropdownList';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 
 export const MenuListsDropdown = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -328,10 +329,7 @@ export const MenuListsDropdown = () => {
       dispatch(setIsChangeGeoTree(!value));
     }
     dispatch(resetAll());
-    const keysToRemove = Object.keys(localStorage);
-    keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
-    });
+    clearSavedData();
   };
 
   const handleApplyEnslaversDialog = (

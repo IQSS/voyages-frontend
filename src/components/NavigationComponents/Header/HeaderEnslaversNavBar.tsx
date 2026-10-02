@@ -63,6 +63,7 @@ import {
 import { DatasetButton } from './DatasetButton';
 import { DrawerMenuBar } from './DrawerMenuBar';
 import HeaderLogo from './HeaderLogo';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 
 const HeaderEnslaversNavBar: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -102,10 +103,7 @@ const HeaderEnslaversNavBar: React.FC = () => {
     dispatch(resetAll());
     dispatch(resetBlockNameAndPageName());
     dispatch(resetAllStateToInitailState());
-    const keysToRemove = Object.keys(localStorage);
-    keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
-    });
+    clearSavedData();
   };
 
   const handleSelectEnslaversDataset = useCallback(
@@ -154,12 +152,7 @@ const HeaderEnslaversNavBar: React.FC = () => {
       };
       if (styleNameToPathMap[styleName])
         navigate(styleNameToPathMap[styleName]);
-      const keysToRemove = Object.keys(localStorage);
-      keysToRemove.forEach((key) => {
-        if (key !== 'filterObject') {
-          localStorage.removeItem(key);
-        }
-      });
+      clearSavedData(['filterObject']);
     },
     [navigate, dispatch, currentBlockName],
   );

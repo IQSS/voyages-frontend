@@ -25,8 +25,9 @@ export const checkVoyageConflict = async (
     // a CSV import has run — and parsing it blocked the page long enough to
     // look frozen.
     const rootId = encodeURIComponent(String(voyageId));
-    // Fetch both WIP and Submitted — backend filters by role so we must request each status explicitly
-    const [wipRes, submittedRes] = await Promise.all([
+    // Every status still open (not yet published or rejected); the backend
+    // filters by role, so each status is requested explicitly.
+    const [wipRes, submittedRes, acceptedRes] = await Promise.all([
       fetchContributionsData(
         1,
         100,
@@ -37,10 +38,16 @@ export const checkVoyageConflict = async (
         100,
         `status=${ContributionStatus.Submitted}&root_id=${rootId}`,
       ),
+      fetchContributionsData(
+        1,
+        100,
+        `status=${ContributionStatus.Accepted}&root_id=${rootId}`,
+      ),
     ]);
     const wipContributions = [
       ...(wipRes?.data ?? []),
       ...(submittedRes?.data ?? []),
+      ...(acceptedRes?.data ?? []),
     ];
 
     // Check for conflicts based on type
@@ -98,6 +105,13 @@ export const getConflictErrorMessage = (
     return {
       status: 'submitted',
       content: `This voyage has already been submitted for evaluation. Please contact the editor at editors@slavevoyages.org for any further revisions or additional information you wish to contribute.`,
+    };
+  }
+
+  if (conflictStatus === ContributionStatus.Accepted) {
+    return {
+      status: 'accepted',
+      content: `This voyage has an accepted contribution that is not published yet. Please wait until it is published, or contact the editor at editors@slavevoyages.org.`,
     };
   }
 

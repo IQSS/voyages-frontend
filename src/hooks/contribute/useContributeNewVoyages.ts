@@ -32,11 +32,16 @@ import { useVoyageContribution } from '@/hooks/useVoyageContribution';
 import { RootState } from '@/redux/store';
 import { idsFromGrid, saveNavList } from '@/utils/contribute/contributionNav';
 import { contributionForEdit } from '@/utils/contribute/loadContributionRoot';
+import {
+  addWelcomeFilters,
+  DateRange,
+} from '@/utils/contribute/welcomeListQuery';
 import { getDisplayButtons } from '@/utils/functions/contribuitePath';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
 
 /** Rows per request, matching the Edit Requests grid. */
 const WIP_BLOCK_SIZE = 50;
+const SEARCH_DEBOUNCE_MS = 500;
 
 const SORT_FIELDS: Record<string, string> = {
   voyage_id: 'voyage_id',
@@ -123,6 +128,12 @@ export const useContributeNewVoyages = () => {
   buildQueryRef.current = buildNewVoyagesFilterQuery;
   // What the grid last fetched with, for Previous / Next on a contribution.
   const lastQueryRef = useRef('');
+  // Search box and date range, read by the datasource through refs.
+  const [searchInput, setSearchInput] = useState('');
+  const [dateRange, setDateRange] = useState<DateRange>(null);
+  const searchRef = useRef('');
+  const dateRangeRef = useRef<DateRange>(null);
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const totalRef = useRef(0);
 
   const datasource = useMemo<IDatasource>(
@@ -143,6 +154,7 @@ export const useContributeNewVoyages = () => {
         Object.entries(sortParams(params.sortModel)).forEach(([k, v]) =>
           query.set(k, v),
         );
+        addWelcomeFilters(query, searchRef.current, dateRangeRef.current);
         lastQueryRef.current = query.toString();
         try {
           const response = await fetchContributionsDataByAuthor(
@@ -236,6 +248,37 @@ export const useContributeNewVoyages = () => {
     gridRef.current?.api?.purgeInfiniteCache();
   }, []);
 
+  // Applied shortly after typing stops, so each keystroke is not a request.
+  const onSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setSearchInput(value);
+      clearTimeout(searchTimerRef.current);
+      searchTimerRef.current = setTimeout(() => {
+        searchRef.current = value;
+        gridRef.current?.api?.purgeInfiniteCache();
+      }, SEARCH_DEBOUNCE_MS);
+    },
+    [],
+  );
+
+  const onDateRangeChange = useCallback((next: DateRange) => {
+    dateRangeRef.current = next;
+    setDateRange(next);
+    gridRef.current?.api?.purgeInfiniteCache();
+  }, []);
+
+  const onClearFilters = useCallback(() => {
+    clearTimeout(searchTimerRef.current);
+    searchRef.current = '';
+    dateRangeRef.current = null;
+    setSearchInput('');
+    setDateRange(null);
+    gridRef.current?.api?.purgeInfiniteCache();
+  }, []);
+
+  const hasFilters = searchInput.trim() !== '' || dateRange !== null;
+
   const handleRowClick = useCallback(
     ({
       data,
@@ -270,5 +313,11 @@ export const useContributeNewVoyages = () => {
     handleRowClick,
     statusFilter,
     onStatusChange,
+    searchInput,
+    onSearchChange,
+    dateRange,
+    onDateRangeChange,
+    hasFilters,
+    onClearFilters,
   };
 };

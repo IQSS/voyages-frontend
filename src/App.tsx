@@ -66,6 +66,7 @@ import {
   allEnslavers,
 } from '@/share/CONST_DATA';
 import { theme } from '@/styleMUI/theme';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 import { supabase } from '@/utils/supabase/supabaseClient';
 
 import UseSaveSearchURL from './components/FilterComponents/SaveSearchComponent/SaveSearchURLReturn';
@@ -95,7 +96,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (location.pathname === '/') {
-      localStorage.clear();
+      clearSavedData();
     }
   }, [location.pathname]);
 

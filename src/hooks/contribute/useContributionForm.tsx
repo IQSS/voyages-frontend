@@ -133,13 +133,8 @@ export const useContributionForm = ({
     null,
   );
   const [changeSetId, setChangeSetId] = useState<string>('');
-  // The id the server last gave this contribution.
-  //
-  // The edit-a-voyage screen passes no `contributionId` and its route carries
-  // no `:id`, so there is nothing here that names the contribution until the
-  // server has been asked to store it once. Saving with no id makes a new one,
-  // so without remembering the answer a second save would file a second
-  // contribution against the same voyage rather than updating the first.
+  // The id the server last gave this contribution, kept so later saves and
+  // the submit update it rather than file another one.
   const [savedContributionId, setSavedContributionId] = useState<string>('');
   // A refused submission, held so the contributor can read the list of fields
   // and then go straight back to filling them in. Cleared by dismissing it,
@@ -282,6 +277,20 @@ export const useContributionForm = ({
     }));
 
   const displayedChanges = isReviewMode ? reviewChanges : localChanges;
+  // What the form's fields show. Read-only, a field shows its latest value, so
+  // a review's change wins over the contributor's own.
+  const stackedChanges = useMemo(
+    () =>
+      combineEntityChanges([
+        ...localChanges,
+        // Oldest review first, so the latest one's value wins.
+        ...[...reviews]
+          .sort((a, b) => a.stackOrder - b.stackOrder)
+          .flatMap((r) => r.changeSet.changes ?? []),
+      ]),
+    [localChanges, reviews],
+  );
+  const formChanges = isReadOnlyMode ? stackedChanges : displayedChanges;
   const isShowStartReview = mode === ReviewMode.ReadOnly && !isReviewMode;
   const isShowStartReviewDisable =
     currentStatus !== ContributionStatus.Submitted &&
@@ -476,6 +485,12 @@ export const useContributionForm = ({
     setPreviewEntity(updated);
   }, [changeSet, isReviewMode, reviewChanges, stackedEntity, entity]);
 
+  // The id every save and submit from this form stores under, so one piece of
+  // work stays one contribution from draft to decision. The contribution's own
+  // id covers the screens whose route carries none (Edit Existing Voyage).
+  const ownContributionId =
+    savedContributionId || contributionId || ID || contribution?.id;
+
   const handleSaveChanges = async () => {
     setIsSaving(true);
     setIsSaveChange(false);
@@ -483,7 +498,7 @@ export const useContributionForm = ({
       const formValues = await contributeForm.validateFields();
       const changesToSubmit = isReviewMode ? reviewChanges : changeSet?.changes;
       const payload: Contribution = {
-        id: contributionId ?? ID!,
+        id: ownContributionId!,
         root: entity.entityRef,
         changeSet: {
           title: '',
@@ -501,6 +516,7 @@ export const useContributionForm = ({
       const response = await createSaveChangeContribution(payload);
       message.success('Changes saved successfully!');
       setIsSaveChange(true);
+      setSavedContributionId(String(response?.id ?? ''));
       setChangeSetId(String(response?.changeSet?.id ?? ''));
 
       if (isReviewMode) {
@@ -550,7 +566,7 @@ export const useContributionForm = ({
             ? reviewChanges
             : changeSet.changes;
           let payload: Contribution = {
-            id: savedContributionId || contributionId || ID!,
+            id: ownContributionId!,
             root: entity.entityRef,
             changeSet: {
               title: '',
@@ -801,6 +817,7 @@ export const useContributionForm = ({
     stackedEntity,
     accessLevelOptions,
     displayedChanges,
+    formChanges,
     isShowStartReview,
     isShowStartReviewDisable,
     contributionSection,

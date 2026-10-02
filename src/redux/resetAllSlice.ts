@@ -22,6 +22,7 @@ import { resetAllStateSlice as resetAllStateSliceDataEnslavers } from './getPeop
 import { resetSliceSaveSearch } from './getSaveSearchSlice';
 import { resetSliceShowHideFilter } from './getShowFilterObjectSlice';
 import { resetSliceTable } from './getTableSlice';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 
 export const resetAll = () => (dispatch: Dispatch) => {
   dispatch(resetOptionsData());
@@ -61,9 +62,6 @@ export const resetAllStateToInitailState = () => (dispatch: Dispatch) => {
   dispatch(resetSliceShowHideFilter());
   dispatch(resetSliceTable());
 
-  // Clear all localStorage
-  const keysToRemove = Object.keys(localStorage);
-  keysToRemove.forEach((key) => {
-    localStorage.removeItem(key);
-  });
+  // Clear the saved data, keeping the sign-in.
+  clearSavedData();
 };

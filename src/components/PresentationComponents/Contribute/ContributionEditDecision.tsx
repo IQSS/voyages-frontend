@@ -39,6 +39,8 @@ export interface ContributionEditDecisionProps {
   canReopen?: boolean;
   uncommittedReviewChanges?: number;
   missingBeforeAccept?: string[];
+  /** Other reasons the contribution cannot be accepted yet. */
+  acceptBlockers?: string[];
 }
 
 const ContributionEditDecision = ({
@@ -55,15 +57,19 @@ const ContributionEditDecision = ({
   canReopen = false,
   uncommittedReviewChanges = 0,
   missingBeforeAccept = [],
+  acceptBlockers = [],
 }: ContributionEditDecisionProps) => {
   // Not gated on review mode: uncommitted review edits are exactly what an
   // editor most needs told back to them before they decide.
   const holdingUncommittedWork = uncommittedReviewChanges > 0;
   const blockedFromAccepting =
-    selectedDecision === 'accept' && missingBeforeAccept.length > 0;
-  const blockedReason = blockedFromAccepting
-    ? `Start a review and fill in ${missingBeforeAccept.join(' and ')}, then accept — a new voyage cannot be published without ${missingBeforeAccept.length === 1 ? 'it' : 'them'}.`
-    : '';
+    selectedDecision === 'accept' &&
+    (missingBeforeAccept.length > 0 || acceptBlockers.length > 0);
+  const blockedReason = !blockedFromAccepting
+    ? ''
+    : missingBeforeAccept.length > 0
+      ? `Start a review and fill in ${missingBeforeAccept.join(' and ')}, then accept — a new voyage cannot be published without ${missingBeforeAccept.length === 1 ? 'it' : 'them'}.`
+      : acceptBlockers.join(' ');
   return (
     <Form
       layout="vertical"

@@ -1,13 +1,15 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
+
+import { authStorage } from './authStorage';
 
 const supabaseUrl =
-  window.__ENV__?.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL
+  window.__ENV__?.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey =
   window.__ENV__?.VITE_SUPABASE_ANON_KEY ||
-  import.meta.env.VITE_SUPABASE_ANON_KEY
+  import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
+  throw new Error('Missing Supabase environment variables');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -15,7 +17,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    storage: window.localStorage,
-    flowType: 'pkce'
-  }
-})
+    storage: authStorage,
+    flowType: 'pkce',
+  },
+});

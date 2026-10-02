@@ -6,6 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import { signInWithEmail, signInWithOAuth } from '@/redux/getAuthUserSlice';
 import { RootState, AppDispatch } from '@/redux/store';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
+import {
+  getRememberedEmail,
+  getRememberMe,
+  rememberEmail,
+  setRememberMe,
+} from '@/utils/supabase/authStorage';
 
 export interface SignInFormValues {
   email: string;
@@ -30,9 +36,9 @@ export const useSignInForm = (nextPath: string) => {
   const translatedContribute = translationLanguagesContribute(languageValue);
 
   const [formValues, setFormValues] = useState<SignInFormValues>({
-    email: '',
+    email: getRememberedEmail(),
     password: '',
-    remember: false,
+    remember: getRememberMe(),
   });
   const [fieldErrors, setFieldErrors] = useState<SignInFieldErrors>({});
   const [authError, setAuthError] = useState<string | null>(null);
@@ -94,6 +100,8 @@ export const useSignInForm = (nextPath: string) => {
       return;
     }
 
+    setRememberMe(formValues.remember);
+    rememberEmail(formValues.email, formValues.remember);
     try {
       await dispatch(
         signInWithEmail({
@@ -109,6 +117,7 @@ export const useSignInForm = (nextPath: string) => {
 
   const handleGoogleSignIn = async (): Promise<void> => {
     setAuthError(null);
+    setRememberMe(formValues.remember);
     try {
       await dispatch(signInWithOAuth('google')).unwrap();
     } catch (error: unknown) {
@@ -123,6 +132,7 @@ export const useSignInForm = (nextPath: string) => {
 
   const handleGitHubSignIn = async (): Promise<void> => {
     setAuthError(null);
+    setRememberMe(formValues.remember);
     try {
       await dispatch(signInWithOAuth('github')).unwrap();
     } catch (error: unknown) {

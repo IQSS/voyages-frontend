@@ -52,9 +52,9 @@ export const useSearchEditRequestsFilters = (
     { author: user?.email },
   );
 
+  // The status (or "all except Published") is added by the Welcome table.
   const buildNewVoyagesFilterQuery = useCallback((): string => {
     const params = new URLSearchParams();
-    params.append('status', '0');
     if (user?.email) params.append('author', user.email);
     return params.toString();
   }, [user?.email]);

@@ -4,10 +4,11 @@ import '@/style/newVoyages.scss';
 import { Button } from '@mui/material';
 import { ContributionStatus } from '@slavevoyages/voyages-contribute';
 import { AgGridReact } from 'ag-grid-react';
-import { Select } from 'antd';
+import { Button as AntButton, DatePicker, Select } from 'antd';
 
 import { useContributeNewVoyages } from '@/hooks/contribute/useContributeNewVoyages';
 
+import { SearchInput } from './commons/SearchInput';
 import { statusConfig } from './commons/StatusCellRenderer';
 import { TransformedContribution } from './utils/transformContributionData';
 
@@ -39,6 +40,12 @@ const ContributeHomeWelcome: React.FC = () => {
     handleRowClick,
     statusFilter,
     onStatusChange,
+    searchInput,
+    onSearchChange,
+    dateRange,
+    onDateRangeChange,
+    hasFilters,
+    onClearFilters,
   } = useContributeNewVoyages();
 
   if (contributePath) return null;
@@ -81,21 +88,42 @@ const ContributeHomeWelcome: React.FC = () => {
           gap: 8,
         }}
       >
-        <Select
-          value={statusFilter ?? 'all'}
-          onChange={(val) =>
-            onStatusChange(
-              val === 'all' ? undefined : (val as ContributionStatus),
-            )
-          }
-          options={STATUS_OPTIONS}
-          style={{ width: 180 }}
-          size="small"
-        />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            flexWrap: 'wrap',
+          }}
+        >
+          <Select
+            value={statusFilter ?? 'all'}
+            onChange={(val) =>
+              onStatusChange(
+                val === 'all' ? undefined : (val as ContributionStatus),
+              )
+            }
+            options={STATUS_OPTIONS}
+            style={{ width: 180 }}
+          />
+          <SearchInput
+            value={searchInput}
+            onChange={onSearchChange}
+            placeholder="Search Voyage ID or comments"
+          />
+          <DatePicker.RangePicker
+            value={dateRange}
+            onChange={(dates) => onDateRangeChange(dates ?? null)}
+            allowEmpty={[true, true]}
+          />
+          {hasFilters && <AntButton onClick={onClearFilters}>Clear</AntButton>}
+        </div>
         <span style={{ color: '#6b7280', fontSize: 13 }}>
           {totalContributions > 0
             ? `${totalContributions.toLocaleString()} contribution${totalContributions !== 1 ? 's' : ''} — scroll to load more`
-            : ''}
+            : hasFilters
+              ? 'No contributions match'
+              : ''}
         </span>
       </div>
       <div

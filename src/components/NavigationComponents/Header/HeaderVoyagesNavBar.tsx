@@ -62,6 +62,7 @@ import { DrawerMenuBar } from './DrawerMenuBar';
 import HeaderLogo from './HeaderLogo';
 import GlobalSearchButton from '../../PresentationComponents/GlobalSearch/GlobalSearchButton';
 import CascadingMenu from '../../SelectorComponents/Cascading/CascadingMenu';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 
 export default function HeaderVoyagesNavBar() {
   const dispatch: AppDispatch = useDispatch();
@@ -154,12 +155,7 @@ export default function HeaderVoyagesNavBar() {
       }
 
       // Cleanup LocalStorage (only remove specific keys if needed)
-      const keysToRemove = Object.keys(localStorage);
-      keysToRemove.forEach((key) => {
-        if (key !== 'filterObject') {
-          localStorage.removeItem(key);
-        }
-      });
+      clearSavedData(['filterObject']);
     },
     [value, currentVoyageBlockName, navigate, dispatch],
   );
@@ -177,10 +173,7 @@ export default function HeaderVoyagesNavBar() {
   };
   const onClickReset = () => {
     dispatch(resetAllStateToInitailState());
-    const keysToRemove = Object.keys(localStorage);
-    keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
-    });
+    clearSavedData();
   };
 
   return (

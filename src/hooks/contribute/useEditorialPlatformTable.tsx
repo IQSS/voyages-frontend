@@ -579,10 +579,13 @@ export const useEditorialPlatformTable = () => {
         setReviews(updatedReviews);
 
         if (active?.changeSet) {
+          // While reviewing, the form reports the review's changes through
+          // `changeSet`; the contribution's own are the ones held from when
+          // the review started.
           const updated: Contribution = {
             ...active,
             reviews: updatedReviews,
-            changeSet: active.changeSet,
+            changeSet: savedContributionState?.changeSet ?? active.changeSet,
           };
           setSavedContributionState(updated);
           setActive(updated);
@@ -596,7 +599,7 @@ export const useEditorialPlatformTable = () => {
         message.error(msg);
       }
     },
-    [reviews, active, id],
+    [reviews, active, savedContributionState, id],
   );
 
   const handleReviewCancel = useCallback(() => {

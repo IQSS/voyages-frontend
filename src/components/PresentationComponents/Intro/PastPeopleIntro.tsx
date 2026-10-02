@@ -12,6 +12,7 @@ import { AppDispatch, RootState } from '@/redux/store';
 import { LabelFilterMeneList } from '@/share/InterfaceTypes';
 import PEOPLE from '@/utils/flatfiles/people/people_page_data.json';
 import { checkPathPeople } from '@/utils/functions/checkPathPeople';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 
 type LanguageKeys = 'en' | 'es' | 'pt';
 
@@ -93,10 +94,7 @@ const PastPeopleIntro = () => {
                           dispatch(setCurrentEnslavedPage(1));
                           dispatch(setCurrentEnslaversPage(1));
                           dispatch(resetAll());
-                          const keysToRemove = Object.keys(localStorage);
-                          keysToRemove.forEach((key) => {
-                            localStorage.removeItem(key);
-                          });
+                          clearSavedData();
                           window.location.href = URL;
                         }}
                       >

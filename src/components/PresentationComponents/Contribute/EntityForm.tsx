@@ -58,6 +58,8 @@ export interface EntityFormProps {
   commentsLocked?: boolean;
   /** Shown under a field listed in `errorPropertyUids`. */
   errorHint?: string;
+  /** A hint of its own for some of those fields, by property uid. */
+  errorHints?: Record<string, string>;
 }
 
 // Section labels that differ from what the voyages-contribute package ships.
@@ -90,6 +92,7 @@ export const EntityForm = ({
   errorPropertyUids,
   commentsLocked = false,
   errorHint = 'Please fill out this field before accepting.',
+  errorHints,
 }: EntityFormProps) => {
   const properties = useMemo(
     () =>
@@ -106,6 +109,7 @@ export const EntityForm = ({
     () =>
       properties.map((p) => {
         const isError = errorPropertyUids?.includes(p.uid) ?? false;
+        const hint = errorHints?.[p.uid] ?? errorHint;
         const displayLabel = displayPropertyLabel(p);
         const component = (
           <>
@@ -131,7 +135,7 @@ export const EntityForm = ({
           p.kind === 'number' ||
           p.kind === 'linkedEntity' ||
           p.kind === 'table'
-          ? addLabel(component, displayLabel, p.schema, isError, errorHint)
+          ? addLabel(component, displayLabel, p.schema, isError, hint)
           : component;
       }),
     [
@@ -148,6 +152,7 @@ export const EntityForm = ({
       errorPropertyUids,
       commentsLocked,
       errorHint,
+      errorHints,
     ],
   );
 
@@ -217,11 +222,16 @@ const addLabel = (
   error = false,
   hint = '',
 ) => {
-  const fillOutHint = error ? (
-    <Typography.Text type="danger" style={{ fontSize: 12, display: 'block' }}>
-      {hint}
+  // Always rendered, empty when there is no error: adding or removing it would
+  // rebuild the field, and the input would lose focus while being typed in.
+  const fillOutHint = (
+    <Typography.Text
+      type="danger"
+      style={{ fontSize: 12, display: error ? 'block' : 'none' }}
+    >
+      {error ? hint : null}
     </Typography.Text>
-  ) : null;
+  );
   const isVoyageSparseDate = schema === 'VoyageSparseDate';
   if (isVoyageSparseDate) {
     // For date fields, use a more compact layout with better alignment

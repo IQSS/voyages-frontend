@@ -27,6 +27,7 @@ import HeaderLogo from './HeaderLogo';
 import LanguagesDropdown from '@/components/SelectorComponents/DropDown/LanguagesDropdown';
 import { LabelFilterMeneList } from '@/share/InterfaceTypes';
 import { HeaderDrawerMenuPeopleBar } from './HeaderDrawerMenuPeopleBar';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 
 export default function HeaderPeopleNavBar() {
   const navigate = useNavigate();
@@ -45,10 +46,7 @@ export default function HeaderPeopleNavBar() {
 
   const handleSelectMenuItems = (item: string) => {
     dispatch(resetAllStateToInitailState());
-    const keysToRemove = Object.keys(localStorage);
-    keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
-    });
+    clearSavedData();
     if (
       item === 'Enslaved' ||
       item === 'Esclavizados' ||
