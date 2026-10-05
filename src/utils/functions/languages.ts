@@ -60,12 +60,12 @@ export const PagesOptions: PagesOptionsProps[] = [
   },
   {
     page: {
-      name: 'Enslavers',
+      name: 'Slave Traders',
       pathUrl: `${ENSALVERSPAGE}${TRANSATLANTICENSLAVERS}#people`,
       label: {
-        en: 'Enslavers',
-        es: 'Esclavistas',
-        pt: 'Escravizadores',
+        en: 'Slave Traders',
+        es: 'Traficantes de Esclavos',
+        pt: 'Traficantes de Escravoss',
       },
     },
   },

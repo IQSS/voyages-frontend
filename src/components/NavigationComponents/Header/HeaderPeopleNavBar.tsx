@@ -58,9 +58,9 @@ export default function HeaderPeopleNavBar() {
       dispatch(setCurrentEnslavedPage(1));
       dispatch(setPathNameEnslaved(AFRICANORIGINS));
     } else if (
-      item === 'Enslavers' ||
-      item === 'Esclavistas' ||
-      item === 'Escravizadores'
+      item === 'Slave Traders' ||
+      item === 'Traficantes de Esclavos' ||
+      item === 'Traficantes de Escravos'
     ) {
       navigate(`${ENSALVERSPAGE}${TRANSATLANTICENSLAVERS}#people`);
       dispatch(setCurrentEnslaversPage(1));

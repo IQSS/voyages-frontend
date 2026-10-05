@@ -1,5 +1,7 @@
 import L, { LatLngExpression } from 'leaflet';
 
+import { EDGES_MAIN_PANE } from '@/share/CONST_DATA';
+
 const renderEdgesLinesOnMap = (
   startLatLng: LatLngExpression | null,
   endLatLng: LatLngExpression | null,
@@ -31,6 +33,7 @@ const renderEdgesLinesOnMap = (
         fill: false,
         weight: weight,
         stroke: true,
+        pane: EDGES_MAIN_PANE,
       }
     );
     return curve;

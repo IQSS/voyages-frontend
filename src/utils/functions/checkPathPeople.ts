@@ -14,9 +14,9 @@ export const checkPathPeople = (title: string) => {
   ) {
     url = `${ENSALVEDPAGE}${AFRICANORIGINSPAGE}#people`;
   } else if (
-    title === 'Enslavers' ||
-    title === 'Esclavistas' ||
-    title === 'Escravizadores'
+    title === 'Slave Traders' ||
+    title === 'Traficantes de Esclavos' ||
+    title === 'Traficantes de Escravos'
   ) {
     url = `${ENSALVERSPAGE}${TRANSATLANTICENSLAVERS}#people`;
   }
