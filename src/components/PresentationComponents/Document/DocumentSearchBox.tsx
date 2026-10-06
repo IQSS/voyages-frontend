@@ -46,7 +46,7 @@ type DocumentSearchFields = (typeof DocumentSearchFieldNames)[number];
 const UIDocumentSearchFieldHeader: Record<DocumentSearchFields, string> = {
   title: 'Title',
   voyageIds: 'Voyage IDs',
-  enslaver: 'Enslavers',
+  enslaver: 'Slave Traders',
   shipname: 'Ship name',
   bib: 'Bibliography',
   fullText: 'Full text',

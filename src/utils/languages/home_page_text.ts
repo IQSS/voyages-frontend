@@ -136,9 +136,9 @@ export const homePageTranslated: TranslateType = {
   },
   homeEnslavers: {
     label: {
-      en: 'Enslavers',
-      es: 'Esclavizadores',
-      pt: 'Escravizadores',
+      en: 'Slave Traders',
+      es: 'Traficantes de Esclavos',
+      pt: 'Traficantes de Escravos',
     },
   },
   homeEnslaversDes: {
@@ -353,9 +353,9 @@ export const homePageTranslated: TranslateType = {
   },
   enslaversPage: {
     label: {
-      en: 'Enslavers',
-      es: 'Esclavistas',
-      pt: 'Escravizadores',
+      en: 'Slave Traders',
+      es: 'Traficantes de Esclavos',
+      pt: 'Traficantes de Escravos',
     },
   },
   timeLapsePage: {

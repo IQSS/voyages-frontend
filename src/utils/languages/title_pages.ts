@@ -25,9 +25,9 @@ export const enslaversHeader = {
   header: [
     {
       label: {
-        en: 'Enslavers',
-        es: 'Esclavistas',
-        pt: 'Escravizadores',
+        en: 'Slave Traders',
+        es: 'Traficantes de Esclavos',
+        pt: 'Traficantes de Escravos',
       },
     },
   ],

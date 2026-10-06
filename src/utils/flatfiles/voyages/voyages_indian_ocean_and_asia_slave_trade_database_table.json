@@ -1272,10 +1272,9 @@
 		},
 		{
 			"header_label": {
-				"en": "Enslavers",
-				"es": "Esclavistas",
-				"pt": "Escravistas"
-
+				"en":"Slave Traders",
+				"es":"Traficantes de Esclavos",
+				"pt":"Traficantes de Escravos"
 			},
 			"cell_type": "literal",
 			"visible": true,
@@ -1684,9 +1683,9 @@
 		},
 		{
 			"label": {
-				"en": "Enslavers",
-				"es": "Esclavistas",
-				"pt": "Escravistas"
+				"en":"Slave Traders",
+				"es":"Traficantes de Esclavos",
+				"pt":"Traficantes de Escravos"
 			},
 			"children": [
 				{

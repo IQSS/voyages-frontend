@@ -10,9 +10,9 @@
 	},
 	{
 		"label": {
-			"en": "Ship, nation, enslavers",
-			"es": "Buque, nación, esclavistas",
-			"pt": "Navio, nação, escravistas"
+			"en": "Ship, nation, slave traders",
+			"es": "Buque, nación, traficantes de esclavos",
+			"pt": "Navio, nação, traficantes de escravos"
 		},
 		"children": [
 			{
