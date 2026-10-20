@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 
 import { useNavigation } from '@/hooks/useNavigation';
 import { RootState } from '@/redux/store';
+import { hasEditorRole } from '@/utils/auth/hasEditorRole';
 import { getDisplayButtons } from '@/utils/functions/contribuitePath';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
 
@@ -21,7 +22,7 @@ const SidebarContribute: React.FC = () => {
     (state: RootState) => state.getLanguages,
   );
   const translatedContribute = translationLanguagesContribute(languageValue);
-  const buttons = getDisplayButtons(translatedContribute);
+  const buttons = getDisplayButtons(translatedContribute, hasEditorRole(user));
 
   const buttonStyle: React.CSSProperties = {
     cursor: 'pointer',

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 import { useSelector } from 'react-redux';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 // Form Components
 import EditExistingVoyage from '@/components/PresentationComponents/Contribute/Form/EditExistingVoyage';
@@ -15,6 +15,10 @@ import SignUpForm from '@/components/PresentationComponents/Contribute/Form/Sign
 import { useNavigation } from '@/hooks/useNavigation';
 import { usePageRouter } from '@/hooks/usePageRouter';
 import { RootState } from '@/redux/store';
+import {
+  hasEditorRole,
+  isEditorOnlyContributeRoute,
+} from '@/utils/auth/hasEditorRole';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
 
 import ContributeHomeWelcome from './ContributeHomeWelcome';
@@ -61,6 +65,9 @@ const ContributeContent: React.FC<ContributeContentProps> = ({
   const { user, loading } = useSelector(
     (state: RootState) => state.getAuthUserSlice,
   );
+  const isEditor = hasEditorRole(user);
+  const isAdminRoute = endpointPath === 'admin';
+  const isEditorialRoute = isEditorOnlyContributeRoute(location.pathname);
   const translatedContribute = translationLanguagesContribute(languageValue);
 
   // Check if current route is public (doesn't require auth)
@@ -106,7 +113,6 @@ const ContributeContent: React.FC<ContributeContentProps> = ({
     'editor_main/publish': () => <PublishNewDBVersion />,
     'editor_main/downloads': () => <DownloadVoyages />,
 
-
     // 'admin/auth/user/': () => <AdminUserList />,
   };
 
@@ -128,8 +134,24 @@ const ContributeContent: React.FC<ContributeContentProps> = ({
       );
     }
 
+    // Protected routes require authentication before role checks or rendering.
+    if (!user && !isPublicRoute) {
+      return (
+        <SignInPage
+          translatedContribute={translatedContribute}
+          handleClickGuidelines={handleClickGuidelines}
+        />
+      );
+    }
+
+    // Admin and editorial screens are available to Editors only, including
+    // when a non-Editor enters one of these URLs directly.
+    if ((isAdminRoute || isEditorialRoute) && !isEditor) {
+      return <Navigate to="/contribute/" replace />;
+    }
+
     // ── Admin routes (/admin/ and /admin/auth/user/) ─────────────────────
-    if (endpointPath === 'admin') {
+    if (isAdminRoute) {
       if (location.pathname === '/admin/' || location.pathname === '/admin') {
         return <AdminHome />;
       }
@@ -139,17 +161,6 @@ const ContributeContent: React.FC<ContributeContentProps> = ({
       if (location.pathname.startsWith('/admin/auth/user')) {
         return <AdminUserList />;
       }
-    }
-
-    // If user is not authenticated and trying to access protected route,
-    // show signin page while redirect happens
-    if (!user && !isPublicRoute) {
-      return (
-        <SignInPage
-          translatedContribute={translatedContribute}
-          handleClickGuidelines={handleClickGuidelines}
-        />
-      );
     }
 
     if (location.pathname.includes('/accounts/signup')) {
