@@ -751,9 +751,10 @@ export const ContributionForm = (props: ContributionFormProps) => {
       })()}
 
       {/* Editorial decision panel */}
-      {(currentStatus === ContributionStatus.Submitted ||
-        currentStatus === ContributionStatus.Accepted ||
-        currentStatus === ContributionStatus.Rejected) && (
+      {isEditor &&
+        (currentStatus === ContributionStatus.Submitted ||
+          currentStatus === ContributionStatus.Accepted ||
+          currentStatus === ContributionStatus.Rejected) && (
         <ContributionEditDecision
           missingBeforeAccept={missingBeforeAccept}
           acceptBlockers={
@@ -772,7 +773,7 @@ export const ContributionForm = (props: ContributionFormProps) => {
           onReopen={props.onReopen ? handleReopenForEditing : undefined}
           canReopen={isEditor}
         />
-      )}
+        )}
 
       {/* A refused submission. Shown over the form rather than beside it: the
           contributor has to read the list before the form means anything, and
