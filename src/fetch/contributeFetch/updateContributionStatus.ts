@@ -51,9 +51,10 @@ export const updateContributionStatus = async (
           data.error ?? 'This contribution is not ready yet.',
         );
       }
-      throw new Error(
-        `Failed to update status: ${data?.error || data?.details || error.message}`,
-      );
+      const reason =
+        [data?.error, data?.details].filter(Boolean).join(': ') ||
+        error.message;
+      throw new Error(`Failed to update status: ${reason}`);
     }
 
     throw error;

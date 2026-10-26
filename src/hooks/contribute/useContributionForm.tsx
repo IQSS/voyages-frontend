@@ -43,7 +43,7 @@ import {
 } from '@/utils/contribute/contributionChanges';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
 
-/** Where a contributor lands once a submission has been accepted. */
+/** Editors return to the review queue after submitting. */
 const SUBMITTED_LIST_PATH = '/contribute/editor_main/requests';
 
 export const useContributionForm = ({
@@ -370,7 +370,7 @@ export const useContributionForm = ({
   }, [preReviewState, onChange, onAbandonReview]);
 
   const handleEditorialDecisionSubmit = useCallback(() => {
-    if (!selectedDecision || !onEditorialDecision) return;
+    if (!isEditor || !selectedDecision || !onEditorialDecision) return;
     // Anything still open in the review is stored first. A decision reads what
     // is saved, so an editor who fills in a value and then decides -- which is
     // the whole shape of the job for a new voyage, where the dataset is theirs
@@ -397,6 +397,7 @@ export const useContributionForm = ({
       },
     });
   }, [
+    isEditor,
     selectedDecision,
     decisionComments,
     onEditorialDecision,
@@ -416,6 +417,7 @@ export const useContributionForm = ({
    * and the original acceptance — who made it and any comment on it — is gone.
    */
   const handleReopenForEditing = useCallback(() => {
+    if (!isEditor) return;
     Modal.confirm({
       title: 'Reopen this contribution for editing?',
       content:
@@ -426,7 +428,7 @@ export const useContributionForm = ({
       cancelText: 'Cancel',
       onOk: () => onReopen?.(),
     });
-  }, [onReopen]);
+  }, [isEditor, onReopen]);
 
   const onChangesUpdate = useCallback(
     /**
@@ -662,7 +664,9 @@ export const useContributionForm = ({
           // query string because a hard navigation cannot carry router state.
           const submittedId = String(response?.id ?? payload.id);
           window.location.replace(
-            `${SUBMITTED_LIST_PATH}?submitted=${encodeURIComponent(submittedId)}`,
+            isEditor
+              ? `${SUBMITTED_LIST_PATH}?submitted=${encodeURIComponent(submittedId)}`
+              : '/contribute/',
           );
         } catch (error) {
           // A refusal is not a failure: the contribution was never submitted,
