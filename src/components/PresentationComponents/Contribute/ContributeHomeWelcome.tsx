@@ -15,7 +15,7 @@ import { TransformedContribution } from './utils/transformContributionData';
 // Default option (everything except Published, see useContributeNewVoyages)
 // plus one option per ContributionStatus, in enum order.
 const STATUS_OPTIONS = [
-  { value: 'all', label: 'All except Published' },
+  { value: 'all', label: 'All' },
   ...Object.entries(statusConfig).map(([value, cfg]) => ({
     value: Number(value),
     label: cfg.label,
