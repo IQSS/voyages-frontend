@@ -141,8 +141,9 @@
       "cell_val": {
         "fields": [
           {
-            "var_name": "voyages__id",
-            "cell_fn": "literal"
+            "var_name": "voyages__voyage_id",
+            "cell_fn": "literal",
+            "node_class": "voyages"
           }
         ]
       }

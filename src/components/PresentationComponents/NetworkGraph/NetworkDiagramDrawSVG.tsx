@@ -14,12 +14,10 @@ import {
   edgeRoleColors,
   nodeColor,
 } from '@/utils/functions/networkPalette';
-import {
-  setNetWorksID,
-  setNetWorksKEY,
-} from '@/redux/getPastNetworksGraphDataSlice';
 import { fetchPastNetworksGraphApi } from '@/fetch/pastEnslavedFetch/fetchPastNetworksGraph';
-import { setIsModalCard, setNodeClass } from '@/redux/getCardFlatObjectSlice';
+import { openCardTarget } from '@/redux/getCardFlatObjectSlice';
+import { resolveCardTarget } from '@/utils/functions/cardTarget';
+import { createNetworkNodeClickCoordinator } from '@/utils/functions/networkNodeClickCoordinator';
 import '@/style/networks.scss';
 
 type NetworkDiagramProps = {
@@ -27,7 +25,6 @@ type NetworkDiagramProps = {
   height: number;
 };
 
-const CLICK_DELAY = 300;
 const CHARGE_STRENGTH = -400;
 const LINK_DISTANCE = 105;
 const NODE_STROKE_WIDTH = '1';
@@ -68,7 +65,7 @@ export const NetworkDiagramDrawSVG = ({
   const transformRef = useRef<d3.ZoomTransform>(zoomIdentity);
   const simulationRef = useRef<d3.Simulation<Nodes, Edges> | null>(null);
   const isDraggingRef = useRef(false);
-  const clickTimeout = useRef<NodeJS.Timeout | undefined>();
+  const clickCoordinator = useRef(createNetworkNodeClickCoordinator());
   const calloutUuidsRef = useRef<Set<string>>(new Set());
   const seedNodeRef = useRef({ id: networkID, nodeClass: networkKEY });
   const calloutRingsRef = useRef<d3.Selection<
@@ -108,19 +105,15 @@ export const NetworkDiagramDrawSVG = ({
   const isCalloutNode = (node: Nodes) =>
     calloutUuidsRef.current.has(node.uuid);
 
-  const clearClickTimeout = () => {
-    if (clickTimeout.current !== undefined) {
-      clearTimeout(clickTimeout.current);
-      clickTimeout.current = undefined;
-    }
-  };
-
-  const handleClickNodeShowCard = async (nodeId: number, nodeClass: string) => {
+  const handleClickNodeShowCard = (nodeId: number, nodeClass: string) => {
     if (nodeClass !== ENSLAVEMENTNODE) {
-      dispatch(setIsModalCard(true));
-      dispatch(setNodeClass(nodeClass));
-      dispatch(setNetWorksID(nodeId));
-      dispatch(setNetWorksKEY(nodeClass));
+      const cardTarget = resolveCardTarget({
+        clickedValue: nodeId,
+        rowId: nodeId,
+        explicitNodeClass: nodeClass,
+        pageNodeClass: nodeClass,
+      });
+      if (cardTarget) dispatch(openCardTarget(cardTarget));
     }
   };
 
@@ -284,6 +277,8 @@ export const NetworkDiagramDrawSVG = ({
     nodesGraphRef.current
       .attr('opacity', 1)
       .attr('class', 'nodes')
+      .attr('data-network-node-id', (d: Nodes) => d.id)
+      .attr('data-network-node-class', (d: Nodes) => d.node_class)
       .attr('stroke', '#fff')
       .style('cursor', 'pointer')
       .attr('stroke-width', NODE_STROKE_WIDTH)
@@ -315,15 +310,11 @@ export const NetworkDiagramDrawSVG = ({
         isDraggingRef.current = false;
         return;
       }
-      clearClickTimeout();
-      if (event.detail >= 2) {
-        handleDoubleClick(d.id, d.node_class);
-        return;
-      }
-      clickTimeout.current = setTimeout(() => {
-        clickTimeout.current = undefined;
-        handleClickNodeShowCard(d.id, d.node_class);
-      }, CLICK_DELAY);
+      clickCoordinator.current.handleClick(
+        event.detail,
+        () => handleClickNodeShowCard(d.id, d.node_class),
+        () => handleDoubleClick(d.id, d.node_class),
+      );
     });
 
     nodesGraphRef.current.on('mouseover', (event: MouseEvent, d: Nodes) => {
@@ -535,7 +526,7 @@ export const NetworkDiagramDrawSVG = ({
       simulationRef.current?.stop();
       simulationRef.current = null;
       isDraggingRef.current = false;
-      clearClickTimeout();
+      clickCoordinator.current.cancel();
     };
     return svgCleanup;
   }, []);
