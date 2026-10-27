@@ -1,0 +1,61 @@
+.table-wrapper {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  
+  .table-section {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    overflow-x: auto;
+    max-height: 80vh;
+    border-radius: 6px;
+  }
+  
+  
+  .comment-sidebar {
+    flex-shrink: 0;
+    width: 220px;
+  }
+  
+  .table-container {
+    display: inline-block;
+    min-width: 100%;
+    max-height: 80vh;
+    overflow: auto;
+  }
+  
+  .numbers-table {
+    border-collapse: collapse;
+    width: auto;
+  }
+  
+  .numbers-table th,
+  .numbers-table td {
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+    min-width: 100px;
+  }
+  
+  .numbers-table thead th {
+    position: sticky;
+    top: 0;
+    background: #f5f5f5;
+    z-index: 2;
+  }
+  
+  .numbers-table .row-header {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 1;
+    min-width: 200px;
+  }
+  
+  .comment-box-wrapper {
+    position: absolute;
+    left: 100%;
+    bottom: 104%;
+  }
+  

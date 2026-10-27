@@ -1,11 +1,30 @@
 import { MouseEventHandler, useState } from 'react';
-import { AppBar, Box, IconButton, Hidden, Typography } from '@mui/material';
+
 import MenuIcon from '@mui/icons-material/Menu';
+import {
+  AppBar,
+  Box,
+  IconButton,
+  useMediaQuery,
+  useTheme,
+  Typography,
+  Button,
+  Menu,
+} from '@mui/material';
 import Toolbar from '@mui/material/Toolbar';
-import { Button, Menu } from '@mui/material';
-import PEOPLE from '@/utils/flatfiles/people/people_page_data.json';
-import { useNavigate } from 'react-router-dom';
 import '@/style/Nav.scss';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
+import LanguagesDropdown from '@/components/SelectorComponents/DropDown/LanguagesDropdown';
+import {
+  setPathEnslavers,
+  setPathNameEnslaved,
+} from '@/redux/getDataPathNameSlice';
+import { setCurrentEnslavedPage } from '@/redux/getScrollEnslavedPageSlice';
+import { setCurrentEnslaversPage } from '@/redux/getScrollEnslaversPageSlice';
+import { resetAllStateToInitailState } from '@/redux/resetAllSlice';
+import { AppDispatch, RootState } from '@/redux/store';
 import {
   ALLENSLAVERS,
   ENSALVEDPAGE,
@@ -14,26 +33,21 @@ import {
   AFRICANORIGINSPAGE,
   AFRICANORIGINS,
 } from '@/share/CONST_DATA';
-import { setCurrentEnslavedPage } from '@/redux/getScrollEnslavedPageSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/redux/store';
-import { setCurrentEnslaversPage } from '@/redux/getScrollEnslaversPageSlice';
-import {
-  setPathEnslavers,
-  setPathNameEnslaved,
-} from '@/redux/getDataPathNameSlice';
-import { resetAllStateToInitailState } from '@/redux/resetAllSlice';
-import HeaderLogo from './HeaderLogo';
-import LanguagesDropdown from '@/components/SelectorComponents/DropDown/LanguagesDropdown';
 import { LabelFilterMeneList } from '@/share/InterfaceTypes';
+import PEOPLE from '@/utils/flatfiles/people/people_page_data.json';
+import { clearSavedData } from '@/utils/supabase/authStorage';
+
 import { HeaderDrawerMenuPeopleBar } from './HeaderDrawerMenuPeopleBar';
+import HeaderLogo from './HeaderLogo';
 
 export default function HeaderPeopleNavBar() {
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const dispatch: AppDispatch = useDispatch();
   const { languageValue } = useSelector(
-    (state: RootState) => state.getLanguages
+    (state: RootState) => state.getLanguages,
   );
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -45,10 +59,7 @@ export default function HeaderPeopleNavBar() {
 
   const handleSelectMenuItems = (item: string) => {
     dispatch(resetAllStateToInitailState());
-    const keysToRemove = Object.keys(localStorage);
-    keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
-    });
+    clearSavedData();
     if (
       item === 'Enslaved' ||
       item === 'Esclavizados' ||
@@ -83,7 +94,7 @@ export default function HeaderPeopleNavBar() {
         }}
       >
         <Toolbar sx={{ display: 'flex', alignItems: 'center' }}>
-          <Hidden mdUp>
+          {!isDesktop && (
             <IconButton
               edge="start"
               aria-label="menu"
@@ -92,7 +103,7 @@ export default function HeaderPeopleNavBar() {
             >
               <MenuIcon />
             </IconButton>
-          </Hidden>
+          )}
           <Typography
             component="div"
             sx={{
@@ -156,7 +167,7 @@ export default function HeaderPeopleNavBar() {
                     <div>{textTitle}</div>
                   </Button>
                 );
-              })
+              }),
             )}
             <LanguagesDropdown />
           </Box>

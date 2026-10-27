@@ -1,4 +1,4 @@
-// ✅ Define the correct shape for AntD TreeSelect node
+// Define the correct shape for AntD TreeSelect node
 export interface TreeSelectNode {
   title: string;
   value: string | number;
@@ -7,7 +7,7 @@ export interface TreeSelectNode {
   children?: TreeSelectNode[];
 }
 
-// ✅ Input location data type
+// Input location data type
 export interface LocationNode {
   id: number;
   name: string;
@@ -18,8 +18,10 @@ export interface LocationNode {
   children?: LocationNode[];
 }
 
-// ✅ Main function to convert your nested location data
-export function convertToTreeSelectFormat(data: LocationNode[]): TreeSelectNode[] {
+// Main function to convert your nested location data
+export function convertToTreeSelectFormat(
+  data: LocationNode[],
+): TreeSelectNode[] {
   const convertNode = (node: LocationNode): TreeSelectNode => {
     const isPlace = node.location_type?.name === 'Place';
 

@@ -114,6 +114,34 @@ export const StyleDialog: SxProps = {
   },
 };
 
+/**
+ * Use this for modals that open ON TOP of another modal (e.g. CreateBatchModal
+ * or BatchUploadModal over BatchManagement). A dark semi-transparent backdrop
+ * and strong box-shadow make the layering immediately obvious.
+ */
+export const StyleDialogOnTop: SxProps = {
+  '& .MuiDialog-container': {
+    position: 'relative',
+    top: '10%',
+    alignItems: 'flex-start',
+  },
+  '& .MuiBackdrop-root': {
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+  },
+  '& .MuiDialogContent-root': {
+    padding: '10px 15px',
+  },
+  '& .MuiPaper-root': {
+    boxShadow: '0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,0,0,0.08)',
+  },
+};
+export const footerStyle = {
+  p: 2,
+  borderTop: '1px solid #ddd',
+  textAlign: 'right',
+  bgcolor: '#f9f9f9',
+};
+
 export const StyleDiver = styled(Divider)`
   border-width: 0.25px;
   border-color: rgb(0 0 0 / 50%);
@@ -178,7 +206,7 @@ export const DialogModalStyle = {
 };
 export const PaperDraggableStyle = {
   maxWidth: 'min(500px, 90vw)',
-  minWidth: 'min(300px, 90vw)'
+  minWidth: 'min(300px, 90vw)',
 };
 
 export const PaperDraggableTimeLapseStyle = {
@@ -186,6 +214,37 @@ export const PaperDraggableTimeLapseStyle = {
   minWidth: 550,
   overflow: 'hidden',
 };
+
+export const PaperDraggableContributeStyle = {
+  maxWidth: 550,
+  minWidth: 550,
+  overflow: 'hidden',
+};
+
+export const PaperDraggableNumberTableStyle = {
+  maxWidth: '75%',
+  minWidth: 600,
+  overflow: 'hidden',
+};
+
+export const PaperDraggablePreviewStyle = {
+  maxWidth: '70%',
+  minWidth: 800,
+  overflow: 'hidden',
+};
+
+export const PaperDraggableBatchStyle = {
+  maxWidth: '50%',
+  minWidth: 500,
+  overflow: 'hidden',
+};
+
+export const PaperDraggableBatchManangmentStyle = {
+  maxWidth: '80%',
+  minWidth: 800,
+  overflow: 'hidden',
+};
+
 export const TextFieldSearch = styled(TextField)`
   & label.Mui-focused {
     color: white;
@@ -239,7 +298,7 @@ export const styleTapMap = {
 };
 export const styleTapNetWorkGraph = {
   bgcolor: '#222',
-  overflowY: 'auto'
+  overflowY: 'auto',
 };
 
 export const styleCardEstimate = {

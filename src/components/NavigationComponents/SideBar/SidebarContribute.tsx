@@ -1,19 +1,34 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
-import { loadUserFromStorage } from '@/redux/getAuthUserSlice';
-import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
-import { getDisplayButtons } from '@/utils/functions/contribuitePath';
-import StyledDrawer from '@/styleMUI/StyledDrawer';
-import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import {  ExitToApp, AccountCircleRounded, Home, Diversity3 } from '@mui/icons-material';
+import React from 'react';
+
+import {
+  ExitToApp,
+  AccountCircleRounded,
+  Home,
+  BookOutlined,
+} from '@mui/icons-material';
+import {
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Tooltip,
+} from '@mui/material';
+import { useSelector } from 'react-redux';
+
 import { useNavigation } from '@/hooks/useNavigation';
+import { RootState } from '@/redux/store';
+import StyledDrawer from '@/styleMUI/StyledDrawer';
+import { hasEditorRole } from '@/utils/auth/hasEditorRole';
+import { getDisplayButtons } from '@/utils/functions/contribuitePath';
+import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
+
 interface SidebarContributeProps {
   openSideBar: boolean;
 }
 
-const SidebarContribute: React.FC<SidebarContributeProps> = ({ openSideBar }) => {
-  const dispatch = useDispatch();
+const SidebarContribute: React.FC<SidebarContributeProps> = ({
+  openSideBar,
+}) => {
   const { user } = useSelector((state: RootState) => state.getAuthUserSlice);
   const {
     handleClickGuidelines,
@@ -21,55 +36,145 @@ const SidebarContribute: React.FC<SidebarContributeProps> = ({ openSideBar }) =>
     handleLogout,
     handleClickSideBar,
   } = useNavigation();
-  const { languageValue } = useSelector((state: RootState) => state.getLanguages);
+  const { languageValue } = useSelector(
+    (state: RootState) => state.getLanguages,
+  );
   const translatedContribute = translationLanguagesContribute(languageValue);
-  const buttons = getDisplayButtons(translatedContribute);
-
-
-  useEffect(() => {
-    dispatch(loadUserFromStorage());
-  }, []);
+  const buttons = getDisplayButtons(translatedContribute, hasEditorRole(user));
 
   return (
-
-    <StyledDrawer  variant="permanent" anchor="left" open={openSideBar} lang={languageValue}>
+    <StyledDrawer
+      variant="permanent"
+      anchor="left"
+      open={openSideBar}
+      lang={languageValue}
+    >
       <List>
-        <ListItem  onClick={handleClickGuidelines}>
-          <ListItemIcon>
-            <Home />
-          </ListItemIcon>
-          {openSideBar && <ListItemText primaryTypographyProps={{style: {fontSize: '0.90rem', fontWeight: '500'}}} primary={translatedContribute.contributeGuidelines} />}
+        <ListItem onClick={handleClickGuidelines}>
+          <Tooltip
+            title={translatedContribute.contributeGuidelines}
+            placement="right"
+            arrow
+          >
+            <ListItemIcon>
+              <BookOutlined style={{ cursor: 'pointer' }} />
+            </ListItemIcon>
+          </Tooltip>
+          {openSideBar && (
+            <ListItemText
+              slotProps={{
+                primary: {
+                  style: {
+                    fontSize: '0.90rem',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                  },
+                },
+              }}
+              primary={translatedContribute.contributeGuidelines}
+            />
+          )}
         </ListItem>
         {user ? (
           <>
-            <ListItem  onClick={() => handleClickSideBar('')}>
-              <ListItemIcon>
-                <Diversity3 />
-              </ListItemIcon>
-              {openSideBar && <ListItemText primaryTypographyProps={{style: {fontSize: '0.90rem', fontWeight: '500'}}} primary={translatedContribute.contributeContributeHome} />}
+            <ListItem onClick={() => handleClickSideBar('')}>
+              <Tooltip
+                title={translatedContribute.contributeContributeHome}
+                placement="right"
+                arrow
+              >
+                <ListItemIcon>
+                  <Home style={{ cursor: 'pointer' }} />
+                </ListItemIcon>
+              </Tooltip>
+              {openSideBar && (
+                <ListItemText
+                  slotProps={{
+                    primary: {
+                      style: {
+                        fontSize: '0.90rem',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                      },
+                    },
+                  }}
+                  primary={translatedContribute.contributeContributeHome}
+                />
+              )}
             </ListItem>
             {buttons.map((btn) => (
-              <ListItem  key={btn.nameBtn} onClick={() => handleClickSideBar(btn.path)}>
-                <ListItemIcon>
-                  {btn.icon}
-                </ListItemIcon>
-                {openSideBar && <ListItemText primaryTypographyProps={{style: {fontSize: '0.90rem', fontWeight: '500'}}} primary={btn.nameBtn} />}
+              <ListItem
+                key={btn.nameBtn}
+                onClick={() => handleClickSideBar(btn.path)}
+              >
+                <Tooltip title={btn.nameBtn} placement="right" arrow>
+                  <ListItemIcon style={{ cursor: 'pointer' }}>
+                    {btn.icon}
+                  </ListItemIcon>
+                </Tooltip>
+                {openSideBar && (
+                  <ListItemText
+                    slotProps={{
+                      primary: {
+                        style: {
+                          fontSize: '0.90rem',
+                          fontWeight: '500',
+                          cursor: 'pointer',
+                        },
+                      },
+                    }}
+                    primary={btn.nameBtn}
+                  />
+                )}
               </ListItem>
             ))}
 
-            <ListItem  onClick={handleLogout}>
-              <ListItemIcon>
-                <ExitToApp />
-              </ListItemIcon>
-              {openSideBar && <ListItemText primaryTypographyProps={{style: {fontSize: '0.90rem', fontWeight: '500'}}} primary={translatedContribute.contributeLogOut} />}
+            <ListItem onClick={handleLogout}>
+              <Tooltip
+                title={translatedContribute.contributeLogOut}
+                placement="right"
+              >
+                <ListItemIcon>
+                  <ExitToApp style={{ cursor: 'pointer' }} />
+                </ListItemIcon>
+              </Tooltip>
+              {openSideBar && (
+                <ListItemText
+                  slotProps={{
+                    primary: {
+                      style: {
+                        fontSize: '0.90rem',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                      },
+                    },
+                  }}
+                  primary={translatedContribute.contributeLogOut}
+                />
+              )}
             </ListItem>
           </>
         ) : (
-          <ListItem  onClick={handleSignInClick}>
-            <ListItemIcon>
-              <AccountCircleRounded />
-            </ListItemIcon>
-            {openSideBar && <ListItemText primaryTypographyProps={{style: {fontSize: '0.90rem', fontWeight: '500'}}} primary={translatedContribute.contributeSignInButton} />}
+          <ListItem onClick={handleSignInClick}>
+            <Tooltip title={translatedContribute.contributeSignInButton}>
+              <ListItemIcon>
+                <AccountCircleRounded style={{ cursor: 'pointer' }} />
+              </ListItemIcon>
+            </Tooltip>
+            {openSideBar && (
+              <ListItemText
+                slotProps={{
+                  primary: {
+                    style: {
+                      fontSize: '0.90rem',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                    },
+                  },
+                }}
+                primary={translatedContribute.contributeSignInButton}
+              />
+            )}
           </ListItem>
         )}
       </List>

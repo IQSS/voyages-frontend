@@ -81,6 +81,7 @@ import {
 } from '@/utils/functions/getColorStyle';
 import { updatedEnslaversRoleAndNameToLocalStorage } from '@/utils/functions/updatedEnslaversRoleAndNameToLocalStorage';
 import { updateFilterTextDialog } from '@/utils/functions/updateFilterTextDialog';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 
 import { DropdownCascading } from './DropdownCascading';
 import '@/style/homepage.scss';
@@ -328,10 +329,7 @@ export const MenuListsDropdown = () => {
       dispatch(setIsChangeGeoTree(!value));
     }
     dispatch(resetAll());
-    const keysToRemove = Object.keys(localStorage);
-    keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
-    });
+    clearSavedData();
   };
 
   const handleApplyEnslaversDialog = (

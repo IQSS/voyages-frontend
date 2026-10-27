@@ -235,6 +235,14 @@ This application is a simple search engine for the CRC Voyages database. It allo
 
 The application also includes a form for adding new voyages to the database, although this functionality is not yet fully implemented.
 
+## Contribution runtime
+
+The EKS container supplies `window.__VOYAGES_RUNTIME_CONFIG__` in `/runtime-config.js` before the application loads. Its contribution settings are `contributeApiBaseUrl` (default `/contribute-api`), `supabaseUrl`, and the public `supabaseAnonKey`. Local development may use the matching `VITE_API_BASE_NODE_URL`, `VITE_SUPABASE_URL`, and `VITE_SUPABASE_ANON_KEY` values from the environment sample.
+
+Keep `apiAuthToken` for Django requests. Contribution requests use the signed-in user's Supabase bearer token; never put a Supabase service-role key or a Node-to-Django service credential in browser configuration. The Supabase project must allow the candidate origin and `/auth/callback` and `/auth/reset-password` redirect URLs.
+
+The contribution package remains locked at version 0.6.12. Installing dependencies requires a GitHub Packages token with access to `@slavevoyages/voyages-contribute`; provide it through an untracked, temporary npm configuration. Production deployments remain owned by `IQSS/voyages-control`.
+
 ## Building for Production
 
     javascipt

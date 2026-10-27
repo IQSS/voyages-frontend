@@ -1,15 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 
-import {
-  LinkedEntitySelectionChange,
-  MaterializedEntity,
-  LinkedEntityProperty,
-  getSchema,
-  materializeNew,
-  EntityChange,
-  EntityUpdate,
-  addToChangeSet,
-} from '@dotproductdev/voyages-contribute';
 import { Close } from '@mui/icons-material';
 import {
   Button,
@@ -19,18 +9,34 @@ import {
   DialogContent,
   IconButton,
 } from '@mui/material';
+import {
+  LinkedEntitySelectionChange,
+  MaterializedEntity,
+  LinkedEntityProperty,
+  getSchema,
+  isMaterializedEntity,
+  materializeNew,
+  EntityChange,
+  PropertyChange,
+  applyUpdate,
+  cloneEntity,
+} from '@slavevoyages/voyages-contribute';
 import { Form } from 'antd';
 
+import FooterModal from '@/components/commonComponents/FooterModal';
+import { PaperDraggableLinkEntityAddComponent } from '@/components/SelectorComponents/Cascading/PaperDraggable';
+import { useDebounce } from '@/hooks/useDebounce';
 import { StyleDialog } from '@/styleMUI';
+import {
+  linkedChangesFromData,
+  mergePropertyChanges,
+  nameChange,
+} from '@/utils/contribute/linkedEntityChanges';
+import { namePropertyLabel } from '@/utils/contribute/linkedEntityName';
 
 import { EntityForm, EntityFormProps } from './EntityForm';
 
 import '@/style/contributeContent.scss';
-import {
-  PaperDraggableLinkEntityAddComponent,
-  PaperDraggableLinkEntityModifyComponent,
-} from '@/components/SelectorComponents/Cascading/PaperDraggable';
-import FooterModal from '@/components/commonComponents/FooterModal';
 
 export interface LinkedEntityPropertyComponentProps {
   property: LinkedEntityProperty;
@@ -39,42 +45,75 @@ export interface LinkedEntityPropertyComponentProps {
   onChange: EntityFormProps['onChange'];
 }
 
+/**
+ * A request to add a new entity named by text typed into the dropdown's
+ * search. `seq` changes with every request, so asking twice for the same text
+ * still opens the dialog.
+ */
+export interface AddFromSearchRequest {
+  text: string;
+  seq: number;
+}
+
 const LinkedEntityAddNewComponent = (
   props: LinkedEntityPropertyComponentProps &
-    EntityFormProps & { comments?: string },
+    EntityFormProps & {
+      comments?: string;
+      addFromSearch?: AddFromSearchRequest;
+    },
 ) => {
-  const { property, entity, lastChange, comments, onChange, ...other } = props;
+  const {
+    property,
+    entity,
+    lastChange,
+    comments,
+    onChange,
+    addFromSearch,
+    ...other
+  } = props;
   const { linkedEntitySchema, uid } = property;
+  // Read-only until the editor starts a review: nothing may be added, modified
+  // or cleared from here before then (DD-0540).
+  const readOnly = !!other.readOnly;
 
   const [open, setOpen] = useState(false);
-  const [draggable, setDraggable] = useState('add');
   const [addedEntity, setAddedEntity] = useState<
     MaterializedEntity | undefined
   >(undefined);
-  const [localChanges, setLocalChanges] = useState<EntityUpdate | undefined>();
+  const [localChanges, setLocalChanges] = useState<EntityChange | undefined>();
   const linkedSchema = getSchema(linkedEntitySchema);
-  console.log({ draggable });
-  const onClose = useCallback(() => setOpen(false), []);
+  // A drag-handle id unique to this dialog instance, so a nested Add-new (e.g. a
+  // short reference opened from inside a source) does not share one id with the
+  // dialog behind it. useId can contain ":" which is invalid in a CSS selector,
+  // so strip it.
+  const dragHandleId = `draggable-dialog-title-contribute-${useId().replace(/:/g, '')}`;
+
+  // The new entity the field currently holds, if any: from this layer's change,
+  // or from an earlier one (the contribution, a previous review) via the
+  // entity's data. Either can be reopened with Modify.
+  const current = lastChange ? lastChange.changed : entity.data[property.label];
+  const currentNew =
+    current && isMaterializedEntity(current) && current.entityRef.type === 'new'
+      ? current
+      : undefined;
+
+  const onClose = useCallback(() => {
+    setOpen(false);
+    // Re-sync with what is actually selected. If "Add new" was opened over an
+    // existing reference and closed without entering anything, the fresh entity
+    // was never emitted, so drop it and let the existing selection (and the
+    // button) stand.
+    setAddedEntity(currentNew);
+  }, [currentNew]);
 
   useEffect(() => {
-    let selected = lastChange?.changed;
-    selected =
-      selected && selected.entityRef.type === 'new' ? selected : undefined;
-    setAddedEntity(selected);
-    setLocalChanges(
-      selected && lastChange?.linkedChanges
-        ? {
-            type: 'update',
-            entityRef: selected.entityRef,
-            changes: lastChange.linkedChanges,
-          }
-        : undefined,
-    );
-  }, [lastChange]);
+    setAddedEntity(currentNew);
+  }, [currentNew]);
 
+  // The new entity's fields go out as `linkedChanges` alongside it: they are
+  // what publication writes (see mergePropertyChanges). A clear sends none.
   const editAdded = useCallback(
-    (e: MaterializedEntity | null, changes?: EntityUpdate) => {
-      const localPropChanges = changes ? changes.changes : [];
+    (e: MaterializedEntity | null, linkedChanges?: PropertyChange[]) =>
       onChange({
         type: 'update',
         entityRef: entity.entityRef,
@@ -84,60 +123,119 @@ const LinkedEntityAddNewComponent = (
             property: uid,
             comments,
             changed: e,
-            linkedChanges: localPropChanges,
+            ...(e ? { linkedChanges: linkedChanges ?? [] } : {}),
           },
         ],
-      });
-    },
+      }),
     [onChange, entity, uid, comments],
   );
 
-  const handleAddOrModify = useCallback(
-    (check: string) => {
-      if (addedEntity === undefined) {
-        const added = materializeNew(linkedSchema, crypto.randomUUID());
-        editAdded(added, localChanges);
+  // The field changes already sent for the entity being edited, so a later
+  // edit -- or reopening it with Modify -- adds to them instead of replacing
+  // them.
+  // An entity emitted before these were sent has only its `data`; its changes
+  // are rebuilt from that, so editing one field of it keeps the others.
+  const sentLinkedChanges = useCallback(
+    (e: MaterializedEntity | undefined): PropertyChange[] => {
+      if (!e || currentNew?.entityRef.id !== e.entityRef.id) {
+        return [];
       }
-      if (check === 'modify') {
-        setDraggable('modify');
-      } else {
-        setDraggable('add');
-      }
-      setOpen(true);
+      return (
+        lastChange?.linkedChanges ??
+        linkedChangesFromData(linkedSchema, currentNew, getSchema)
+      );
     },
-    [addedEntity, linkedSchema, editAdded, localChanges],
+    [lastChange, currentNew, linkedSchema],
   );
 
-  const handleClear = useCallback(() => {
+  // "Add …" from a search that found nothing: a new entity named by what was
+  // typed, recorded at once (the editor asked for exactly this) and opened so
+  // the rest of it can be filled in. Without it, text typed into the search
+  // was dropped with a bare "No data" (DD-0559).
+  useEffect(() => {
+    const text = addFromSearch?.text.trim();
+    if (!text) return;
+    const added = materializeNew(linkedSchema, crypto.randomUUID());
+    const nameLabel = namePropertyLabel(linkedSchema);
+    if (nameLabel) {
+      added.data[nameLabel] = text;
+    }
+    const named = nameChange(linkedSchema, text);
     setLocalChanges(undefined);
-    setAddedEntity(undefined);
+    setAddedEntity(added);
+    editAdded(added, named ? [named] : []);
+    setOpen(true);
+    // Only a new request opens the dialog; the rest are read at that moment.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addFromSearch?.seq]);
+
+  const handleAddOrModify = useCallback(() => {
+    if (addedEntity === undefined) {
+      // Open the dialog on a fresh entity but do NOT emit it yet. Emitting here
+      // would replace the currently selected reference with a blank one the
+      // moment "Add new" is clicked. The selection is kept until the editor
+      // actually enters values -- the debounced edit below then emits and
+      // replaces it -- so adding a new reference over an existing selection no
+      // longer wipes it on open.
+      setAddedEntity(materializeNew(linkedSchema, crypto.randomUUID()));
+    }
+    setOpen(true);
+  }, [addedEntity, linkedSchema]);
+
+  // Each field reports only its own change, so a new one is merged into what is
+  // pending rather than replacing it. Replacing it lost every field edited in
+  // the same debounce window: type a title, pick a source type within a second,
+  // and the title was gone (DD-0559).
+  const mergeLocalChange = useCallback((change: EntityChange) => {
+    setLocalChanges((prev) => {
+      if (
+        !prev ||
+        prev.type !== 'update' ||
+        change.type !== 'update' ||
+        prev.entityRef.id !== change.entityRef.id
+      ) {
+        return change;
+      }
+      const touched = new Set(change.changes.map((c) => c.property));
+      return {
+        ...change,
+        changes: [
+          ...prev.changes.filter((c) => !touched.has(c.property)),
+          ...change.changes,
+        ],
+      };
+    });
+  }, []);
+
+  const debouncedChanges = useDebounce(localChanges, 1000);
+
+  // Each set of edits is emitted once. The effect also re-runs when the form
+  // re-renders with the emitted value, which must not emit it again.
+  const emitted = useRef<EntityChange | undefined>(undefined);
+  useEffect(() => {
+    if (
+      !debouncedChanges ||
+      emitted.current === debouncedChanges ||
+      addedEntity?.entityRef.id !== debouncedChanges.entityRef.id ||
+      debouncedChanges.type !== 'update'
+    ) {
+      return;
+    }
+    emitted.current = debouncedChanges;
+    const modified = cloneEntity(addedEntity);
+    editAdded(
+      applyUpdate(modified, debouncedChanges.changes),
+      mergePropertyChanges(
+        sentLinkedChanges(addedEntity),
+        debouncedChanges.changes,
+      ),
+    );
+  }, [debouncedChanges, editAdded, addedEntity, sentLinkedChanges]);
+
+  const handleClear = useCallback(() => {
     editAdded(null);
   }, [editAdded]);
 
-  const handleLocalChanges = useCallback(
-    (c: EntityChange) => {
-      if (addedEntity === undefined) {
-        alert('Invalid state: addedEntity is undefined');
-        return;
-      }
-      if (c.type !== 'update') {
-        alert('Unexpected change type');
-        return;
-      }
-      if (localChanges !== undefined) {
-        const merged = addToChangeSet([localChanges], c);
-        if (merged.length !== 1 || merged[0].type !== 'update') {
-          alert('Unexpected merged changes result');
-          return;
-        }
-        c = merged[0];
-      }
-      setLocalChanges(c);
-      editAdded(addedEntity, c);
-    },
-    [addedEntity, editAdded],
-  );
-  console.log({ addedEntity });
   return (
     <>
       <Stack
@@ -147,10 +245,8 @@ const LinkedEntityAddNewComponent = (
       >
         <Button
           variant="contained"
-          onClick={() => {
-            const isAddOrModyfy = addedEntity !== undefined ? 'modify' : 'add';
-            handleAddOrModify(isAddOrModyfy);
-          }}
+          onClick={handleAddOrModify}
+          disabled={readOnly}
           className="button-save-contribute"
           sx={{
             cursor: 'pointer',
@@ -166,6 +262,7 @@ const LinkedEntityAddNewComponent = (
             variant="outlined"
             color="error"
             onClick={handleClear}
+            disabled={readOnly}
             size="small"
             sx={{
               cursor: 'pointer',
@@ -193,18 +290,17 @@ const LinkedEntityAddNewComponent = (
         }}
         fullWidth
         maxWidth="sm"
-        PaperComponent={
-          draggable === 'modify'
-            ? PaperDraggableLinkEntityModifyComponent
-            : PaperDraggableLinkEntityAddComponent
-        }
-        aria-labelledby={
-          draggable === 'modify'
-            ? 'draggable-dialog-modify'
-            : 'draggable-dialog-add-new'
-        }
+        PaperComponent={PaperDraggableLinkEntityAddComponent}
+        PaperProps={{ handleId: dragHandleId } as { handleId: string }}
+        aria-labelledby={dragHandleId}
       >
         <DialogTitle
+          // Per-instance id so this dialog's draggable Paper handle targets its
+          // own title, not another open dialog's. Without a matching id the
+          // handle matched nothing and the dialog could not be dragged; a shared
+          // static id let a nested "Add new" (e.g. a short reference opened from
+          // inside a source) collide with the dialog behind it.
+          id={dragHandleId}
           sx={{
             cursor: 'move',
             position: 'relative',
@@ -237,13 +333,15 @@ const LinkedEntityAddNewComponent = (
           }}
         >
           {open && addedEntity && (
-            <Form>
+            <Form layout="vertical">
               <EntityForm
                 {...other}
+                // A new entity's values are known: its fields take comments.
+                commentsLocked={false}
                 changes={localChanges ? [localChanges] : []}
                 schema={linkedSchema}
                 entity={addedEntity}
-                onChange={handleLocalChanges}
+                onChange={mergeLocalChange}
               />
             </Form>
           )}

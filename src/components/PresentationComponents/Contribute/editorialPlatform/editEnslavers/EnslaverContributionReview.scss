@@ -1,0 +1,61 @@
+/**
+ * Scoped styling for the enslaver contribution review tabs. The app's global
+ * CSS paints antd tab labels as solid blue blocks; these rules reset them to
+ * clean text tabs with a teal active state, matching the legacy contribute UI.
+ */
+$teal: rgb(55, 148, 141);
+
+.enslaver-review {
+  .ant-tabs-nav {
+    margin-bottom: 20px;
+
+    &::before {
+      border-bottom: 1px solid #e8e8e8;
+    }
+  }
+
+  .ant-tabs-tab {
+    background: transparent !important;
+    border: none !important;
+    padding: 8px 4px !important;
+    margin: 0 20px 0 0 !important;
+    font-size: 15px;
+
+    .ant-tabs-tab-btn {
+      color: #6b7280 !important;
+      background: transparent !important;
+      text-shadow: none !important;
+    }
+
+    &:hover .ant-tabs-tab-btn {
+      color: $teal !important;
+    }
+
+    &.ant-tabs-tab-active .ant-tabs-tab-btn {
+      color: $teal !important;
+      font-weight: 600;
+    }
+
+    &.ant-tabs-tab-disabled .ant-tabs-tab-btn {
+      color: #c0c4cc !important;
+      cursor: not-allowed;
+    }
+  }
+
+  .ant-tabs-ink-bar {
+    background: $teal;
+    height: 2px;
+  }
+
+  // The read-only field table.
+  .ant-descriptions-item-label {
+    width: 240px;
+    background: #fafafa;
+    color: #4b5563;
+    font-weight: 500;
+  }
+
+  .review-panel {
+    max-width: 900px;
+  }
+}

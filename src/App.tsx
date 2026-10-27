@@ -14,10 +14,13 @@ import {
   useLocation,
 } from 'react-router-dom';
 
+import { AuthCallback } from '@/components/Auth/AuthCallback';
+import { ResetPassword } from '@/components/Auth/ResetPassword';
 import BlogDetailsPost from '@/components/BlogPageComponents/Blogcomponents/BlogDetailsPost';
 import Estimates from '@/components/PresentationComponents/Assessment/Estimates/Estimates';
 import IntroductoryMaps from '@/components/PresentationComponents/Assessment/IntroductoryMaps/IntroductoryMaps';
 import LessonPlans from '@/components/PresentationComponents/Assessment/LessonPlans/LessonPlans';
+import PasswordChangeForm from '@/components/PresentationComponents/Contribute/Form/PasswordChangeForm';
 import TabsSelect from '@/components/SelectorComponents/Tabs/TabsSelect';
 import { usePageRouter } from '@/hooks/usePageRouter';
 import AboutPage from '@/pages/AboutPage';
@@ -33,6 +36,7 @@ import InstitutionAuthorsPage from '@/pages/InstitutionAuthorsPage';
 import PageNotFound404 from '@/pages/PageNotFound404';
 import PastHomePage from '@/pages/PastHomePage';
 import VoyagesPage from '@/pages/VoyagesPage';
+import { setSession, setLoading } from '@/redux/getAuthUserSlice';
 import {
   setCardRowID,
   setNodeClass,
@@ -65,6 +69,11 @@ import {
   allEnslavers,
 } from '@/share/CONST_DATA';
 import { theme } from '@/styleMUI/theme';
+import { clearSavedData } from '@/utils/supabase/authStorage';
+import {
+  hasSupabaseConfiguration,
+  supabase,
+} from '@/utils/supabase/supabaseClient';
 
 import UseSaveSearchURL from './components/FilterComponents/SaveSearchComponent/SaveSearchURLReturn';
 import MetaTag from './components/MetaTag/MetaTag';
@@ -94,9 +103,35 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (location.pathname === '/') {
-      localStorage.clear();
+      clearSavedData();
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!hasSupabaseConfiguration) {
+      dispatch(setSession(null));
+      return;
+    }
+    let mounted = true;
+    dispatch(setLoading(true));
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        if (mounted) dispatch(setSession(session));
+      })
+      .catch(() => {
+        if (mounted) dispatch(setSession(null));
+      });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (mounted) dispatch(setSession(session));
+    });
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     const url = window.location.pathname;
@@ -323,10 +358,7 @@ const App: React.FC = () => {
         <Route path={`${CONTRIBUTE}guidelines`} element={<ContributePage />} />
         <Route path={`${ACCOUNTS}signin`} element={<ContributePage />} />
         <Route path={`${ACCOUNTS}signup`} element={<ContributePage />} />
-        <Route
-          path={`${ACCOUNTS}password/reset`}
-          element={<ContributePage />}
-        />
+        <Route path={`${ACCOUNTS}password/reset`} element={<ResetPassword />} />
         <Route path={`${ACCOUNTS}logout`} element={<ContributePage />} />
         <Route
           path={`${ACCOUNTS}password_change`}
@@ -346,10 +378,63 @@ const App: React.FC = () => {
           path={`${CONTRIBUTE}delete_voyage`}
           element={<ContributePage />}
         />
+        <Route
+          path={`${CONTRIBUTE}interim/new/:id`}
+          element={<ContributePage />}
+        />
+        <Route
+          path={`${CONTRIBUTE}editor_main/pending`}
+          element={<ContributePage />}
+        />
+        <Route
+          path={`${CONTRIBUTE}editor_main/requests`}
+          element={<ContributePage />}
+        />
+        <Route
+          path={`${CONTRIBUTE}editor_main/requests/:id`}
+          element={<ContributePage />}
+        />
+        <Route
+          path={`${CONTRIBUTE}editor_main/enslavers_contrib`}
+          element={<ContributePage />}
+        />
+        <Route
+          path={`${CONTRIBUTE}enslaver_contribution_review/:id`}
+          element={<ContributePage />}
+        />
+        <Route
+          path={`${CONTRIBUTE}editor_main/enslaved_contrib`}
+          element={<ContributePage />}
+        />
+        <Route
+          path={`${CONTRIBUTE}editor_main/users`}
+          element={<ContributePage />}
+        />
+        <Route
+          path={`${CONTRIBUTE}editor_main/sources`}
+          element={<ContributePage />}
+        />
+        <Route
+          path={`${CONTRIBUTE}editor_main/publish`}
+          element={<ContributePage />}
+        />
+        <Route
+          path={`${CONTRIBUTE}editor_main/downloads`}
+          element={<ContributePage />}
+        />
+
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/auth/reset-password" element={<PasswordChangeForm />} />
         <Route path={`${LESSONPLANS}/`} element={<LessonPlans />} />
         <Route path={`${INTRODUCTORYMAPS}/`} element={<IntroductoryMaps />} />
         <Route path={`${ABOUTPAGE}`} element={<AboutPage />} />
         <Route path={`${DOWNLOADS}`} element={<DownloadPage />} />
+        <Route path="/admin/" element={<ContributePage />} />
+        <Route path="/admin" element={<ContributePage />} />
+        <Route path="/admin/auth/user/add/" element={<ContributePage />} />
+        <Route path="/admin/auth/user/add" element={<ContributePage />} />
+        <Route path="/admin/auth/user/" element={<ContributePage />} />
+        <Route path="/admin/auth/user" element={<ContributePage />} />
         <Route path="/404" element={<PageNotFound404 />} />
         <Route path="*" element={<PageNotFound404 />} />
       </Routes>

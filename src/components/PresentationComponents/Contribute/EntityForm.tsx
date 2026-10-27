@@ -1,23 +1,20 @@
-import {EntityChange,} from '@/models/changeSets';
-import { EntitySchema} from '@/models/entities';
-import {MaterializedEntity} from '@/models/materialization';
-import { PropertyAccessLevel } from '@/models/properties';
+import React, { ReactNode, useMemo, useEffect } from 'react';
+
 import {
-  Collapse,
-  CollapseProps,
-  Form,
-  Typography
-} from 'antd';
-import React, {
-  ReactNode,
-  useMemo,
-  useEffect,
-} from 'react';
+  EntityChange,
+  EntitySchema,
+  MaterializedEntity,
+  PropertyAccessLevel,
+} from '@slavevoyages/voyages-contribute';
+import { CollapseProps, Form, Typography } from 'antd';
+
+import { StyledCollapse } from '@/styleMUI/stylesMenu/styleCollapse';
+import { displayPropertyLabel } from '@/utils/contribute/propertyLabels';
+
 import { EntityPropertyComponent } from './EntityPropertyComponent';
 
 export interface ContributionFormProps {
   entity: MaterializedEntity;
-  // onUpdate: (contribution: Contribution) => void;
 }
 
 export interface EntityFormProps {
@@ -34,8 +31,51 @@ export interface EntityFormProps {
   setExpandedMenu: React.Dispatch<React.SetStateAction<string[]>>;
   accessLevel: PropertyAccessLevel;
   onSectionsChange?: (sections: CollapseProps['items']) => void;
+  readOnly?: boolean;
+  /**
+   * Property uids that stay editable even when the form is read-only.
+   *
+   * An editor opening a submitted contribution is reading, not editing -- with
+   * one exception. `Voyage.dataset` is theirs to supply and nobody else's, so
+   * requiring them to open a review to reach one field put the two halves of a
+   * single decision behind a toggle.
+   */
+  editableWhenReadOnly?: string[];
+  /**
+   * When set, only these property uids render. Used for the year-only voyage
+   * date fields, whose owned VoyageSparseDate schema carries Year/Month/Day but
+   * should present the Year alone. Purely presentational -- the value stored is
+   * still the Year on the same backing table.
+   */
+  visiblePropertyUids?: string[];
+  errorPropertyUids?: string[];
+  /**
+   * The entity's stored values are unknown -- an existing voyage that failed
+   * to load. A comment has to travel with the field's value, so on a field
+   * whose value is unknown it would record a clear of the stored one; such
+   * fields take no comments.
+   */
+  commentsLocked?: boolean;
+  /** Shown under a field listed in `errorPropertyUids`. */
+  errorHint?: string;
+  /** A hint of its own for some of those fields, by property uid. */
+  errorHints?: Record<string, string>;
 }
 
+// Section labels that differ from what the voyages-contribute package ships.
+// Keyed by the package's section string, valued by what the UI should display.
+const SECTION_LABEL_OVERRIDES: Record<string, string> = {
+  'Slave numbers': 'Enslaved',
+  'Ship, Nations': 'Ship and nation',
+  'Voyage Outcome': 'Voyage outcomes',
+  'Voyage Itinerary': 'Voyage itinerary',
+  'Voyage Dates': 'Voyage dates',
+  // Subsections under "Enslaved (numbers)" (DD-0541). The backing package still
+  // ships the old section strings until it is rebuilt, so relabel them here too
+  // (sentence case). Harmless once the package carries the new names.
+  Numbers: 'Totals',
+  'Enslaved (characteristics)': 'Age and sex',
+};
 
 export const EntityForm = ({
   schema,
@@ -46,18 +86,31 @@ export const EntityForm = ({
   setExpandedMenu,
   accessLevel,
   onSectionsChange,
+  readOnly = false,
+  editableWhenReadOnly,
+  visiblePropertyUids,
+  errorPropertyUids,
+  commentsLocked = false,
+  errorHint = 'Please fill out this field before accepting.',
+  errorHints,
 }: EntityFormProps) => {
   const properties = useMemo(
     () =>
       schema.properties.filter(
-        (p) => p.accessLevel === undefined || p.accessLevel <= accessLevel,
+        (p) =>
+          (p.accessLevel === undefined || p.accessLevel <= accessLevel) &&
+          (visiblePropertyUids === undefined ||
+            visiblePropertyUids.includes(p.uid)),
       ),
-    [schema, accessLevel],
+    [schema, accessLevel, visiblePropertyUids],
   );
 
   const children = useMemo(
     () =>
       properties.map((p) => {
+        const isError = errorPropertyUids?.includes(p.uid) ?? false;
+        const hint = errorHints?.[p.uid] ?? errorHint;
+        const displayLabel = displayPropertyLabel(p);
         const component = (
           <>
             <EntityPropertyComponent
@@ -70,6 +123,9 @@ export const EntityForm = ({
               changes={changes}
               onChange={onChange}
               accessLevel={accessLevel}
+              readOnly={readOnly && !editableWhenReadOnly?.includes(p.uid)}
+              commentsLocked={commentsLocked}
+              error={isError}
             />
           </>
         );
@@ -77,19 +133,26 @@ export const EntityForm = ({
         return p.kind === 'bool' ||
           p.kind === 'text' ||
           p.kind === 'number' ||
-          p.kind === 'linkedEntity'
-          ? addLabel(component, p.label)
+          p.kind === 'linkedEntity' ||
+          p.kind === 'table'
+          ? addLabel(component, displayLabel, p.schema, isError, hint)
           : component;
       }),
     [
       properties,
-      accessLevel,
       schema,
       expandedMenu,
       setExpandedMenu,
       entity,
       changes,
       onChange,
+      accessLevel,
+      readOnly,
+      editableWhenReadOnly,
+      errorPropertyUids,
+      commentsLocked,
+      errorHint,
+      errorHints,
     ],
   );
 
@@ -102,17 +165,15 @@ export const EntityForm = ({
     const collapsible: CollapseProps['items'] = [];
     for (const [section, items] of Object.entries(map)) {
       if (section !== '') {
+        const displaySection = SECTION_LABEL_OVERRIDES[section] ?? section;
         collapsible.push({
-          key: `${items.map((item) => {
-            if (React.isValidElement(item)) {
-              return item.props.children.key;
-            } else {
-              return item?.toString();
-            }
-          })}`,
+          // Stable key so the panel's expanded/collapsed state survives
+          // accessLevel changes — it must not depend on which properties
+          // are currently filtered into the section.
+          key: `${schema.name}-${section}`,
           label: (
             <Typography.Title level={4} className="collapse-title">
-              {section}
+              {displaySection}
             </Typography.Title>
           ),
           children: (
@@ -127,44 +188,88 @@ export const EntityForm = ({
     }
 
     return [map[''] ?? [], collapsible];
-  }, [properties, children]);
+  }, [properties, children, schema.name]);
 
   useEffect(() => {
     onSectionsChange?.(sections);
   }, [sections, onSectionsChange]);
-
   return (
-   <>
+    <>
       {ungrouped.length > 0 &&
         ungrouped.map((item, index) => (
           <div key={`ungrouped-${index}`}>{item}</div>
         ))}
       {sections.length > 0 && (
-        <div>
-          <Collapse
-            activeKey={expandedMenu}
-            onChange={(keys) => {
-              setExpandedMenu(keys as string[]);
-            }}
-            bordered={false}
-            items={sections}
-            ghost
-            className="custom-collapse"
-          />
-        </div>
+        <StyledCollapse
+          activeKey={expandedMenu}
+          onChange={(keys) => {
+            setExpandedMenu(keys as string[]);
+          }}
+          bordered={false}
+          items={sections}
+          ghost
+          className="custom-collapse"
+        />
       )}
     </>
   );
 };
 
-const addLabel = (item: ReactNode, label: string) => {
+const addLabel = (
+  item: ReactNode,
+  label: string,
+  schema: string,
+  error = false,
+  hint = '',
+) => {
+  // Always rendered, empty when there is no error: adding or removing it would
+  // rebuild the field, and the input would lose focus while being typed in.
+  const fillOutHint = (
+    <Typography.Text
+      type="danger"
+      style={{ fontSize: 12, display: error ? 'block' : 'none' }}
+    >
+      {error ? hint : null}
+    </Typography.Text>
+  );
+  const isVoyageSparseDate = schema === 'VoyageSparseDate';
+  if (isVoyageSparseDate) {
+    // For date fields, use a more compact layout with better alignment
+    return (
+      <Form.Item
+        label={<span className="form-contribute-label">{label}</span>}
+        name={label}
+        style={{
+          margin: '8px 0px',
+          marginBottom: '12px',
+        }}
+        labelCol={{ span: 24 }}
+        wrapperCol={{ span: 24 }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            flexWrap: 'wrap',
+          }}
+        >
+          {item}
+        </div>
+        {fillOutHint}
+      </Form.Item>
+    );
+  }
+
+  // For regular fields
   return (
     <Form.Item
       label={<span className="form-contribute-label">{label}</span>}
       name={label}
-      style={{ marginBottom: 0 }}
+      style={{ margin: '2px 0 4px 0' }}
     >
       {item}
+      {fillOutHint}
     </Form.Item>
   );
 };

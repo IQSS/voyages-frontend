@@ -11,7 +11,8 @@ import {
   AppBar,
   Box,
   IconButton,
-  Hidden,
+  useMediaQuery,
+  useTheme,
   Divider,
   Menu,
   Typography,
@@ -67,6 +68,7 @@ import {
   getColorBoxShadow,
   getColorBTNVoyageDatasetBackground,
 } from '@/utils/functions/getColorStyle';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 
 import { DrawerMenuBar } from './DrawerMenuBar';
 import HeaderLogo from './HeaderLogo';
@@ -74,6 +76,8 @@ import GlobalSearchButton from '../../PresentationComponents/GlobalSearch/Global
 import CascadingMenu from '../../SelectorComponents/Cascading/CascadingMenu';
 
 export default function HeaderVoyagesNavBar() {
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const dispatch: AppDispatch = useDispatch();
   const { styleName: styleNameRoute } = usePageRouter();
   const navigate = useNavigate();
@@ -170,12 +174,7 @@ export default function HeaderVoyagesNavBar() {
       }
 
       // Cleanup LocalStorage (only remove specific keys if needed)
-      const keysToRemove = Object.keys(localStorage);
-      keysToRemove.forEach((key) => {
-        if (key !== 'filterObject') {
-          localStorage.removeItem(key);
-        }
-      });
+      clearSavedData(['filterObject']);
     },
     [currentVoyageBlockName, navigate, dispatch, styleNameToPathMap],
   );
@@ -193,10 +192,7 @@ export default function HeaderVoyagesNavBar() {
   };
   const onClickReset = () => {
     dispatch(resetAllStateToInitailState());
-    const keysToRemove = Object.keys(localStorage);
-    keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
-    });
+    clearSavedData();
   };
 
   return (
@@ -214,7 +210,7 @@ export default function HeaderVoyagesNavBar() {
         }}
       >
         <Toolbar sx={{ display: 'flex', alignItems: 'center' }}>
-          <Hidden mdUp>
+          {!isDesktop && (
             <IconButton
               edge="start"
               color="default"
@@ -224,7 +220,7 @@ export default function HeaderVoyagesNavBar() {
             >
               <MenuIcon style={{ color: 'fff' }} />
             </IconButton>
-          </Hidden>
+          )}
           <Typography
             component="div"
             sx={{
@@ -258,7 +254,7 @@ export default function HeaderVoyagesNavBar() {
               {inputSearchValue && <GlobalSearchButton />}
             </Typography>
           </Typography>
-          <Hidden mdUp>{!inputSearchValue && <CascadingMenu />}</Hidden>
+          {!isDesktop && !inputSearchValue && <CascadingMenu />}
           <Box
             className="menu-nav-bar-select-box"
             sx={{
@@ -296,7 +292,7 @@ export default function HeaderVoyagesNavBar() {
             borderClor: 'rgb(0 0 0 / 50%)',
           }}
         />
-        <Hidden mdDown>{!inputSearchValue && <CascadingMenu />}</Hidden>
+        {isDesktop && !inputSearchValue && <CascadingMenu />}
         <Box component="nav">
           <Menu
             anchorEl={anchorEl}

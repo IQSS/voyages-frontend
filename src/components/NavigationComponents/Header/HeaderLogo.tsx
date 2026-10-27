@@ -9,6 +9,7 @@ import { setInputSearchValue } from '@/redux/getCommonGlobalSearchResultSlice';
 import { resetAllStateToInitailState } from '@/redux/resetAllSlice';
 import { resetBlockNameAndPageName } from '@/redux/resetBlockNameAndPageName';
 import { AppDispatch } from '@/redux/store';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 import '@/style/Nav.scss';
 
 export default function HeaderLogo() {
@@ -19,7 +20,7 @@ export default function HeaderLogo() {
     dispatch(resetAllStateToInitailState());
     dispatch(resetBlockNameAndPageName());
     dispatch(setInputSearchValue(''));
-    localStorage.clear();
+    clearSavedData();
   };
 
   return (

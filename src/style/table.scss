@@ -353,14 +353,6 @@
   align-items: center;
 }
 
-.ag-header-cell,
-.ag-header-group-cell {
-  padding-left: 10px !important;
-  padding-right: 10px !important;
-  padding-top: 6px !important;
-  padding-bottom: 6px !important;
-}
-
 .ag-header-cell-comp-wrapper {
   justify-content: start;
 }
@@ -459,7 +451,31 @@ div .customHeaderLabelSummaryTable {
 .pagination-div>nav>ul>li>button {
   font-size: 0.875rem;
 }
+.pagination-contribute {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px 0;
+  .css-1l5xwdx-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected {
+    background-color: rgb(0, 114, 105) !important;
+    color: #fff;
+}
+  .css-1omp2b7.Mui-selected {
+    background-color: rgb(0, 114, 105) !important;
+  }
 
+  .css-1to7aaw-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected {
+    background-color:rgb(0, 114, 105) !important;;
+  }
+  nav>ul>li>button:focus {
+    background-color: rgb(0, 114, 105) !important;
+    color: #fff;
+  }
+  nav>ul>li>button:active {
+    background-color: rgb(0, 114, 105) !important;
+    color: #fff;
+  }
+}
 .Skeleton-loading {
   position: relative;
   top: 5rem;

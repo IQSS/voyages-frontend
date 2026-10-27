@@ -3,35 +3,51 @@
     @media only screen and (max-width: 374px) {
       @content;
     }
-  } @else if $size==1 {
+  }
+
+  @else if $size==1 {
     @media only screen and (min-width: 375px) and (max-width: 425px) {
       @content;
     }
-  } @else if $size==1.1 {
+  }
+
+  @else if $size==1.1 {
     @media only screen and (min-width: 425px) and (max-width: 479px) {
       @content;
     }
-  } @else if $size==2 {
+  }
+
+  @else if $size==2 {
     @media only screen and (min-width: 480px) and (max-width: 575px) {
       @content;
     }
-  } @else if $size==3 {
+  }
+
+  @else if $size==3 {
     @media only screen and (min-width: 576px) and (max-width: 767px) {
       @content;
     }
-  } @else if $size==4 {
+  }
+
+  @else if $size==4 {
     @media only screen and (min-width: 768px) and (max-width: 991px) {
       @content;
     }
-  } @else if $size==5 {
+  }
+
+  @else if $size==5 {
     @media only screen and (min-width: 992px) and (max-width: 1024px) {
       @content;
     }
-  } @else if $size==6 {
+  }
+
+  @else if $size==6 {
     @media only screen and (min-width: 1025px) and (max-width: 1366px) {
       @content;
     }
-  } @else if $size==7 {
+  }
+
+  @else if $size==7 {
     @media only screen and (max-width: 1440px) {
       @content;
     }
@@ -67,18 +83,13 @@
 
 .contribuite-main-content {
   margin: 0 2rem;
+  padding-bottom: 1.5rem;
   margin-top: 7rem;
-  display: inline-flex;
+  display: flex;
+  box-sizing: border-box;
 
   .contribute-content {
-    padding: 10px;
 
-    .page-title-1 {
-      font-weight: bold;
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      color: #333;
-    }
 
     p {
       margin-top: 1rem;
@@ -89,7 +100,19 @@
         text-decoration: none;
       }
     }
-  }
+
+    .ant-card-bordered {
+      border: 1px solid #028479;
+    }
+}
+
+.page-title-1 {
+      font-weight: bold;
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+      color: #333;
+      margin-top: 0.5rem;
+}
 
   .lable-title {
     font-size: 1rem;
@@ -113,10 +136,6 @@
       border-bottom: 1px solid #ddca9d;
     }
 
-    label {
-      display: block;
-      margin: 10px 0;
-    }
 
     .label-signup {
       margin-right: 1.5rem;
@@ -132,7 +151,7 @@
       height: 18px;
     }
 
-    button {
+    .btn-sigin {
       padding: 10px 15px;
       background-color: rgb(55, 148, 141);
       color: white;
@@ -143,6 +162,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 34px;
 
       img {
         border-radius: 50%;
@@ -150,16 +170,43 @@
       }
     }
 
-    button:hover {
+    .btn-sigin:hover {
       background-color: rgba(6, 186, 171, 0.83);
     }
 
-    .create-account {
-      color: rgb(55, 148, 141);
-      cursor: pointer;
-    }
-  }
+    .signup-resetpassword-session {
+      display: flex;
+      align-items: center;
 
+      .sigup-reset-session {
+        display: flex;
+        align-items: center;
+
+        .create-account {
+          color: rgb(55, 148, 141);
+          cursor: pointer;
+          background: none;
+          border: none;
+          padding: 0;
+          font: inherit;
+          margin: 0 4px;
+
+          &:hover {
+            background: none;
+          }
+        }
+      }
+
+    }
+
+  }
+    .contribute-sign-up-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 1rem;
+    }
   .guide-pdf {
     margin-bottom: 1rem;
     margin-left: 2rem;
@@ -186,27 +233,54 @@
     text-decoration: underline;
   }
 }
-.property-changes-table .ant-table-thead > tr > th {
+
+.property-changes-table .ant-table-thead>tr>th {
   background-color: #f9fafb;
   font-weight: 600;
   color: #4b5563;
 }
 
-.property-changes-table .ant-table-tbody > tr:nth-child(odd) {
+.property-changes-table .ant-table-tbody>th {
+  background: rgb(55, 148, 141) !important;
+}
+
+.property-changes-table .ant-table-tbody>tr:nth-child(odd) {
   background-color: #fcfcfc;
 }
 
-.property-changes-table .ant-table-tbody > tr > td {
+.property-changes-table .ant-table-tbody>tr>td {
   padding: 8px 12px;
 }
+
 .ant-table-title {
   background: rgb(55, 148, 141);
-  .section-title{
+
+  .section-title {
     color: #fff;
     font-size: 0.85rem;
+    cursor: pointer;
   }
 }
-.property-change{
+
+.section-header-title {
+  background: rgb(55, 148, 141);
+  color: #fff;
+  font-size: 0.85rem;
+  padding: 2px 8px 2px 12px;
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+}
+
+.expanded-icon {
+  margin-left: 10px;
+  font-size: 16px;
+}
+
+.property-change {
   font-size: 0.85rem;
   font-weight: 500;
   color: 'rgb(55, 148, 141)'
@@ -232,20 +306,450 @@
   border-bottom: 1px solid #e8e8e8;
 }
 
-.button-reset-contribute{
-  border-color: rgb(55, 148, 141) !important;
-  color: rgb(55, 148, 141) !important;
-  background-color: #fff !important;
-}
-
-.button-save-contribute{
+.button-save-contribute {
   background-color: rgb(55, 148, 141) !important;
   border-color: rgb(55, 148, 141) !important;
   color: #fff !important;
 }
 
-.button-submit-contribute{
+// The colours above are forced, so a disabled button (read-only form) would
+// still look clickable without this.
+.button-save-contribute:disabled,
+.button-save-contribute.Mui-disabled {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+}
+
+.button-submit-contribute {
   background-color: #0958d9 !important;
   border-color: #0958d9 !important;
   color: #fff !important;
+}
+
+.truncate-select .ant-select-selection-placeholder {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.truncate-input input {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.truncate-tree-select .ant-select-selection-item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.truncate-tree-select .ant-select-selection-placeholder {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.linked-change-wrapper {
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border-left: 3px solid #00796b;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+
+  .linked-change-table .ant-table {
+    margin-inline: 0px -8px !important;
+    margin-block: -8px !important;
+  }
+}
+
+
+.linked-entity-label {
+  font-weight: 600;
+  color: #00796b;
+  margin-bottom: 0.5rem;
+}
+
+.date-fields-container {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 6px 12px 8px 12px;
+  border-radius: 4px;
+  border: 0.5px solid #d1d0d0;
+  margin-top: 5px;
+}
+
+.section-header-review {
+  color: #fff;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  background: rgb(55, 148, 141);
+  padding: 4px 0px 4px 10px;
+  border-radius: 4px;
+  border-bottom: 1px solid rgba(249, 249, 249, 0.2509803922);
+}
+
+/* Add these styles to your existing table.scss file */
+
+.compact-table {
+  .ag-header {
+    background-color: #f8f9fa !important;
+    border-bottom: 2px solid #e9ecef !important;
+    font-weight: 600 !important;
+  }
+
+  .ag-header-cell {
+    border-right: 1px solid #e9ecef !important;
+    color: rgb(55, 148, 141) !important;
+  }
+
+  .compact-header {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #495057 !important;
+  }
+
+  .ag-cell {
+    // padding: 8px 12px !important;
+    border-right: 1px solid #f1f3f4 !important;
+    border-bottom: 1px solid #f1f3f4 !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+  }
+
+  .even-row {
+    background-color: #ffffff !important;
+  }
+
+  .odd-row {
+    background-color: #f8f9fa !important;
+  }
+  .ag-row.decided-row {
+    background-color: #fffbe6 !important;
+    border-left: 3px solid #faad14 !important;
+  }
+
+  .ag-row:hover {
+    background-color: #e3f2fd !important;
+    cursor: pointer;
+  }
+
+  /* Remove default row selection styling */
+  .ag-row-selected {
+    background-color: #e3f2fd !important;
+  }
+
+  /* Compact scrollbars */
+  .ag-body-horizontal-scroll {
+    height: 12px !important;
+  }
+
+  .ag-body-vertical-scroll {
+    width: 12px !important;
+  }
+
+  /* Header sorting icons */
+  .ag-icon-asc,
+  .ag-icon-desc {
+    font-size: 12px !important;
+  }
+
+  /* Remove extra padding from cells */
+  .ag-cell-value {
+    line-height: 1.2 !important;
+  }
+}
+
+/* Custom pointer row styling */
+.custom-pointer-row {
+  cursor: pointer !important;
+}
+
+.custom-pointer-row:hover {
+  background-color: #f0f8ff !important;
+}
+
+/* Status chip custom styling */
+.status-chip {
+  border-radius: 12px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  height: 20px !important;
+  padding: 0 8px !important;
+}
+
+/* Table container improvements */
+.tableContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  border-radius: 0 0 8px 8px;
+}
+
+.pagination-contribute {
+  display: flex;
+  align-items: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .compact-table {
+
+    .ag-header-cell,
+    .ag-cell {
+      padding: 6px 8px !important;
+      font-size: 12px !important;
+    }
+  }
+
+  .tableContainer {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+.list-edittorial-container {
+  background: #fff;
+  margin: 5px 0 10px 0;
+  padding: 8px 0;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+/* AG Grid Checkbox Styling */
+.ag-theme-alpine {
+  /* Custom checkbox styling */
+  --ag-checkbox-checked-color: #007269;
+  --ag-checkbox-unchecked-color: #d1d5db;
+  --ag-checkbox-indeterminate-color: #007269;
+  --ag-checkbox-background-color: #ffffff;
+  --ag-checkbox-border-color: #d1d5db;
+  --ag-checkbox-border-radius: 4px;
+  --ag-checkbox-size: 16px;
+
+  /* Checkbox container styling */
+  .ag-selection-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Custom checkbox appearance */
+  .ag-checkbox-input-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+  }
+
+  .ag-checkbox-input {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #d1d5db;
+    border-radius: 4px;
+    background-color: #ffffff;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #007269;
+      box-shadow: 0 0 0 2px rgba(0, 114, 105, 0.1);
+    }
+
+    &:checked {
+      background-color: #007269;
+      border-color: #007269;
+
+      &::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+      }
+    }
+
+    &:indeterminate {
+      background-color: #007269;
+      border-color: #007269;
+
+      &::after {
+        content: '−';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+      }
+    }
+  }
+
+  /* Header checkbox styling */
+  .ag-header-cell .ag-checkbox-input {
+    &:checked {
+      background-color: #007269;
+      border-color: #007269;
+    }
+  }
+
+  /* Row checkbox styling */
+  .ag-row .ag-checkbox-input {
+    &:checked {
+      background-color: #007269;
+      border-color: #007269;
+    }
+  }
+
+  /* Custom checkbox variants */
+  .ag-checkbox-input.custom-checkbox {
+    border-radius: 50%;
+    /* Round checkboxes */
+  }
+
+  .ag-checkbox-input.large-checkbox {
+    width: 20px;
+    height: 20px;
+    border-width: 3px;
+  }
+
+  .ag-checkbox-input.small-checkbox {
+    width: 14px;
+    height: 14px;
+    border-width: 1px;
+  }
+
+  /* Disabled state */
+  .ag-checkbox-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+  }
+
+  /* Focus state */
+  .ag-checkbox-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 114, 105, 0.2);
+  }
+
+  /* Disable row click for specific columns */
+  .ag-cell[col-id="Action"] {
+    cursor: default !important;
+    pointer-events: none;
+    /* Completely disable interaction */
+  }
+
+  /* Or allow only checkbox interaction in Action column */
+  .ag-cell[col-id="Action"] .ag-selection-checkbox {
+    pointer-events: auto;
+    /* Re-enable for checkboxes only */
+  }
+}
+
+.card-contribute {
+  .ant-card-head {
+    background-color: rgb(55, 148, 141);
+    color: #fff;
+    font-weight: 600;
+    min-height: 40px;
+    padding: 0 12px;
+  }
+}
+
+.contribute-edit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  button {
+    border-color: #fff;
+    background-color: rgb(55, 148, 141);
+    color: #fff;
+    font-weight: 600;
+
+  }
+}
+
+.card-contribute-decision {
+  margin-bottom: 2rem;
+
+  .ant-card-head {
+    background-color: rgb(55, 148, 141);
+    color: #fff;
+    font-weight: 600;
+    min-height: 40px;
+    padding: 0 12px;
+  }
+}
+
+.status-and-decistion {
+  display: flex;
+  justify-content: space-between;
+
+  .ant-typography {
+    color: #ffffff
+  }
+}
+
+.action-review-btn {
+  display: flex;
+  gap: 8px;
+
+  .abandon-review {
+    color: red;
+  }
+
+  .commit-review {
+    color: #fff;
+  }
+}
+// Admin routes rendered inside ContributePage shell
+// Same flex layout as .contribuite-main-content but NO side margins
+.admin-main-content {
+  margin-top: 7rem;
+  padding-bottom: 1.5rem;
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  justify-content: center;
+}
+.badge-secondary {
+    color: #fff;
+    background-color: #868e96;
+}
+.badge {
+    display: inline-block;
+    padding: .25em .4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25rem;
+}
+
+.admin-add-user{
+    display: inline-block;
+    padding: 3px 15px 3px 15px;
+    background: 4px center no-repeat rgb(55, 148, 141);
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 4px;
+    line-height: 20px;
 }

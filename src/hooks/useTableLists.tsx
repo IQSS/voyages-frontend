@@ -11,7 +11,7 @@ import { useQuery } from 'react-query';
 
 export const useTableLists = (
   dataSend: TableListPropsRequest | undefined,
-  styleName?: string
+  styleName?: string,
 ) => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['tableLists', dataSend],

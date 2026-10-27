@@ -1,0 +1,8 @@
+# The deployment writes apiAuthToken into /runtime-config.js; never bundle it with Vite.
+VITE_API_BASE_URL = 'http://127.0.0.1:8000'
+VITE_API_BASE_NODE_URL = '/contribute-api'
+VITE_SUPABASE_URL = ''
+VITE_SUPABASE_ANON_KEY = ''
+HOST='0.0.0.0'
+POST='3000'
+VITE_IIIF_MANIFESTS_BASEURL='https://location.of.iiifmanifests/withtrailingslash/'

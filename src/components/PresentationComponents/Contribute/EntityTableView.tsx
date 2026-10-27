@@ -1,22 +1,7 @@
+import { useCallback, useMemo } from 'react';
+
+import { Add } from '@mui/icons-material';
 import {
-  areMatch,
-  EntityChange,
-  EntityUpdate,
-  mergePropertyChange,
-  OwnedEntityListChange,
-  PropertyChange,
-} from '@/models/changeSets';
-import {
-  applyUpdate,
-  cloneEntity,
-  expandMaterialized,
-  isMaterializedEntityArray,
-  MaterializedEntity,
-  materializeNew,
-} from '@/models/materialization';
-import { OwnedEntityListProperty } from '@/models/properties';
-import {
-  Box,
   IconButton,
   Paper,
   Table,
@@ -26,12 +11,22 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
+import {
+  applyUpdate,
+  isMaterializedEntityArray,
+  MaterializedEntity,
+  getSchema,
+  materializeNew,
+  areMatch,
+  OwnedEntityListChange,
+  OwnedEntityListProperty,
+  cloneEntity,
+} from '@slavevoyages/voyages-contribute';
 import { Typography } from 'antd';
-import React, { useCallback, useMemo } from 'react';
-import {Add, Delete, Restore} from '@mui/icons-material';
-import { EntitySchema, getSchema } from '@/models/entities';
-import { EntityForm, EntityFormProps } from './EntityForm';
-import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
+import { v4 as uuidv4 } from 'uuid';
+
+import { EntityFormProps } from './EntityForm';
+import { EntityTableRow } from './EntityTableRow';
 
 export interface EntityTableViewProps {
   property: OwnedEntityListProperty;
@@ -39,180 +34,12 @@ export interface EntityTableViewProps {
   entity: MaterializedEntity;
 }
 
-interface EntityTableRowProps {
-  schema: EntitySchema;
-  entity: MaterializedEntity;
-  parent: MaterializedEntity;
-  property: OwnedEntityListProperty;
-  lastChange?: OwnedEntityListChange;
-}
-
-const createEmptyChange = (property: string): OwnedEntityListChange => ({
+export const createEmptyChange = (property: string): OwnedEntityListChange => ({
   kind: 'ownedList',
   modified: [],
   removed: [],
   property,
 });
-
-const EntityTableRow = ({
-  schema,
-  entity,
-  parent,
-  property,
-  lastChange,
-  onChange,
-  ...other
-}: EntityTableRowProps & EntityFormProps) => {
-  const [open, setOpen] = React.useState(false);
-  const isDeleted =
-    lastChange &&
-    lastChange.removed.findIndex((r) => areMatch(r, entity.entityRef)) >= 0;
-  const handleDelAction = useCallback(() => {
-    if (isDeleted) {
-      onChange({
-        type: 'update',
-        entityRef: parent.entityRef,
-        changes: [
-          {
-            ...lastChange,
-            removed: lastChange.removed.filter(
-              (r) => !areMatch(r, entity.entityRef),
-            ),
-          },
-        ],
-      });
-    } else {
-      const change: OwnedEntityListChange =
-        lastChange ?? createEmptyChange(property.uid);
-      onChange({
-        type: 'update',
-        entityRef: parent.entityRef,
-        changes: [
-          {
-            ...change,
-            removed: [...change.removed, entity.entityRef],
-          },
-        ],
-      });
-    }
-  }, [isDeleted, lastChange, onChange]);
-  const handleRowChange = useCallback(
-    (c: EntityChange) => {
-      const change: OwnedEntityListChange =
-        lastChange ?? createEmptyChange(property.uid);
-      if (c.type !== 'update') {
-        alert('Not supported change in nested table entry!');
-        return;
-      }
-      const prev = change.modified.find((m) =>
-        areMatch(m.ownedEntityId, c.entityRef),
-      );
-      const next = mergePropertyChange(prev, {
-        kind: 'owned',
-        ownedEntityId: c.entityRef,
-        property: property.uid,
-        changes: c.changes,
-      });
-      onChange({
-        type: 'update',
-        entityRef: parent.entityRef,
-        changes: [
-          {
-            ...change,
-            modified: [
-              ...change.modified.filter(
-                (m) => !areMatch(m.ownedEntityId, c.entityRef),
-              ),
-              next,
-            ],
-          },
-        ],
-      });
-    },
-    [lastChange, parent, property, onChange],
-  );
-  const rowPropChanges: PropertyChange[] = useMemo(() => {
-    if (!lastChange) {
-      return [];
-    }
-    return lastChange.modified
-      .filter((v) => areMatch(v.ownedEntityId, entity.entityRef))
-      .flatMap((v) => v.changes);
-  }, [entity, lastChange]);
-  const rowChanges: EntityUpdate[] = useMemo(
-    () =>
-      rowPropChanges.length === 0
-        ? []
-        : [
-            {
-              type: 'update',
-              entityRef: entity.entityRef,
-              changes: rowPropChanges,
-            },
-          ],
-    [entity, rowPropChanges],
-  );
-  const background = isDeleted
-    ? 'red'
-    : entity.entityRef.type === 'new'
-      ? 'green'
-      : 'transparent';
-  const updatedEntity = useMemo(() => {
-    const e = rowPropChanges.length > 0 ? cloneEntity(entity) : entity;
-    if (rowPropChanges.length > 0) {
-      applyUpdate(e, expandMaterialized(e), rowPropChanges);
-    }
-    return e;
-  }, [entity, rowPropChanges]);
-  return (
-    <React.Fragment>
-      <TableRow
-        sx={{
-          '& > *': {
-            borderBottom: 'unset',
-            background,
-          },
-        }}
-      >
-        <TableCell>
-          {schema.contributionMode !== 'ReadOnly' && (
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={() => setOpen(!open)}
-            >
-              {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-            </IconButton>
-          )}
-        </TableCell>
-        <TableCell component="th" scope="row">
-          {schema.getLabel(updatedEntity.data)}
-        </TableCell>
-        <TableCell align="right">
-          <IconButton size="small" color="error" onClick={handleDelAction}>
-            {isDeleted ? <Restore /> : <Delete />}
-          </IconButton>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          {open && (
-            <Box sx={{ margin: 1 }}>
-              <EntityForm
-                key={entity.entityRef.id}
-                {...other}
-                schema={schema}
-                entity={entity}
-                changes={rowChanges}
-                onChange={handleRowChange}
-              />
-            </Box>
-          )}
-        </TableCell>
-      </TableRow>
-    </React.Fragment>
-  );
-};
 
 export const EntityTableView = ({
   property,
@@ -222,26 +49,22 @@ export const EntityTableView = ({
 }: EntityTableViewProps & EntityFormProps) => {
   const { label, linkedEntitySchema } = property;
   const fieldValue = entity.data[label];
-  if (!isMaterializedEntityArray(fieldValue)) {
-    return (
-      <span>
-        BUG: The entity data does not match the expectation of being an array of
-        materialized entities (children)
-      </span>
-    );
-  }
+  const isValidFieldValue = isMaterializedEntityArray(fieldValue);
   const childSchema = getSchema(linkedEntitySchema);
+  const onChange = other.onChange;
+
   const children = useMemo(() => {
+    if (!isValidFieldValue) return [];
     const res: MaterializedEntity[] = [...fieldValue];
     if (lastChange) {
       const added = lastChange.modified.filter(
         (m) =>
-          m.ownedEntityId.type === 'new' &&
-          !res.find((e) => areMatch(m.ownedEntityId, e.entityRef)),
+          m.ownedEntity.entityRef.type === 'new' &&
+          !res.find((e) => areMatch(m.ownedEntity.entityRef, e.entityRef)),
       );
       for (const m of added) {
-        const item = materializeNew(childSchema, m.ownedEntityId.id);
-        applyUpdate(item, {}, m.changes);
+        const item = cloneEntity(m.ownedEntity);
+        applyUpdate(item, m.changes);
         res.push(item);
       }
     }
@@ -261,66 +84,89 @@ export const EntityTableView = ({
       return a.localeCompare(b);
     });
     return res;
-  }, [entity, lastChange, childSchema, fieldValue]);
-  const onChange = other.onChange;
+  }, [isValidFieldValue, lastChange, fieldValue]);
+
   const handleAdd = useCallback(() => {
-    const change = lastChange ?? createEmptyChange(property.uid);
-    const childProp = childSchema.properties.find(
-      (p) => p.label === property.childBackingProp,
-    );
-    if (childProp === undefined) {
-      throw new Error(
-        `Invalid schema: the child property "${property.childBackingProp}" was not found in ${linkedEntitySchema}`,
+    try {
+      const change = lastChange ?? createEmptyChange(property.uid);
+      const childProp = childSchema.properties.find(
+        (p) => p.label === property.childBackingProp,
       );
-    }
-    onChange({
-      type: 'update',
-      entityRef: entity.entityRef,
-      changes: [
-        {
-          ...change,
-          modified: [
-            ...change.modified,
-            {
-              kind: 'owned',
-              ownedEntityId: {
-                type: 'new',
-                id: `${new Date().getTime()}${crypto.randomUUID()}`,
-                schema: linkedEntitySchema,
+      if (childProp === undefined) {
+        throw new Error(
+          `Invalid schema: the child property "${property.childBackingProp}" was not found in ${linkedEntitySchema}`,
+        );
+      }
+      onChange({
+        type: 'update',
+        entityRef: entity.entityRef,
+        changes: [
+          {
+            ...change,
+            modified: [
+              ...change.modified,
+              {
+                kind: 'owned',
+                ownedEntity: materializeNew(
+                  childSchema,
+                  `${new Date().getTime()}${uuidv4()}`,
+                ),
+                changes: [
+                  {
+                    kind: 'direct',
+                    property: childProp.uid,
+                    changed: entity.entityRef.id,
+                  },
+                ],
               },
-              property: property.uid,
-              changes: [
-                {
-                  kind: 'direct',
-                  property: childProp.uid,
-                  changed: entity.entityRef.id,
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    });
-  }, [entity, lastChange, property, linkedEntitySchema, onChange]);
+            ],
+          },
+        ],
+      });
+    } catch (e) {
+      console.error(e);
+      alert(e);
+    }
+  }, [entity, lastChange, property, linkedEntitySchema, onChange, childSchema]);
+
+  if (!isValidFieldValue) {
+    return (
+      <span>
+        BUG: The entity data does not match the expectation of being an array of
+        materialized entities (children)
+      </span>
+    );
+  }
+
   return (
-    <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+    <div style={{ marginBottom: '10px' }}>
       <TableContainer component={Paper}>
         <Table aria-label="collapsible table">
           <TableHead>
             <TableRow>
               <TableCell />
               <TableCell>
-                <Typography.Title level={5}>{property.label}</Typography.Title>
+                <Typography.Title
+                  level={5}
+                  style={{ color: 'rgb(55, 148, 141)' }}
+                >
+                  {property.label}
+                </Typography.Title>
               </TableCell>
               <TableCell align="right">
-                <IconButton size="small" color="success" onClick={handleAdd}>
+                <IconButton
+                  size="small"
+                  color="success"
+                  onClick={handleAdd}
+                  disabled={!!other.readOnly}
+                >
                   <Add />
                 </IconButton>
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {children.map((c, i) => (
+            {children.map((c) => (
               <EntityTableRow
                 key={c.entityRef.id}
                 {...other}

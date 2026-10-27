@@ -1,21 +1,29 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import {
-  areMatch,
-  DirectPropertyChange,
-  EntityChange,
   LinkedEntitySelectionChange,
-} from '@/models/changeSets';
-import {
   isMaterializedEntity,
   MaterializedEntity,
-  materializeNew,
-} from '@/models/materialization';
-import { EntityLinkEditMode, LinkedEntityProperty } from '@/models/properties';
-import { Button, Select } from 'antd';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { EntityForm, EntityFormProps } from './EntityForm';
+  EntityLinkEditMode,
+  LinkedEntityProperty,
+  getSchema,
+} from '@slavevoyages/voyages-contribute';
+import { Alert, Button, Select, Spin, Tooltip, Typography } from 'antd';
+import type { RefSelectProps } from 'antd/es/select';
+
+import { useSchemaEnumeration } from '@/hooks/useEnumeration';
+import { useTreeSelectContributeLocation } from '@/hooks/useTreeSelectContributeLocation';
+
+import TreeSelectedEntity from './commonContribute/TreeSelectedEntity';
+import { lowerCaseFirstLetter } from './DirectEntityPropertyField';
+import { EntityFormProps } from './EntityForm';
 import { EntityPropertyChangeCommentBox } from './EntityPropertyChangeCommentBox';
-import { getSchema, getSchemaProp } from '@/models/entities';
-import { useEnumeration } from '@/hooks/useEnumeration';
+import LinkedEntityAddNewDialogComponent, {
+  AddFromSearchRequest,
+} from './LinkedEntityAddNewDialogComponent';
+import { LinkedEntityOwnedPropertyComponent } from './LinkedEntityOwnedPropertyComponent';
+
+import '@/style/contributeContent.scss';
 
 export interface LinkedEntityPropertyComponentProps {
   property: LinkedEntityProperty;
@@ -24,118 +32,30 @@ export interface LinkedEntityPropertyComponentProps {
   onChange: EntityFormProps['onChange'];
 }
 
-export const LinkedEntityOwnedPropertyComponent = ({
-  property,
-  entity,
-  lastChange,
-  changes,
-  onChange,
-  ...other
-}: LinkedEntityPropertyComponentProps & EntityFormProps) => {
-  const { label } = property;
-  const value = lastChange
-    ? lastChange.changed
-    : (entity.data[label] as MaterializedEntity | null);
-  const schema = getSchema(property.linkedEntitySchema);
-  const localChanges: EntityChange[] = useMemo(
-    () =>
-      value && lastChange?.linkedChanges
-        ? [
-            {
-              type: 'update' as const,
-              entityRef: value.entityRef,
-              changes: lastChange.linkedChanges,
-            },
-          ]
-        : [],
-    [changes, value, entity],
-  );
-  const handleClear = useCallback(() => {
-    if (value === null) {
-      return;
-    }
-    onChange({
-      type: 'update',
-      entityRef: entity.entityRef,
-      changes: [
-        {
-          kind: 'linked',
-          property: property.uid,
-          changed: null,
-        },
-      ],
-    });
-    onChange({
-      type: 'delete',
-      entityRef: value.entityRef,
-    });
-  }, [value, entity, property]);
-  const handleSet = useCallback(() => {
-    // Materialize a new entity
-    const owned = materializeNew(schema, crypto.randomUUID());
-    onChange({
-      type: 'update',
-      entityRef: entity.entityRef,
-      changes: [
-        {
-          kind: 'linked',
-          property: property.uid,
-          //comments,
-          changed: owned,
-        },
-      ],
-    });
-  }, [schema, entity, property, onChange]);
-  const handleChanges = useCallback(
-    (ec: EntityChange) => {
-      if (ec.type !== 'update') {
-        throw new Error('Unexpected ec type');
-      }
-      onChange({
-        type: 'update',
-        entityRef: entity.entityRef,
-        changes: [
-          {
-            kind: 'linked',
-            property: property.uid,
-            changed: value,
-            linkedChanges: ec.changes.filter(
-              (c) => c.kind === 'direct',
-            ) as DirectPropertyChange[],
-          },
-        ],
-      });
-    },
-    [entity, property, value, onChange],
-  );
-  return (
-    <>
-      {value ? (
-        <Button onClick={handleClear}>Clear</Button>
-      ) : (
-        <Button onClick={handleSet}>Set</Button>
-      )}
-      {value && (
-        <div style={{ marginLeft: '24px' }}>
-          <EntityForm
-            key={value.entityRef.id}
-            {...other}
-            changes={localChanges}
-            schema={schema}
-            entity={value}
-            onChange={handleChanges}
-          />
-        </div>
-      )}
-    </>
-  );
-};
-
 export const LinkedEntityPropertyComponent = (
   props: LinkedEntityPropertyComponentProps & EntityFormProps,
 ) => {
-  const { property, entity, lastChange, onChange } = props;
+  const {
+    property,
+    entity,
+    lastChange,
+    onChange,
+    readOnly = false,
+    commentsLocked = false,
+  } = props;
   const [comments, setComments] = useState<string | undefined>();
+  // No comment where the value it would travel with is unknown (see
+  // EntityFormProps.commentsLocked): it would record a clear.
+  const commentLocked = commentsLocked && !lastChange;
+  // What is typed into the search, and the last "Add …" asked of it.
+  const [searchText, setSearchText] = useState('');
+  // To close the dropdown once "Add …" is clicked: the button keeps focus in
+  // the select (so its click lands), which otherwise left the menu open over
+  // the form, now listing every entry because the search was cleared.
+  const selectRef = useRef<RefSelectProps>(null);
+  const [addFromSearch, setAddFromSearch] = useState<
+    AddFromSearchRequest | undefined
+  >();
   const { uid, mode, label, linkedEntitySchema } = property;
   const value = lastChange
     ? lastChange.changed
@@ -150,60 +70,56 @@ export const LinkedEntityPropertyComponent = (
     return <LinkedEntityOwnedPropertyComponent {...props} />;
   }
   const linkedSchema = getSchema(linkedEntitySchema);
-  const { items: optionItems } = useEnumeration(linkedEntitySchema);
-  let options = optionItems.map((entity) => ({
-    label: linkedSchema.getLabel(entity.data, true),
-    value: entity.entityRef.id,
-    entity,
-  }));
-  if (options.length === 0) {
-    // TODO: remove this after the Enumeration API is in place.
-    const dummyRecord = (fields: string[]) =>
-      fields.reduce(
-        (rec, f) => ({ ...rec, [f]: `dummy_${f}_${crypto.randomUUID()}` }),
-        {} as Record<string, string>,
-      );
-    const fillEntityWithDummies = (entity: MaterializedEntity) => {
-      const schema = getSchema(entity.entityRef.schema);
-      const fields = Object.keys(entity.data).filter((label) => {
-        const prop = getSchemaProp(schema, label);
-        return (
-          prop !== undefined && (prop.kind === 'number' || prop.kind === 'text')
-        );
-      });
-      Object.assign(entity.data, dummyRecord(fields));
-      return entity;
-    };
-    options = [1, 2, 3, 4, 5, 6].map((i, _) => ({
-      label: `Mocked ${property.linkedEntitySchema} with id ${i}`,
-      value: i,
-      entity: fillEntityWithDummies(materializeNew(linkedSchema, i)),
+  const { items: optionItems } = useSchemaEnumeration(linkedEntitySchema);
+
+  const { locationsList, loading, error } = useTreeSelectContributeLocation({
+    expirationSeconds: 300,
+  });
+
+  const options = useMemo(() => {
+    const res = optionItems.map((entity) => ({
+      label: linkedSchema.getLabel(entity.data, true),
+      value: entity.entityRef.id,
+      entity,
     }));
-  }
-  // TODO: Specialize component for locations.
-  /*return property.linkedEntitySchema === Location.name ? (
-        <TreeSelect
-        placeholder={`Please select ${label}`}
-        treeData={treeData}
-        style={{ width: 'calc(100% - 20px)' }}
-        dropdownStyle={{ overflow: 'auto', zIndex: 1301 }}
-        showSearch
-        treeCheckable
-        allowClear
-        multiple
-        treeDefaultExpandAll={false}
-        maxTagCount={8}
-        filterTreeNode={filterTreeNode}
-        />
-    ) : */
+
+    // Always carry the current selection as an option so the Select can render
+    // it by its label. A new entity (Add new), an imported one, or any source
+    // not in the enumerated list is otherwise unmatched, and antd falls back to
+    // showing the raw value -- the entity's id (a uuid) instead of its title.
+    if (
+      value &&
+      !res.some((o) => String(o.value) === String(value.entityRef.id))
+    ) {
+      res.push({
+        label: linkedSchema.getLabel(value.data, true),
+        value: value.entityRef.id,
+        entity: value,
+      });
+    }
+    return res;
+  }, [optionItems, value, linkedSchema]);
+
   const handleChange = useCallback(
     (item: string | number | null) => {
-      if (
-        item === ((lastChange?.changed ?? value)?.entityRef.id ?? null) &&
-        comments === lastChange?.comments
-      ) {
+      if (item == null) return;
+
+      // On mount the local `comments` state is undefined and the effect below
+      // re-emits the current value; fall back to the saved comment so that emit
+      // does not wipe it (the reason comments vanished after save/reload).
+      const nextComments = comments ?? lastChange?.comments;
+      const currentId = (lastChange?.changed ?? value)?.entityRef.id ?? null;
+      if (item === currentId && nextComments === lastChange?.comments) {
         return;
       }
+      const matchedOption = options.find(
+        (x) => String(x.value) === String(item),
+      );
+      if (!matchedOption) {
+        console.warn('No matching option found for item:', item);
+        return;
+      }
+
       onChange({
         type: 'update',
         entityRef: entity.entityRef,
@@ -211,44 +127,201 @@ export const LinkedEntityPropertyComponent = (
           {
             kind: 'linked',
             property: uid,
-            comments,
-            changed: item
-              ? {
-                  entityRef: {
-                    id: item,
-                    schema: linkedEntitySchema,
-                    type: 'existing',
-                  },
-                  data:
-                  options.find((x) => x.value === item)?.entity.data ??
-                    {},
-                  state: 'lazy',
-                }
-              : null,
+            comments: nextComments,
+            changed: {
+              entityRef: {
+                id: item,
+                schema: linkedEntitySchema,
+                type: 'existing',
+              },
+              data: matchedOption.entity.data,
+              state: 'lazy',
+            },
           },
         ],
       });
     },
-    [onChange, entity, property, comments, lastChange, value],
+    [
+      onChange,
+      entity,
+      property,
+      comments,
+      lastChange,
+      value,
+      options,
+      uid,
+      linkedEntitySchema,
+    ],
   );
-  useEffect(
-    () => handleChange(value?.entityRef.id ?? null),
-    [handleChange, value],
-  );
+
+  // Persist a comment on its own. handleChange is gated on a non-null selection
+  // and a matching loaded option, so on an empty select (most Itinerary and
+  // Outcome fields) or one whose current value is not in the loaded option list,
+  // a comment would be dropped -- the uneven-bubbles bug (DD-0545). Recording it
+  // directly against the current value (kept as-is, or null when empty) makes
+  // the bubble work everywhere, like it does on the direct text/number fields.
+  // A plain function (not a hook) so it adds no hook after the early returns
+  // above; a stable reference is not needed for the comment box.
+  const handleCommentChange = (comment: string) => {
+    setComments(comment);
+    onChange({
+      type: 'update',
+      entityRef: entity.entityRef,
+      changes: [
+        {
+          kind: 'linked',
+          property: uid,
+          comments: comment,
+          changed: lastChange?.changed ?? value ?? null,
+        },
+      ],
+    });
+  };
+
+  // The dropdown's clear (x). handleChange ignores an empty selection, because
+  // it also runs on mount with none, so clearing is recorded here.
+  const handleClear = () =>
+    onChange({
+      type: 'update',
+      entityRef: entity.entityRef,
+      changes: [
+        {
+          kind: 'linked',
+          property: uid,
+          comments: comments ?? lastChange?.comments,
+          changed: null,
+        },
+      ],
+    });
+
+  // useEffect only if external `value` updates should trigger a change
+  useEffect(() => {
+    handleChange(value?.entityRef.id ?? null);
+  }, [handleChange, value]);
+
+  const styledOptions = options.map((opt) => ({
+    ...opt,
+    label: (
+      <Tooltip title={opt.label}>
+        <div
+          style={{
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            maxWidth: '400px', // adjust as needed
+          }}
+        >
+          {opt.label}
+        </div>
+      </Tooltip>
+    ),
+  }));
+
+  const typed = searchText.trim();
+  const notFoundContent =
+    mode === EntityLinkEditMode.Create && !readOnly && typed !== '' ? (
+      <div style={{ padding: '4px 8px' }}>
+        <Typography.Text type="secondary" style={{ display: 'block' }}>
+          No {lowerCaseFirstLetter(label)} matches “{typed}”.
+        </Typography.Text>
+        <Button
+          type="link"
+          size="small"
+          style={{
+            padding: 0,
+            maxWidth: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+          // Keep focus in the select until the click lands.
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            setAddFromSearch((prev) => ({
+              text: typed,
+              seq: (prev?.seq ?? 0) + 1,
+            }));
+            setSearchText('');
+            selectRef.current?.blur();
+          }}
+        >
+          + Add “{typed}”
+        </Button>
+      </div>
+    ) : undefined;
+
+  let displaySelected;
+
+  if (property.linkedEntitySchema === 'Location') {
+    if (loading) {
+      return (
+        <Spin spinning={true} tip="Loading location tree...">
+          <div style={{ minHeight: 60 }} />
+        </Spin>
+      );
+    }
+
+    if (error) {
+      return <Alert type="error" message="Failed to load location data." />;
+    }
+
+    displaySelected = (
+      <TreeSelectedEntity
+        handleChange={handleChange}
+        onClear={handleClear}
+        value={value}
+        label={label}
+        options={options}
+        lastChange={lastChange}
+        locationsList={locationsList}
+        disabled={readOnly}
+      />
+    );
+  } else {
+    displaySelected = (
+      <Select
+        ref={selectRef}
+        className={`truncate-select ${lastChange ? 'changedEntityProperty' : ''}`}
+        value={value?.entityRef.id}
+        placeholder={`Select ${lowerCaseFirstLetter(label)}`}
+        style={{ width: 'calc(100% - 20px)' }}
+        options={styledOptions}
+        onChange={handleChange}
+        allowClear
+        onClear={handleClear}
+        showSearch
+        searchValue={searchText}
+        onSearch={setSearchText}
+        onBlur={() => setSearchText('')}
+        notFoundContent={notFoundContent}
+        styles={{
+          popup: { root: { maxHeight: 400, overflow: 'auto', zIndex: 9999 } },
+        }}
+        optionLabelProp="label"
+        filterOption={(input: string, option: any) =>
+          (option?.label?.props?.title ?? '')
+            .toLowerCase()
+            .includes(input.toLowerCase())
+        }
+        disabled={readOnly}
+      />
+    );
+  }
+
   return (
     <>
-      <Select
-        className={lastChange ? 'changedEntityProperty' : undefined}
-        value={value?.entityRef.id}
-        placeholder={`Please select ${label}`}
-        style={{ width: 'calc(100% - 20px)' }}
-        options={options}
-        onChange={handleChange}
-      />
+      {displaySelected}
+      {mode === EntityLinkEditMode.Create && (
+        <LinkedEntityAddNewDialogComponent
+          {...props}
+          comments={comments}
+          addFromSearch={addFromSearch}
+        />
+      )}
       <EntityPropertyChangeCommentBox
         property={property}
-        current={comments}
-        onComment={setComments}
+        current={lastChange?.comments}
+        onComment={handleCommentChange}
+        readOnly={readOnly || commentLocked}
       />
     </>
   );

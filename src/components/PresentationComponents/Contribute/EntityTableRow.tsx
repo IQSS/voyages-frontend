@@ -1,5 +1,20 @@
-import { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
+import {
+  Delete,
+  DeleteForever,
+  Restore,
+  KeyboardArrowUp,
+  KeyboardArrowDown,
+} from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  IconButton,
+  TableCell,
+  TableRow,
+  Collapse,
+} from '@mui/material';
 import {
   applyUpdate,
   cloneEntity,
@@ -7,27 +22,31 @@ import {
   EntitySchema,
   areMatch,
   EntityChange,
+  EntityRef,
   EntityUpdate,
   mergePropertyChange,
   OwnedEntityListChange,
   PropertyChange,
   OwnedEntityListProperty,
-  materializeNew,
-  getSchema,
-  OwnedEntityChange,
-} from '@dotproductdev/voyages-contribute';
-import {
-  Delete,
-  Restore,
-  KeyboardArrowUp,
-  KeyboardArrowDown,
-} from '@mui/icons-material';
-import { Box, IconButton, TableCell, TableRow, Collapse } from '@mui/material';
+} from '@slavevoyages/voyages-contribute';
+import { Modal } from 'antd';
 
-import { useDebounce } from '@/hooks/useDebounce';
+import { ListChange, purgedOf } from '@/utils/contribute/contributionChanges';
 
 import { EntityForm, EntityFormProps } from './EntityForm';
 import { createEmptyChange } from './EntityTableView';
+
+// Compact buttons for a deleted row, in place of the single delete icon.
+const rowButtonSx = {
+  textTransform: 'none',
+  fontSize: 12,
+  lineHeight: 1.5,
+  py: 0.25,
+  px: 1,
+  minWidth: 0,
+  background: '#fff',
+  '& .MuiButton-startIcon': { mr: 0.5 },
+} as const;
 
 interface EntityTableRowProps {
   schema: EntitySchema;
@@ -46,7 +65,7 @@ export const EntityTableRow = ({
   onChange,
   ...other
 }: EntityTableRowProps & EntityFormProps) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
   const isDeleted =
     lastChange &&
@@ -54,16 +73,17 @@ export const EntityTableRow = ({
 
   const handleDelAction = useCallback(() => {
     if (isDeleted) {
+      // Revert.
+      const notThis = (r: EntityRef) => !areMatch(r, entity.entityRef);
       onChange({
         type: 'update',
         entityRef: parent.entityRef,
         changes: [
           {
             ...lastChange,
-            removed: lastChange.removed.filter(
-              (r) => !areMatch(r, entity.entityRef),
-            ),
-          },
+            removed: lastChange.removed.filter(notThis),
+            purged: purgedOf(lastChange).filter(notThis),
+          } as ListChange,
         ],
       });
     } else {
@@ -80,14 +100,32 @@ export const EntityTableRow = ({
         ],
       });
     }
-  }, [
-    isDeleted,
-    lastChange,
-    onChange,
-    entity.entityRef,
-    parent.entityRef,
-    property.uid,
-  ]);
+  }, [isDeleted, lastChange, onChange]);
+
+  // Hides a deleted row from the list, after confirmation. It stays removed.
+  const handleDeleteForever = useCallback(() => {
+    if (!lastChange) return;
+    const purge = () =>
+      onChange({
+        type: 'update',
+        entityRef: parent.entityRef,
+        changes: [
+          {
+            ...lastChange,
+            purged: [...purgedOf(lastChange), entity.entityRef],
+          } as ListChange,
+        ],
+      });
+    Modal.confirm({
+      title: 'Delete this row forever?',
+      content:
+        'It will be removed from the list and can no longer be reverted here.',
+      okText: 'Delete forever',
+      okButtonProps: { danger: true },
+      cancelText: 'Cancel',
+      onOk: purge,
+    });
+  }, [lastChange, onChange, parent, entity]);
 
   const handleRowChange = useCallback(
     (c: EntityChange) => {
@@ -104,7 +142,7 @@ export const EntityTableRow = ({
       const prev = change.modified.find((m) =>
         areMatch(m.ownedEntity.entityRef, c.entityRef),
       );
-      const next = mergePropertyChange(prev as OwnedEntityChange, {
+      const next = mergePropertyChange(prev, {
         kind: 'owned',
         ownedEntity: prev?.ownedEntity ?? entity,
         property: property.uid,
@@ -156,29 +194,23 @@ export const EntityTableRow = ({
       ? '#e8f5e9'
       : '#f9f9f9';
 
-  const debouncedPropChanges = useDebounce(rowPropChanges, 800);
-
   const updatedEntity = useMemo(() => {
     let e = entity;
-    if (debouncedPropChanges.length > 0) {
-      e = cloneEntity(entity);
-      if (
-        entity.entityRef.type === 'new' &&
-        Object.keys(entity.data).length === 0
-      ) {
-        // A new entity may be empty to avoid unnecessary data.
-        e = materializeNew(
-          getSchema(entity.entityRef.schema),
-          entity.entityRef.id,
-        );
+    if (rowPropChanges.length > 0) {
+      try {
+        e = cloneEntity(entity);
+        applyUpdate(e, rowPropChanges);
+      } catch {
+        // DEBUG MODE:
+        e = entity;
+        console.dir(e);
       }
-      applyUpdate(e, debouncedPropChanges);
     }
     return e;
-  }, [entity, debouncedPropChanges]);
+  }, [entity, rowPropChanges]);
 
   return (
-    <>
+    <React.Fragment>
       <TableRow
         sx={{
           '& > *': {
@@ -190,12 +222,7 @@ export const EntityTableRow = ({
           },
         }}
       >
-        <TableCell
-          sx={{
-            padding: '2px 16px',
-            borderColor: 'divider',
-          }}
-        >
+        <TableCell>
           {schema.contributionMode !== 'ReadOnly' && (
             <IconButton
               aria-label="expand row"
@@ -209,7 +236,7 @@ export const EntityTableRow = ({
         <TableCell
           component="th"
           scope="row"
-          sx={{ fontWeight: 500, color: '#333', padding: '2px 16px' }}
+          sx={{ fontWeight: 500, color: '#333' }}
         >
           <span
             dangerouslySetInnerHTML={{
@@ -217,21 +244,44 @@ export const EntityTableRow = ({
             }}
           ></span>
         </TableCell>
-        <TableCell
-          align="right"
-          sx={{
-            padding: '2px 16px',
-            borderColor: 'divider',
-          }}
-        >
-          <IconButton
-            size="small"
-            color={isDeleted ? 'primary' : 'error'}
-            onClick={handleDelAction}
-            title={isDeleted ? 'Restore' : 'Delete'}
-          >
-            {isDeleted ? <Restore /> : <Delete />}
-          </IconButton>
+        <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+          {isDeleted ? (
+            <Box sx={{ display: 'inline-flex', gap: 1 }}>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<Restore sx={{ fontSize: '16px !important' }} />}
+                onClick={handleDelAction}
+                disabled={!!other.readOnly}
+                sx={rowButtonSx}
+              >
+                Revert
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                color="error"
+                startIcon={
+                  <DeleteForever sx={{ fontSize: '16px !important' }} />
+                }
+                onClick={handleDeleteForever}
+                disabled={!!other.readOnly}
+                sx={rowButtonSx}
+              >
+                Delete forever
+              </Button>
+            </Box>
+          ) : (
+            <IconButton
+              size="small"
+              color="error"
+              onClick={handleDelAction}
+              title="Delete"
+              disabled={!!other.readOnly}
+            >
+              <Delete />
+            </IconButton>
+          )}
         </TableCell>
       </TableRow>
       <TableRow>
@@ -241,6 +291,8 @@ export const EntityTableRow = ({
               <EntityForm
                 key={entity.entityRef.id}
                 {...other}
+                // A new entity's values are known: its fields take comments.
+                commentsLocked={false}
                 schema={schema}
                 entity={entity}
                 changes={rowChanges}
@@ -250,6 +302,6 @@ export const EntityTableRow = ({
           </Collapse>
         </TableCell>
       </TableRow>
-    </>
+    </React.Fragment>
   );
 };

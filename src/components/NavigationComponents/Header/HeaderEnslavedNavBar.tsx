@@ -7,7 +7,8 @@ import {
   AppBar,
   Box,
   IconButton,
-  Hidden,
+  useMediaQuery,
+  useTheme,
   Divider,
 } from '@mui/material';
 import Toolbar from '@mui/material/Toolbar';
@@ -64,10 +65,13 @@ import {
   getColorBoxShadow,
   getColorNavbarEnslavedBackground,
 } from '@/utils/functions/getColorStyle';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 
 import HeaderLogo from './HeaderLogo';
 
 const HeaderEnslavedNavBar: React.FC = () => {
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const { styleName: styleNameRoute } = usePageRouter();
@@ -149,12 +153,7 @@ const HeaderEnslavedNavBar: React.FC = () => {
         navigate(styleNameToPathMap[styleName]);
       }
 
-      const keysToRemove = Object.keys(localStorage);
-      keysToRemove.forEach((key) => {
-        if (key !== 'filterObject') {
-          localStorage.removeItem(key);
-        }
-      });
+      clearSavedData(['filterObject']);
     },
     [value, currentPageBlockName, navigate, dispatch],
   );
@@ -174,10 +173,7 @@ const HeaderEnslavedNavBar: React.FC = () => {
     dispatch(resetAll());
     dispatch(resetBlockNameAndPageName());
     dispatch(resetAllStateToInitailState());
-    const keysToRemove = Object.keys(localStorage);
-    keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
-    });
+    clearSavedData();
   };
 
   return (
@@ -195,7 +191,7 @@ const HeaderEnslavedNavBar: React.FC = () => {
         }}
       >
         <Toolbar sx={{ display: 'flex', alignItems: 'center' }}>
-          <Hidden mdUp>
+          {!isDesktop && (
             <IconButton
               edge="start"
               color="inherit"
@@ -205,7 +201,7 @@ const HeaderEnslavedNavBar: React.FC = () => {
             >
               <MenuIcon />
             </IconButton>
-          </Hidden>
+          )}
           <Typography
             component="div"
             sx={{
@@ -238,7 +234,7 @@ const HeaderEnslavedNavBar: React.FC = () => {
               {inputSearchValue && <GlobalSearchButton />}
             </Typography>
           </Typography>
-          <Hidden mdUp>{!inputSearchValue && <CascadingMenu />}</Hidden>
+          {!isDesktop && !inputSearchValue && <CascadingMenu />}
           <Box
             className="menu-nav-bar-select-box"
             sx={{
@@ -274,7 +270,7 @@ const HeaderEnslavedNavBar: React.FC = () => {
             borderClor: 'rgb(0 0 0 / 50%)',
           }}
         />
-        <Hidden mdDown>{!inputSearchValue && <CascadingMenu />}</Hidden>
+        {isDesktop && !inputSearchValue && <CascadingMenu />}
         <Box component="nav">
           <Menu
             anchorEl={anchorEl}

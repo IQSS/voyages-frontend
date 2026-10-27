@@ -835,3 +835,47 @@ export interface SaveSearchRequest {
   front_end_path: string;
   query: Filter[];
 }
+
+export interface ContribuitLocation {
+  id: number
+  name: string
+  longitude?: number
+  latitude?: number
+  value: number
+  location_type: LocationType
+  spatial_extent: any
+  children: Children[]
+}
+
+export interface LocationType {
+  name: string
+}
+
+export interface Children {
+  id: number
+  name: string
+  longitude?: number
+  latitude?: number
+  value: number
+  location_type: LocationType2
+  spatial_extent: any
+  children: Children2[]
+}
+
+export interface LocationType2 {
+  name: string
+}
+
+export interface Children2 {
+  id: number
+  name: string
+  longitude?: number
+  latitude?: number
+  value: number
+  location_type: LocationType3
+  spatial_extent: any
+}
+
+export interface LocationType3 {
+  name: string
+}
