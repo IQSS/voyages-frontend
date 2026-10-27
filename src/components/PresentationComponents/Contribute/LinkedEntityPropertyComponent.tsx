@@ -32,10 +32,35 @@ export interface LinkedEntityPropertyComponentProps {
   onChange: EntityFormProps['onChange'];
 }
 
+type LinkedEntityFieldProps = LinkedEntityPropertyComponentProps &
+  EntityFormProps;
+
 export const LinkedEntityPropertyComponent = (
-  props: LinkedEntityPropertyComponentProps & EntityFormProps,
+  props: LinkedEntityFieldProps,
+) => {
+  const { property, entity, lastChange } = props;
+  const value = lastChange
+    ? lastChange.changed
+    : (entity.data[property.label] ?? null);
+  if (value !== null && !isMaterializedEntity(value)) {
+    return <span>BUG: Expected an entity reference value!</span>;
+  }
+  if (property.mode === EntityLinkEditMode.View) {
+    return <span>{value?.entityRef.id ?? 'null'}</span>;
+  }
+  if (property.mode === EntityLinkEditMode.Own) {
+    return <LinkedEntityOwnedPropertyComponent {...props} />;
+  }
+  return <SelectableLinkedEntityPropertyComponent {...props} value={value} />;
+};
+
+// Mode and value guards belong to the wrapper so this editable field always
+// calls its hooks in the same order, including after asynchronous value loads.
+const SelectableLinkedEntityPropertyComponent = (
+  props: LinkedEntityFieldProps & { value: MaterializedEntity | null },
 ) => {
   const {
+    value,
     property,
     entity,
     lastChange,
@@ -57,18 +82,6 @@ export const LinkedEntityPropertyComponent = (
     AddFromSearchRequest | undefined
   >();
   const { uid, mode, label, linkedEntitySchema } = property;
-  const value = lastChange
-    ? lastChange.changed
-    : (entity.data[label] as MaterializedEntity | null);
-  if (value && !isMaterializedEntity(value)) {
-    return <span>BUG: Expected an entity reference value!</span>;
-  }
-  if (mode === EntityLinkEditMode.View) {
-    return <span>{value?.entityRef.id ?? 'null'}</span>;
-  }
-  if (mode === EntityLinkEditMode.Own) {
-    return <LinkedEntityOwnedPropertyComponent {...props} />;
-  }
   const linkedSchema = getSchema(linkedEntitySchema);
   const { items: optionItems } = useSchemaEnumeration(linkedEntitySchema);
 
@@ -160,8 +173,7 @@ export const LinkedEntityPropertyComponent = (
   // a comment would be dropped -- the uneven-bubbles bug (DD-0545). Recording it
   // directly against the current value (kept as-is, or null when empty) makes
   // the bubble work everywhere, like it does on the direct text/number fields.
-  // A plain function (not a hook) so it adds no hook after the early returns
-  // above; a stable reference is not needed for the comment box.
+  // A stable callback reference is not needed for the comment box.
   const handleCommentChange = (comment: string) => {
     setComments(comment);
     onChange({
