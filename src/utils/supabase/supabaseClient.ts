@@ -1,23 +1,31 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@/share/AUTH_BASEURL';
 
 import { authStorage } from './authStorage';
 
-const supabaseUrl =
-  window.__ENV__?.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey =
-  window.__ENV__?.VITE_SUPABASE_ANON_KEY ||
-  import.meta.env.VITE_SUPABASE_ANON_KEY;
+export const hasSupabaseConfiguration = Boolean(
+  SUPABASE_URL && SUPABASE_ANON_KEY,
+);
+let client: SupabaseClient | undefined;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
+// The public site remains usable when contribution authentication is not configured.
+// Create the client only when an auth operation needs it; never contact a fallback host.
+const getClient = (): SupabaseClient => {
+  if (!hasSupabaseConfiguration) {
+    throw new Error('Contribution sign-in is not configured.');
+  }
+  return (client ??= createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true,
+      storage: authStorage,
+      flowType: 'pkce',
+    },
+  }));
+};
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    storage: authStorage,
-    flowType: 'pkce',
-  },
+export const supabase = new Proxy({} as SupabaseClient, {
+  get: (_target, property) => Reflect.get(getClient(), property),
 });

@@ -67,6 +67,7 @@ import {
   getColorBoxShadow,
   getColorBTNVoyageDatasetBackground,
 } from '@/utils/functions/getColorStyle';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 
 import { DrawerMenuBar } from './DrawerMenuBar';
 import HeaderLogo from './HeaderLogo';
@@ -170,12 +171,7 @@ export default function HeaderVoyagesNavBar() {
       }
 
       // Cleanup LocalStorage (only remove specific keys if needed)
-      const keysToRemove = Object.keys(localStorage);
-      keysToRemove.forEach((key) => {
-        if (key !== 'filterObject') {
-          localStorage.removeItem(key);
-        }
-      });
+      clearSavedData(['filterObject']);
     },
     [currentVoyageBlockName, navigate, dispatch, styleNameToPathMap],
   );
@@ -193,10 +189,7 @@ export default function HeaderVoyagesNavBar() {
   };
   const onClickReset = () => {
     dispatch(resetAllStateToInitailState());
-    const keysToRemove = Object.keys(localStorage);
-    keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
-    });
+    clearSavedData();
   };
 
   return (

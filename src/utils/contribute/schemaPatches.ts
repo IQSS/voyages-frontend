@@ -1,4 +1,9 @@
 import {
+  AllProperties,
+  AllSchemas,
+  SchemaIndex,
+  SparseDateSchema,
+  VoyageSourceSchema,
   VoyageDatesSchema,
   VoyageSchema,
 } from '@slavevoyages/voyages-contribute';
@@ -36,7 +41,6 @@ const VOYAGE_DATE_FIELDS_ORDER = [
 // Must be called before any Contribute form renders. No-ops after the first run.
 export function applySchemaPatches() {
   if (applied) return;
-  applied = true;
 
   const props = VoyageDatesSchema.properties;
   const dateFieldSet = new Set(VOYAGE_DATE_FIELDS_ORDER);
@@ -52,6 +56,8 @@ export function applySchemaPatches() {
   props.splice(0, props.length, ...dateProps, ...lengthProps);
 
   moveVoyagePropsToImputeSection();
+  registerSourceDateSchema();
+  applied = true;
 }
 
 // Moves imputation artifacts out of the ungrouped data fields and into their own
@@ -64,4 +70,41 @@ function moveVoyagePropsToImputeSection() {
       prop.section = IMPUTE_SECTION;
     }
   }
+}
+
+// The locked package links document publication dates to voyage sparse dates.
+// Django stores these in a separate table; never reuse voyage date IDs here.
+function registerSourceDateSchema() {
+  let sourceDate = SchemaIndex.SourceDate;
+  if (!sourceDate) {
+    sourceDate = {
+      ...SparseDateSchema,
+      name: 'SourceDate',
+      backingTable: 'document_docsparsedate',
+      properties: SparseDateSchema.properties.map((property) => ({
+        ...property,
+        schema: 'SourceDate',
+        uid: property.uid.replace(/^VoyageSparseDate_/, 'SourceDate_'),
+      })),
+    };
+    AllSchemas.push(sourceDate);
+    SchemaIndex.SourceDate = sourceDate;
+    for (const property of sourceDate.properties) {
+      AllProperties[property.uid] = property;
+    }
+  }
+  const date = VoyageSourceSchema.properties.find(
+    (property) => property.label === 'Date',
+  );
+  if (
+    !date ||
+    date.kind !== 'linkedEntity' ||
+    sourceDate.backingTable !== 'document_docsparsedate'
+  ) {
+    throw new Error(
+      'Source date schema does not match the document date table.',
+    );
+  }
+  // Keep the published property UID so existing source changes remain readable.
+  date.linkedEntitySchema = sourceDate.name;
 }

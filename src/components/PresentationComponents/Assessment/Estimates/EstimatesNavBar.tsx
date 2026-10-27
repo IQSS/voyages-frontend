@@ -6,13 +6,12 @@ import { styled } from '@mui/material/styles';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 
-import SaveSearchComponent from '@/components/FilterComponents/SaveSearchComponent/SaveSearchComponent';
 import HeaderLogoEstimate from '@/components/NavigationComponents/Header/HeaderLogoEstimate';
 import LanguagesDropdown from '@/components/SelectorComponents/DropDown/LanguagesDropdown';
-import { usePageRouter } from '@/hooks/usePageRouter';
 import { resetAll } from '@/redux/resetAllSlice';
 import { AppDispatch, RootState } from '@/redux/store';
 import { translationLanguagesEstimatePage } from '@/utils/functions/translationLanguages';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 
 interface EstimatesNavBarProps {
   handleViewAll: () => void;
@@ -32,17 +31,13 @@ const EstimatesNavBar: FunctionComponent<EstimatesNavBarProps> = ({
   handleViewAll,
 }) => {
   const dispatch: AppDispatch = useDispatch();
-  const { currentBlockName } = usePageRouter();
   const { languageValue } = useSelector(
     (state: RootState) => state.getLanguages,
   );
 
   const resetAllEstimate = () => {
     dispatch(resetAll());
-    const keysToRemove = Object.keys(localStorage);
-    keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
-    });
+    clearSavedData();
   };
 
   const translatedEstimates = translationLanguagesEstimatePage(languageValue);
@@ -126,7 +121,6 @@ const EstimatesNavBar: FunctionComponent<EstimatesNavBarProps> = ({
             </a>
           </div>
         </div>
-
       </div>
     </div>
   );

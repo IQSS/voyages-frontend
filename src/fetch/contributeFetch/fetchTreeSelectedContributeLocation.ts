@@ -1,12 +1,11 @@
 import axios from 'axios';
 
-import { BASEURL } from '../../share/AUTH_BASEURL';
-import { getAuthHeader } from '@/utils/getAuthHeaders';
+import { AUTHTOKEN, BASEURL } from '../../share/AUTH_BASEURL';
 
 export const fetchTreeSelectedContributeLocation = async () => {
   const response = await axios.get(`${BASEURL}/contrib/location_tree`, {
     headers: {
-      Authorization: getAuthHeader(),
+      Authorization: AUTHTOKEN,
       'Content-Type': 'application/json',
     },
   });

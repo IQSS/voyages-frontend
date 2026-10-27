@@ -1,5 +1,8 @@
 type VoyagesRuntimeConfig = Readonly<{
   apiAuthToken?: string;
+  contributeApiBaseUrl?: string;
+  supabaseUrl?: string;
+  supabaseAnonKey?: string;
 }>;
 
 declare global {
@@ -12,6 +15,15 @@ declare global {
 const runtimeConfig = globalThis.__VOYAGES_RUNTIME_CONFIG__ ?? {};
 
 export const BASEURL = import.meta.env.VITE_API_BASE_URL;
+export const BASEURLNODE = (
+  runtimeConfig.contributeApiBaseUrl ??
+  import.meta.env.VITE_API_BASE_NODE_URL ??
+  '/contribute-api'
+).replace(/\/+$/, '');
+export const SUPABASE_URL =
+  runtimeConfig.supabaseUrl ?? import.meta.env.VITE_SUPABASE_URL;
+export const SUPABASE_ANON_KEY =
+  runtimeConfig.supabaseAnonKey ?? import.meta.env.VITE_SUPABASE_ANON_KEY;
 export const AUTHTOKEN = runtimeConfig.apiAuthToken ?? '';
 export const HOST = import.meta.env.HOST;
 export const POST = import.meta.env.POST;

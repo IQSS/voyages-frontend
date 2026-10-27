@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import {
+  Alert,
   Box,
   TextField,
   Button,
@@ -11,17 +12,45 @@ import {
   IconButton,
 } from '@mui/material';
 
+import { supabase } from '@/utils/supabase/supabaseClient';
+
 const PasswordChangeForm = () => {
   const [password, setPassword] = useState<string>('');
   const [passwordAgain, setPasswordAgain] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordAgain, setShowPasswordAgain] = useState(false);
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     event.preventDefault();
-    if (password === passwordAgain) {
-      alert(`Sucessfully password change`);
-    } else {
-      alert(`Password is not match, try again`);
+    setError('');
+    setSuccess(false);
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    if (password !== passwordAgain) {
+      setError('Passwords do not match.');
+      return;
+    }
+    setPending(true);
+    try {
+      const { error: authError } = await supabase.auth.updateUser({ password });
+      if (authError) throw authError;
+      setPassword('');
+      setPasswordAgain('');
+      setSuccess(true);
+    } catch (failure) {
+      setError(
+        failure instanceof Error
+          ? failure.message
+          : 'Password change failed. Please try again.',
+      );
+    } finally {
+      setPending(false);
     }
   };
 
@@ -35,6 +64,10 @@ const PasswordChangeForm = () => {
       <Typography variant="h4" gutterBottom>
         Set Password
       </Typography>
+      {error && <Alert severity="error">{error}</Alert>}
+      {success && (
+        <Alert severity="success">Your password has been changed.</Alert>
+      )}
       <form onSubmit={handleSubmit}>
         <Box sx={{ mb: 3 }}>
           <TextField
@@ -58,6 +91,7 @@ const PasswordChangeForm = () => {
                 ),
               },
             }}
+            autoComplete="new-password"
             label="Password"
             variant="outlined"
             type={showPassword ? 'text' : 'password'}
@@ -88,6 +122,7 @@ const PasswordChangeForm = () => {
                 ),
               },
             }}
+            autoComplete="new-password"
             label={
               <Typography
                 variant="body1"
@@ -108,6 +143,7 @@ const PasswordChangeForm = () => {
         </Box>
         <Button
           type="submit"
+          disabled={pending}
           variant="contained"
           color="primary"
           sx={{
@@ -121,7 +157,7 @@ const PasswordChangeForm = () => {
             },
           }}
         >
-          Reset Password
+          {pending ? 'Saving...' : 'Set Password'}
         </Button>
       </form>
     </Box>

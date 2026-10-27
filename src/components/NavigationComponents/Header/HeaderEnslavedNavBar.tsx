@@ -64,6 +64,7 @@ import {
   getColorBoxShadow,
   getColorNavbarEnslavedBackground,
 } from '@/utils/functions/getColorStyle';
+import { clearSavedData } from '@/utils/supabase/authStorage';
 
 import HeaderLogo from './HeaderLogo';
 
@@ -149,12 +150,7 @@ const HeaderEnslavedNavBar: React.FC = () => {
         navigate(styleNameToPathMap[styleName]);
       }
 
-      const keysToRemove = Object.keys(localStorage);
-      keysToRemove.forEach((key) => {
-        if (key !== 'filterObject') {
-          localStorage.removeItem(key);
-        }
-      });
+      clearSavedData(['filterObject']);
     },
     [value, currentPageBlockName, navigate, dispatch],
   );
@@ -174,10 +170,7 @@ const HeaderEnslavedNavBar: React.FC = () => {
     dispatch(resetAll());
     dispatch(resetBlockNameAndPageName());
     dispatch(resetAllStateToInitailState());
-    const keysToRemove = Object.keys(localStorage);
-    keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
-    });
+    clearSavedData();
   };
 
   return (

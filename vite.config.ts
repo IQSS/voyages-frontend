@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite';
-import { resolve } from 'path';
-import dotenv from 'dotenv';
+import path, { resolve } from 'path';
+
 import react from '@vitejs/plugin-react';
-import path from 'path';
+import dotenv from 'dotenv';
+import { defineConfig } from 'vite';
 
 dotenv.config({ path: resolve(__dirname, '.env') });
 
@@ -21,5 +21,6 @@ export default defineConfig(() => ({
   test: {
     globals: true,
     environment: 'happy-dom',
+    setupFiles: ['./src/tests/setup.ts'],
   },
 }));

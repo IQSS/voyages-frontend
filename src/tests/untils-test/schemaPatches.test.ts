@@ -1,9 +1,15 @@
 import {
+  AllProperties,
+  AllSchemas,
+  getSchema,
+  SparseDateSchema,
+  VoyageSourceSchema,
   VoyageDatesSchema,
   VoyageSchema,
 } from '@slavevoyages/voyages-contribute';
 import { describe, expect, test } from 'vitest';
 
+import { propertyForUid } from '@/utils/contribute/propertyAccess';
 import { applySchemaPatches } from '@/utils/contribute/schemaPatches';
 
 describe('applySchemaPatches', () => {
@@ -35,6 +41,33 @@ describe('applySchemaPatches', () => {
     expect(fields.indexOf('voyage_began_sparsedate_id')).toBeLessThan(
       fields.indexOf('length_middle_passage_days'),
     );
+  });
+
+  test('keeps source dates separate from voyage dates and registers editable properties', () => {
+    const sourceDate = getSchema('SourceDate');
+    expect(sourceDate.backingTable).toBe('document_docsparsedate');
+    expect(sourceDate.properties.map((property) => property.uid)).toEqual([
+      'SourceDate_year',
+      'SourceDate_month',
+      'SourceDate_day',
+    ]);
+    const date = VoyageSourceSchema.properties.find(
+      (property) => property.label === 'Date',
+    );
+    expect(date).toMatchObject({
+      uid: 'Voyage Source_date',
+      linkedEntitySchema: 'SourceDate',
+      backingField: 'date_id',
+    });
+    expect(propertyForUid('SourceDate_year')).toBe(
+      AllProperties.SourceDate_year,
+    );
+    expect(SparseDateSchema.backingTable).toBe('voyage_voyagesparsedate');
+    expect(SparseDateSchema.properties[0].uid).toBe('VoyageSparseDate_year');
+    applySchemaPatches();
+    expect(
+      AllSchemas.filter((schema) => schema.name === 'SourceDate'),
+    ).toHaveLength(1);
   });
 
   test('is idempotent', () => {

@@ -1,5 +1,4 @@
 import store from '@/redux/store';
-import { AUTHTOKEN } from '@/share/AUTH_BASEURL';
 
 /**
  * Gets the appropriate Authorization header based on current auth state
@@ -13,8 +12,8 @@ export const getAuthHeader = (): string => {
     return `Bearer ${token}`;
   }
 
-  // Fallback to legacy token if no Supabase token is available
-  return AUTHTOKEN;
+  // The Django public API token is never a contribution-service credential.
+  return '';
 };
 
 /**
