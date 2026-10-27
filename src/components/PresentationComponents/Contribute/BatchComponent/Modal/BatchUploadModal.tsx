@@ -15,10 +15,7 @@ import {
 } from '@mui/material';
 import { Alert, Button, Progress, Select, Space, Spin, Typography } from 'antd';
 
-import {
-  PaperDraggableCreateBatch,
-  PaperDraggableUploadBatch,
-} from '@/components/SelectorComponents/Cascading/PaperDraggable';
+import { PaperDraggableUploadBatch } from '@/components/SelectorComponents/Cascading/PaperDraggable';
 import { UploadEntity } from '@/fetch/contributeFetch/batchUploadApi';
 import { SUPPORTED_ENTITIES, useBatchUpload } from '@/hooks/useBatchUpload';
 
@@ -88,6 +85,11 @@ const BatchUploadModal: React.FC<BatchUploadModalProps> = ({
     inspecting ||
     hasBlockingErrors ||
     !!duplicateTitleWarning;
+  const columnsMatchSchema =
+    inspectResult !== null &&
+    inspectResult.mappingHeadersNotInCsv.length === 0 &&
+    inspectResult.csvHeadersNotInMapping.length === 0 &&
+    duplicateColumns.length === 0;
 
   return (
     <Dialog
@@ -212,32 +214,42 @@ const BatchUploadModal: React.FC<BatchUploadModalProps> = ({
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
-              onClick={() => fileInputRef.current?.click()}
-              style={{
-                border: `2px dashed ${dragging ? '#37948d' : '#d9d9d9'}`,
-                borderRadius: 8,
-                padding: '12px 16px',
-                textAlign: 'center',
-                cursor: 'pointer',
-                background: dragging ? '#f0fffe' : '#fafafa',
-                transition: 'border-color 0.2s, background 0.2s',
-              }}
             >
-              <InboxOutlined
-                style={{ fontSize: 18, color: '#37948d', marginBottom: 2 }}
-              />
-              <div>
-                <Text style={{ fontSize: 12 }}>
-                  {selectedFile
-                    ? selectedFile.name
-                    : 'Drag and drop a CSV file here, or click to select'}
-                </Text>
-              </div>
-              {selectedFile && (
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                  {(selectedFile.size / 1024).toFixed(1)} KB
-                </Text>
-              )}
+              <button
+                type="button"
+                aria-label="Select CSV file"
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  font: 'inherit',
+                  color: 'inherit',
+                  border: `2px dashed ${dragging ? '#37948d' : '#d9d9d9'}`,
+                  borderRadius: 8,
+                  padding: '12px 16px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  background: dragging ? '#f0fffe' : '#fafafa',
+                  transition: 'border-color 0.2s, background 0.2s',
+                }}
+              >
+                <InboxOutlined
+                  style={{ fontSize: 18, color: '#37948d', marginBottom: 2 }}
+                />
+                <span style={{ display: 'block' }}>
+                  <Text style={{ fontSize: 12 }}>
+                    {selectedFile
+                      ? selectedFile.name
+                      : 'Drag and drop a CSV file here, or click to select'}
+                  </Text>
+                </span>
+                {selectedFile && (
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    {(selectedFile.size / 1024).toFixed(1)} KB
+                  </Text>
+                )}
+              </button>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -445,19 +457,17 @@ const BatchUploadModal: React.FC<BatchUploadModalProps> = ({
                   )}
 
                   {/* All clear */}
-                  {inspectResult.mappingHeadersNotInCsv.length === 0 &&
-                    inspectResult.csvHeadersNotInMapping.length === 0 &&
-                    duplicateColumns.length === 0 && (
-                      <Alert
-                        type="success"
-                        showIcon
-                        message={
-                          <span style={{ fontSize: 12 }}>
-                            All columns match the schema — ready to upload.
-                          </span>
-                        }
-                      />
-                    )}
+                  {columnsMatchSchema && (
+                    <Alert
+                      type="success"
+                      showIcon
+                      message={
+                        <span style={{ fontSize: 12 }}>
+                          All columns match the schema — ready to upload.
+                        </span>
+                      }
+                    />
+                  )}
                 </Space>
               )}
 
@@ -652,7 +662,7 @@ const BatchUploadModal: React.FC<BatchUploadModalProps> = ({
                         })}
                       </div>
 
-                    <Text
+                      <Text
                         type="secondary"
                         style={{
                           display: 'block',
