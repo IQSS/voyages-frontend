@@ -24,11 +24,7 @@ import 'leaflet-easybutton';
 import 'leaflet-easybutton/src/easy-button.css';
 import '@/style/timelapse.scss';
 import { usePageRouter } from '@/hooks/usePageRouter';
-import {
-  setCardRowID,
-  setIsModalCard,
-  setNodeClass,
-} from '@/redux/getCardFlatObjectSlice';
+import { openCardTarget } from '@/redux/getCardFlatObjectSlice';
 import { RootState } from '@/redux/store';
 import {
   AFRICANORIGINS,
@@ -1908,9 +1904,7 @@ export const TimelapseMap = ({
           onPause={() => setPauseWin(window.current ?? null)}
           onPlay={() => setPauseWin(null)}
           onShowDetails={(selected) => {
-            dispatch(setCardRowID(selected.id));
-            dispatch(setIsModalCard(true));
-            dispatch(setNodeClass(VOYAGE));
+            dispatch(openCardTarget({ id: selected.id, nodeClass: VOYAGE }));
           }}
           onSpeedChange={setSpeed}
         />

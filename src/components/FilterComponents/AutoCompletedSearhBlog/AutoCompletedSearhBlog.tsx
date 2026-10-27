@@ -15,10 +15,11 @@ import { AppDispatch, RootState } from '@/redux/store';
 import { BLOGPAGE } from '@/share/CONST_DATA';
 import { Filter, IRootFilterObject } from '@/share/InterfaceTypes';
 import { ResultAutoList } from '@/share/InterfaceTypesBlog';
+import { formatTextURL } from '@/utils/functions/formatText';
 import {
-  formatTextURL,
-  reverseFormatTextURL,
-} from '@/utils/functions/formatText';
+  blogTagNameFromRouteSlug,
+  blogTagSlugFromName,
+} from '@/utils/functions/blogRoutes';
 
 import SelectBlogDropdown from '../../SelectorComponents/SelectDrowdown/SelectBlogDropdown';
 
@@ -53,7 +54,7 @@ const AutoCompletedSearhBlog = () => {
     if (searchAutoValue && localSearchValue === '') {
       setLocalSearchValue(searchAutoValue.trim());
     } else if (blogURL && localSearchValue === '' && !searchAutoValue) {
-      const reversedValue = reverseFormatTextURL(blogURL);
+      const reversedValue = blogTagNameFromRouteSlug(blogURL);
 
       if (reversedValue) {
         setLocalSearchValue(reversedValue);
@@ -126,7 +127,7 @@ const AutoCompletedSearhBlog = () => {
   useEffect(() => {
     if (isFetchHashLoad && currentBlockName && listData.length > 0) {
       const tagLabel = listData.find((item) => {
-        return formatTextURL(item.value) === currentBlockName;
+        return blogTagSlugFromName(item.value) === currentBlockName;
       });
 
       if (tagLabel) {

@@ -5,7 +5,11 @@ import {
   TransatlanticCardProps,
 } from '@/share/InterfaceTypes';
 import jsonDataVoyageCollection from '@/utils/flatfiles/voyages/voyages_collections.json';
-const initialState: InitialStateTransatlanticCard = {
+import { CardTarget, normalizeCardTarget } from '@/utils/functions/cardTarget';
+
+export type { CardTarget } from '@/utils/functions/cardTarget';
+
+export const initialState: InitialStateTransatlanticCard = {
   cardData: [],
   isModalCard: false,
   cardRowID: 0,
@@ -23,6 +27,13 @@ const getCardFlatObjectSlice = createSlice({
     },
     setIsModalCard: (state, action: PayloadAction<boolean>) => {
       state.isModalCard = action.payload;
+    },
+    openCardTarget: (state, action: PayloadAction<CardTarget>) => {
+      const target = normalizeCardTarget(action.payload);
+      if (!target) return;
+      state.cardRowID = target.id;
+      state.nodeTypeClass = target.nodeClass;
+      state.isModalCard = true;
     },
     setCardRowID: (state, action: PayloadAction<number>) => {
       state.cardRowID = action.payload;
@@ -48,6 +59,7 @@ const getCardFlatObjectSlice = createSlice({
 export const {
   setCardData,
   setIsModalCard,
+  openCardTarget,
   setCardRowID,
   setValueVariable,
   setCardFileName,

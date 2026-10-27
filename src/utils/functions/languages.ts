@@ -65,7 +65,7 @@ export const PagesOptions: PagesOptionsProps[] = [
       label: {
         en: 'Slave Traders',
         es: 'Traficantes de Esclavos',
-        pt: 'Traficantes de Escravoss',
+        pt: 'Traficantes de Escravos',
       },
     },
   },
