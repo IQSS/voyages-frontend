@@ -7,7 +7,7 @@ const BlogCardContent = () => {
   const post = useSelector(
     (state: RootState) => state.getBlogData.post as BlogDataProps
   );
-  const { content } = post;
+  const content = post?.content;
 
   return (
     <div className="card-content-body">

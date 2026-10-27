@@ -1,7 +1,7 @@
 import { setsetOpenModalNetworks } from '@/redux/getPastNetworksGraphDataSlice';
 import { RootState } from '@/redux/store';
-import { Modal, Box } from '@mui/material';
-import {Close } from '@mui/icons-material';
+import { Box, IconButton, Modal } from '@mui/material';
+import { Close } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { styleModalNetworks } from '@/styleMUI';
 import NETWORKICON from '@/assets/networksIcon.png';
@@ -11,18 +11,19 @@ import { translatedConnection } from '@/utils/functions/translationLanguages';
 const ModalNetworksGraph = () => {
   const dispatch = useDispatch();
   const { openModal } = useSelector(
-    (state: RootState) => state.getPastNetworksGraphData
+    (state: RootState) => state.getPastNetworksGraphData,
   );
 
   const handleClose = () => {
     dispatch(setsetOpenModalNetworks(false));
   };
   const { languageValue } = useSelector(
-    (state: RootState) => state.getLanguages
+    (state: RootState) => state.getLanguages,
   );
   const translated = translatedConnection(languageValue);
   return (
     <Modal
+      data-testid="network-modal"
       open={openModal}
       disableScrollLock={true}
       onClose={handleClose}
@@ -45,9 +46,13 @@ const ModalNetworksGraph = () => {
               src={NETWORKICON}
             />
           </div>
-          <div className="close-modal-icon-network ">
-            <Close fontSize="large" onClick={handleClose} />
-          </div>
+          <IconButton
+            className="close-modal-icon-network"
+            aria-label="close connections"
+            onClick={handleClose}
+          >
+            <Close fontSize="large" />
+          </IconButton>
         </div>
         <NetworkDiagramSlaveVoyagesSVG />
       </Box>

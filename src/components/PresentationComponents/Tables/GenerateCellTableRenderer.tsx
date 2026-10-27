@@ -1,24 +1,18 @@
 import React, { CSSProperties, useContext } from 'react';
 
 import { ICellRendererParams } from 'ag-grid-community';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 
 import NETWORKICON from '@/assets/networksIcon.png';
 import { usePageRouter } from '@/hooks/usePageRouter';
-import {
-  setCardFileName,
-  setCardRowID,
-  setIsModalCard,
-  setNodeClass,
-} from '@/redux/getCardFlatObjectSlice';
+import { openCardTarget } from '@/redux/getCardFlatObjectSlice';
 import {
   setNetWorksID,
   setNetWorksKEY,
   setsetOpenModalNetworks,
 } from '@/redux/getPastNetworksGraphDataSlice';
 import '@/style/table.scss';
-import { RootState } from '@/redux/store';
 import {
   ENSLAVEDNODE,
   ENSLAVERSNODE,
@@ -32,12 +26,19 @@ import {
 } from '@/utils/functions/checkPagesRoute';
 import { cleanUpTextDisplay } from '@/utils/functions/cleanUpTextDisplay';
 import {
+  CardTarget,
+  normalizeCardTargetId,
+  resolveCardTarget,
+} from '@/utils/functions/cardTarget';
+import {
   DocumentViewerContext,
   createDocKey,
 } from '@/utils/functions/documentWorkspace';
 import { numberWithCommas } from '@/utils/functions/numberWithCommas';
 
 import PopoverWrapper from '../Cards/PopoverWrapper';
+
+const LINKED_VOYAGES_COLUMN = 'linked_voyages';
 
 export const GenerateCellTableRenderer = (
   params: ICellRendererParams,
@@ -51,9 +52,6 @@ export const GenerateCellTableRenderer = (
   const dispatch = useDispatch();
   const { styleName } = usePageRouter();
   const { setDoc } = useContext(DocumentViewerContext);
-  const { cardFileName } = useSelector(
-    (state: RootState) => state.getCardFlatObjectData,
-  );
 
   let nodeType: string = '';
 
@@ -64,6 +62,20 @@ export const GenerateCellTableRenderer = (
   } else if (checkPagesRouteForEnslavers(styleName!)) {
     nodeType = ENSLAVERSNODE;
   }
+
+  const activateCardTarget = (target: CardTarget) => {
+    dispatch(openCardTarget(target));
+  };
+
+  const handleCardTargetKeyDown = (
+    event: React.KeyboardEvent,
+    target: CardTarget,
+  ) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      activateCardTarget(target);
+    }
+  };
   const maxRowsToShow = 5; // Maximum rows to show before applying overflow
   const calculateHeight = (rowCount: number) => {
     const rowHeight = 35; // Adjust this value as needed based on your design
@@ -89,7 +101,10 @@ export const GenerateCellTableRenderer = (
       cursor: 'pointer',
     };
 
-    const sourceIcon = (value?: string, title?: string) => (// This function renders the source icon depending on if it has a published manifest or not, and if it has a valid URL in the bib
+    const sourceIcon = (
+      value?: string,
+      title?: string, // This function renders the source icon depending on if it has a published manifest or not, and if it has a valid URL in the bib
+    ) => (
       <>
         <span>{value} </span>
         <i className="fa fa-file-text" aria-hidden="true" title={title}></i>
@@ -104,19 +119,43 @@ export const GenerateCellTableRenderer = (
       );
     } else {
       const renderedValues = values.map((value: string, index: number) => {
+        const cardTarget = resolveCardTarget({
+          clickedValue: value,
+          rowId: ID,
+          explicitNodeClass: nodeClass,
+          pageNodeClass: nodeType,
+        });
         const additionalProps: React.DetailedHTMLProps<
           React.HTMLAttributes<HTMLDivElement>,
           HTMLDivElement
-        > = {
-          style,
-          onClick: () => {
-            dispatch(setCardRowID(ID));
-            dispatch(setIsModalCard(true));
-            dispatch(setNodeClass(nodeType));
-            dispatch(setCardFileName(cardFileName));
-          },
+        > & {
+          'data-card-column'?: string;
+          'data-card-target-id'?: number;
+          'data-card-target-class'?: string;
+        } = {
+          style: { ...style, cursor: cardTarget ? 'pointer' : 'default' },
           dangerouslySetInnerHTML: { __html: value ?? null },
         };
+        if (cardTarget && colID === LINKED_VOYAGES_COLUMN) {
+          additionalProps.style = {
+            ...additionalProps.style,
+            borderColor: 'blue',
+            borderWidth: 1,
+            borderStyle: 'solid',
+          };
+        }
+        if (cardTarget) {
+          additionalProps.role = 'button';
+          additionalProps.tabIndex = 0;
+          additionalProps['data-card-column'] = colID;
+          additionalProps['data-card-target-id'] = cardTarget.id;
+          additionalProps['data-card-target-class'] = cardTarget.nodeClass;
+          additionalProps['aria-label'] =
+            `Open ${cardTarget.nodeClass} ${cardTarget.id} details`;
+          additionalProps.onClick = () => activateCardTarget(cardTarget);
+          additionalProps.onKeyDown = (event) =>
+            handleCardTargetKeyDown(event, cardTarget);
+        }
         let extraElements: React.ReactNode = null;
         if (
           (colID === 'voyage_sources' || colID === 'enslaved_sources') &&
@@ -133,7 +172,12 @@ export const GenerateCellTableRenderer = (
             borderStyle: 'solid',
           };
           additionalProps.dangerouslySetInnerHTML = undefined;
-          extraElements = sourceIcon(value, "View Source Document");
+          extraElements = sourceIcon(value, 'View Source Document');
+
+          delete additionalProps['data-card-column'];
+          delete additionalProps['data-card-target-id'];
+          delete additionalProps['data-card-target-class'];
+          additionalProps['aria-label'] = 'View Source Document';
 
           additionalProps.onClick = (e) => {
             e.stopPropagation();
@@ -148,6 +192,21 @@ export const GenerateCellTableRenderer = (
               textSnippet: '',
             });
           };
+          additionalProps.onKeyDown = (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setDoc({
+                key: createDocKey(
+                  params.data.sources__zotero_group_id[index],
+                  params.data.sources__zotero_item_id[index],
+                ),
+                label: params.data.sources__title[index],
+                thumb: params.data.sources__thumbnail?.at(index),
+                revision_number: 1,
+                textSnippet: '',
+              });
+            }
+          };
         }
         // Check if the source string contains a URL and if the manifest is published, then make the cell clickable to open the URL in a new tab.
         const sourceString = params.data.sources__bib?.[index];
@@ -157,27 +216,39 @@ export const GenerateCellTableRenderer = (
           params.data.sources__title?.[index] &&
           params.data.sources__has_published_manifest?.[index] === false &&
           foundUrl?.[0]
-        ) {// Only display external source if the manifest is not published even if it has a link inside the bib
-            const urlString = foundUrl[0];
-            try {
-              new URL(urlString); // Throws if invalid
+        ) {
+          // Only display external source if the manifest is not published even if it has a link inside the bib
+          const urlString = foundUrl[0];
+          try {
+            new URL(urlString); // Throws if invalid
 
-              additionalProps.style = {
-                ...style,
-                borderColor: 'red',
-                borderWidth: 1,
-                borderStyle: 'solid',
-              };
-              additionalProps.dangerouslySetInnerHTML = undefined;
-              extraElements = sourceIcon(value, "View External Source");
+            additionalProps.style = {
+              ...style,
+              borderColor: 'red',
+              borderWidth: 1,
+              borderStyle: 'solid',
+            };
+            additionalProps.dangerouslySetInnerHTML = undefined;
+            extraElements = sourceIcon(value, 'View External Source');
 
-              additionalProps.onClick = (e) => {
-                e.stopPropagation();
+            delete additionalProps['data-card-column'];
+            delete additionalProps['data-card-target-id'];
+            delete additionalProps['data-card-target-class'];
+            additionalProps['aria-label'] = 'View External Source';
+
+            additionalProps.onClick = (e) => {
+              e.stopPropagation();
+              window.open(urlString, '_blank', 'noopener,noreferrer');
+            };
+            additionalProps.onKeyDown = (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
                 window.open(urlString, '_blank', 'noopener,noreferrer');
-              }; 
-            } catch (e) {
+              }
+            };
+          } catch (e) {
             console.error('Invalid URL:', urlString);
-            }
+          }
         }
 
         let cellComponent = (
@@ -237,6 +308,12 @@ export const GenerateCellTableRenderer = (
     }
   } else if (typeof values !== 'object' && cellFN !== 'networks') {
     const values = params.value;
+    const cardTarget = resolveCardTarget({
+      clickedValue: values,
+      rowId: ID,
+      explicitNodeClass: nodeClass,
+      pageNodeClass: nodeType,
+    });
     let justifyContent: CSSProperties['justifyContent'] = 'flex-end';
     if (typeof values === 'number') {
       justifyContent = 'flex-end';
@@ -261,48 +338,63 @@ export const GenerateCellTableRenderer = (
       <div className="div-value">
         <div
           className="value-cell"
-          style={{ justifyContent: justifyContent }}
-          role="button"
-          tabIndex={0}
-          onClick={() => {
-            dispatch(setCardRowID(ID));
-            dispatch(setIsModalCard(true));
-            dispatch(setNodeClass(nodeType));
+          style={{
+            justifyContent: justifyContent,
+            cursor: cardTarget ? 'pointer' : 'default',
           }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              dispatch(setCardRowID(ID));
-              dispatch(setIsModalCard(true));
-              dispatch(setNodeClass(nodeType));
-            }
-          }}
+          role={cardTarget ? 'button' : undefined}
+          tabIndex={cardTarget ? 0 : undefined}
+          data-card-column={cardTarget ? colID : undefined}
+          data-card-target-id={cardTarget?.id}
+          data-card-target-class={cardTarget?.nodeClass}
+          aria-label={
+            cardTarget
+              ? `Open ${cardTarget.nodeClass} ${cardTarget.id} details`
+              : undefined
+          }
+          onClick={
+            cardTarget ? () => activateCardTarget(cardTarget) : undefined
+          }
+          onKeyDown={
+            cardTarget
+              ? (event) => handleCardTargetKeyDown(event, cardTarget)
+              : undefined
+          }
         >
           {valueFormat}
         </div>
       </div>
     );
   } else if (cellFN === 'networks' && nodeClass) {
+    const networkId = normalizeCardTargetId(ID);
+    const networkKey = nodeType || nodeClass;
+    const openNetwork = () => {
+      if (networkId === null) return;
+      dispatch(setsetOpenModalNetworks(true));
+      dispatch(setNetWorksID(networkId));
+      dispatch(setNetWorksKEY(networkKey));
+    };
     return (
       <span
-        role="button"
+        role={networkId !== null ? 'button' : undefined}
         className="network-icon"
-        tabIndex={0}
-        onClick={() => {
-          dispatch(setsetOpenModalNetworks(true));
-          dispatch(setNetWorksID(ID));
-          dispatch(setNetWorksKEY(nodeType || nodeClass));
-          dispatch(setCardRowID(ID));
-        }}
+        tabIndex={networkId !== null ? 0 : undefined}
+        aria-label={
+          networkId !== null ? `Open connections for ${networkId}` : undefined
+        }
+        onClick={networkId !== null ? openNetwork : undefined}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            dispatch(setsetOpenModalNetworks(true));
-            dispatch(setNetWorksID(ID));
-            dispatch(setNetWorksKEY(nodeType || nodeClass));
-            dispatch(setCardRowID(ID));
+          if (networkId !== null && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            openNetwork();
           }
         }}
       >
-        <img alt="network" src={NETWORKICON} style={{ cursor: 'pointer' }} />
+        <img
+          alt="network"
+          src={NETWORKICON}
+          style={{ cursor: networkId !== null ? 'pointer' : 'default' }}
+        />
       </span>
     );
   } else {

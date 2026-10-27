@@ -27,6 +27,7 @@ const CardModal = () => {
   return (
     <div className="card-modal-container">
       <Modal
+        data-testid="card-modal"
         open={isModalCard}
         disableScrollLock={true}
         onClose={handleClose}

@@ -1,12 +1,12 @@
-import { BLOGPAGE } from '@/share/CONST_DATA';
-
-import '@/style/homepage.scss';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import UniversityOfLisbon from '@/assets/ULISBOA_HORIZONTAL_NEG_RGB.png';
 import UniversityOfGlasgow from '@/assets/UoG_white.png';
-import  UniversityOfLisbon from '@/assets/ULISBOA_HORIZONTAL_NEG_RGB.png';
+import { HostInstitutionLogos } from '@/components/PresentationComponents/HostInstitutionLogos/HostInstitutionLogos';
 import { RootState } from '@/redux/store';
+import { BLOGPAGE } from '@/share/CONST_DATA';
+import '@/style/homepage.scss';
 import { translationHomepage } from '@/utils/functions/translationLanguages';
 
 export const FooterComponent = () => {
@@ -24,23 +24,11 @@ export const FooterComponent = () => {
         data-aos-duration="500"
       >
         <div className="logo-grid-container">
-          <div className="logo-grid">
-            <Link
-              to="https://rice.edu/"
-              target="_blank"
-              rel="noopener"
-              aria-label="Rice University"
-            >
-              <div className="logo-grid-item fade-in">
-                <img
-                  className="card-img sponsor-card-img block lazy loaded"
-                  data-src="https://api.slavevoyages.org/static/uploads/rice_white_205_76.png"
-                  aria-label="Rice University"
-                  src="https://api.slavevoyages.org/static/uploads/rice_white_205_76.png"
-                  data-was-processed="true"
-                />
-              </div>
-            </Link>
+          <div
+            className="logo-grid logo-grid--primary"
+            data-footer-logo-row="primary"
+          >
+            <HostInstitutionLogos placement="footer" />
             <Link
               to="https://emory.edu/"
               target="_blank"
@@ -53,23 +41,6 @@ export const FooterComponent = () => {
                   data-src="https://api.slavevoyages.org/static/uploads/emory_white_500_130.png"
                   aria-label="Emory University"
                   src="https://api.slavevoyages.org/static/uploads/emory_white_500_130.png"
-                  data-was-processed="true"
-                />
-              </div>
-            </Link>
-
-            <Link
-              to="https://hutchinscenter.fas.harvard.edu/"
-              target="_blank"
-              rel="noopener"
-              aria-label="Hutchins Center for African and African American Research (Harvard University)"
-            >
-              <div className="logo-grid-item fade-in">
-                <img
-                  className="card-img sponsor-card-img block lazy loaded"
-                  data-src="https://api.slavevoyages.org/static/uploads/hutchins_white_580_204.png"
-                  aria-label="Hutchins Center for African and African American Research (Harvard University)"
-                  src="https://api.slavevoyages.org/static/uploads/hutchins_white_580_204.png"
                   data-was-processed="true"
                 />
               </div>
@@ -108,11 +79,27 @@ export const FooterComponent = () => {
                 />
               </div>
             </Link>
+            <Link
+              to="https://rice.edu/"
+              target="_blank"
+              rel="noopener"
+              aria-label="Rice University"
+            >
+              <div className="logo-grid-item fade-in">
+                <img
+                  className="card-img sponsor-card-img block lazy loaded"
+                  data-src="https://api.slavevoyages.org/static/uploads/rice_white_205_76.png"
+                  aria-label="Rice University"
+                  src="https://api.slavevoyages.org/static/uploads/rice_white_205_76.png"
+                  data-was-processed="true"
+                />
+              </div>
+            </Link>
           </div>
         </div>
 
         <div className="logo-grid-container">
-          <div className="logo-grid">
+          <div className="logo-grid" data-footer-logo-row="secondary">
             <div className="logo-grid-item fade-in" style={{ width: 100 }}>
               <img
                 className="card-img sponsor-card-img block lazy loaded"

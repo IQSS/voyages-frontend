@@ -4,6 +4,10 @@ import Mirador from 'mirador';
 import { useSelector } from 'react-redux';
 
 import { RootState } from '@/redux/store';
+import {
+  buildDocumentManifestUrl,
+  firstCanvasIdFromManifest,
+} from '@/utils/functions/documentWorkspace';
 
 type WorkspaceAction = 'Add' | 'Remove' | 'None';
 
@@ -129,7 +133,7 @@ const MiradorViewer = (
     }
 
     const store = Mirador.selectors.miradorSlice(target.current).store;
-    const path = `${manifestUrlBase.replace(/\/$/, '')}/${manifestId}`;
+    const path = buildDocumentManifestUrl(manifestUrlBase, manifestId);
 
     // Check if manifest already exists
     const state = store.getState();
@@ -193,9 +197,13 @@ const MiradorViewer = (
       try {
         const win = findWin(store, path);
         if (win) {
+          const canvasId = firstCanvasIdFromManifest(
+            manifestState?.json,
+            path,
+          );
           const displayAction = Mirador.actions.setCanvas(
             win.id,
-            `${path}/canvas1`,
+            canvasId,
           );
           store.dispatch(displayAction);
         }

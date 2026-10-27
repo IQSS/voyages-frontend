@@ -579,7 +579,8 @@
 				"fields": [
 					{
 						"var_name": "linked_voyages__voyage_id",
-						"cell_fn": "literal"
+						"cell_fn": "literal",
+						"node_class": "voyages"
 					}
 				]
 			}
@@ -1205,16 +1206,16 @@
 			"visible": false,
 			"number_format": null,
 			"order_by": [
-				"voyage_dates__imp_arrival_at_port_of_dis_sparsedate__year",
-				"voyage_dates__imp_arrival_at_port_of_dis_sparsedate__month",
-				"voyage_dates__imp_arrival_at_port_of_dis_sparsedate__day"
+				"voyage_dates__first_dis_of_slaves_sparsedate__year",
+				"voyage_dates__first_dis_of_slaves_sparsedate__month",
+				"voyage_dates__first_dis_of_slaves_sparsedate__day"
 			],
 			"col_width_px": 120,
 			"colID": "voyage_dates__imp_arrival_at_port_of_dis",
 			"cell_val": {
 				"fields": [
 					{
-						"var_name": "voyage_dates__imp_arrival_at_port_of_dis_sparsedate__date_str",
+						"var_name": "voyage_dates__first_dis_of_slaves_sparsedate__date_str",
 						"cell_fn": "literal"
 					}
 				]
@@ -2076,9 +2077,9 @@
 					"col_width_px": 100,
 					"colID": "voyage_dates__date_departed_africa_sparsedate",
 					"label": {
-						"en": "Date vessel departed with captives (in days)",
-						"es": "Date vessel departed with captives (in days)",
-						"pt": "Date vessel departed with captives (in days)"
+						"en": "Date vessel departed with captives",
+						"es": "Date vessel departed with captives",
+						"pt": "Date vessel departed with captives"
 					}
 				},
 				{

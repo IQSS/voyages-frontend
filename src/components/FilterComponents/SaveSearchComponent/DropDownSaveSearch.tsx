@@ -28,11 +28,27 @@ import {
 import { SaveSearchRequest } from '@/share/InterfaceTypes';
 import { filtersDataSend } from '@/utils/functions/filtersDataSend';
 import { translationLanguagesSaveSearch } from '@/utils/functions/translationLanguages';
+import {
+  buildSavedSearchShareUrl,
+  buildSaveSearchFrontEndPath,
+} from '@/utils/functions/saveSearchRoutes';
 
 const DropDownSaveSearch = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { endpointPath, styleName, endpointPeopleDirect } = usePageRouter();
+  const { endpointPath, styleName, endpointPeopleDirect, currentBlockName } =
+    usePageRouter();
   const { filtersObj } = useSelector((state: RootState) => state.getFilter);
+
+  const frontEndPath = useMemo(
+    () =>
+      buildSaveSearchFrontEndPath({
+        currentBlockName,
+        endpointPath,
+        endpointPeopleDirect,
+        styleName,
+      }),
+    [currentBlockName, endpointPath, endpointPeopleDirect, styleName],
+  );
 
   const { saveSearchUrlID, listSaveSearchURL, routeSaveSearch } = useSelector(
     (state: RootState) => state.getSaveSearch,
@@ -55,23 +71,10 @@ const DropDownSaveSearch = () => {
   }
 
   useEffect(() => {
-    if (endpointPeopleDirect === ENSALVEDROUTE) {
-      dispatch(setRouteSaveSearch(`${endpointPeopleDirect}/${styleName}`));
-    } else if (endpointPeopleDirect === ENSALVERSROUTE) {
-      dispatch(setRouteSaveSearch(`${endpointPeopleDirect}/${styleName}`));
-    } else if (endpointPath === VOYAGEPATHENPOINT) {
-      dispatch(setRouteSaveSearch(`${endpointPath}/${styleName}`));
-    } else if (endpointPath === ASSESSMENT) {
-      dispatch(setRouteSaveSearch(`${endpointPath}/${ESTIMATES}/`));
+    if (frontEndPath) {
+      dispatch(setRouteSaveSearch(frontEndPath));
     }
-  }, [
-    routeSaveSearch,
-    dispatch,
-    endpointPath,
-    endpointPeopleDirect,
-    styleName,
-  ]);
-
+  }, [dispatch, frontEndPath]);
 
   const filters = useMemo(
     () =>
@@ -94,20 +97,25 @@ const DropDownSaveSearch = () => {
   const dataSend: SaveSearchRequest = useMemo(()=>{
     return {
       endpoint: endpointSaveSearch,
-      front_end_path: routeSaveSearch,
+      front_end_path: frontEndPath || routeSaveSearch,
       query: newFilters || [],
     };
-  },[endpointSaveSearch, routeSaveSearch, newFilters])
+  },[endpointSaveSearch, frontEndPath, routeSaveSearch, newFilters])
   
-  const URLSAVESEARCH = `${BASE_URL_FRONTEND}/${saveSearhURL}/`;
+  const buildSavedSearchUrl = (id: string) =>
+    buildSavedSearchShareUrl({
+      id,
+      routeSegment: saveSearhURL,
+    });
   const handleSaveSearch = () => {
     fetchData();
   };
 
   const handleCopySaveSearch = (id: string) => {
     if (id) {
-      navigator.clipboard.writeText(`${URLSAVESEARCH}${id}`);
-      alert(`Your URL ${URLSAVESEARCH}${id} is copied`);
+      const savedSearchUrl = buildSavedSearchUrl(id);
+      navigator.clipboard.writeText(savedSearchUrl);
+      alert(`Your URL ${savedSearchUrl} is copied`);
       dispatch(setReloadTable(false));
     }
   };
@@ -226,7 +234,7 @@ const DropDownSaveSearch = () => {
                 {listSaveSearchURL.map((id) => (
                   <div className="flex-between v-saved-searches-item" key={id}>
                     <div id="SzPhOxXs" className="url-searches-item">
-                      {saveSearchUrlID && `${URLSAVESEARCH}${id}`}
+                      {saveSearchUrlID && buildSavedSearchUrl(id)}
                     </div>{' '}
                     <div id="SzPhOxXs" className="url-searches-item"></div>
                     <div>

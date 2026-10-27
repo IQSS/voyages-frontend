@@ -780,6 +780,30 @@
     }
   }
 
+  .host-institution-logos--hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: clamp(0.75rem, 1.5vw, 1.25rem);
+    min-width: 0;
+
+    .host-institution-logo-link--hero {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: flex-end;
+      line-height: 0;
+    }
+
+    img {
+      display: block;
+      width: auto;
+      height: clamp(40px, 3.9vw, 56px);
+      max-width: none;
+      opacity: 1;
+      transition: ease 0.3s;
+    }
+  }
+
   .separator {
     color: #fff;
     opacity: 0.7;
@@ -819,6 +843,30 @@
     margin: 0 0.3rem;
     transition-duration: 0.2s;
     transition-timing-function: cubic-bezier(0.42, 0, 0.58, 1);
+  }
+}
+
+@media only screen and (min-width: 576px) and (max-width: 991px) {
+  .bgvid-container {
+    padding: 0 1.5rem;
+  }
+
+  .social-flex-container {
+    justify-content: flex-end;
+
+    .social-icon-container--utilities {
+      display: none;
+    }
+
+    .host-institution-logos--hero {
+      width: 100%;
+    }
+  }
+}
+
+@media only screen and (max-width: 575px) {
+  .social-flex-container .host-institution-logos--hero {
+    display: none;
   }
 }
 

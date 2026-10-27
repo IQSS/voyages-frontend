@@ -110,9 +110,6 @@ const PivotTables = () => {
   // Enhanced defaultColDef with better configuration
   const defaultColDef = useMemo(() => {
     return {
-      enableRowGroup: true,
-      enablePivot: true,
-      enableValue: true,
       sortable: true,
       resizable: true,
       filter: true,

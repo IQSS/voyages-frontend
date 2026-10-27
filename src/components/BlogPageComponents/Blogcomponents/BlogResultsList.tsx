@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -20,10 +20,8 @@ import {
   BlogFilter,
   InitialStateBlogProps,
 } from '@/share/InterfaceTypesBlog';
-import {
-  formatTextURL,
-  reverseFormatTextURL,
-} from '@/utils/functions/formatText';
+import { formatTextURL } from '@/utils/functions/formatText';
+import { blogTagNameFromRouteSlug } from '@/utils/functions/blogRoutes';
 import '@/style/blogs.scss';
 
 const IMAGES_PER_PAGE = 12;
@@ -40,8 +38,9 @@ const BlogResultsList: React.FC = () => {
   } = useSelector(
     (state: RootState) => state.getBlogData as InitialStateBlogProps,
   );
-  const [localSearchValue, setLocalSearchValue] = useState<string | null>(
-    searchAutoValue,
+  const routeSearchValue = useMemo(
+    () => blogTagNameFromRouteSlug(blogURL),
+    [blogURL],
   );
   const { languageValue } = useSelector(
     (state: RootState) => state.getLanguages,
@@ -68,18 +67,16 @@ const BlogResultsList: React.FC = () => {
       });
     }
 
-    if (searchAutoValue) {
-      setLocalSearchValue(searchAutoValue.trim());
-    } else if (blogURL) {
-      // No searchAutoValue set, use blogURL as fallback
-      setLocalSearchValue(reverseFormatTextURL(blogURL));
-    }
+    const routedTagValue = routeSearchValue.trim();
+    const autocompleteValue = searchAutoValue?.trim() || '';
+    const effectiveSearchValue = routedTagValue || autocompleteValue;
+    const effectiveSearchKey = routedTagValue ? 'tags__name' : searchAutoKey;
 
     // Only add search filter if we have a non-empty search term and searchAutoKey
-    if (localSearchValue && searchAutoKey) {
+    if (effectiveSearchValue && effectiveSearchKey) {
       filters.push({
-        varName: searchAutoKey,
-        searchTerm: localSearchValue,
+        varName: effectiveSearchKey,
+        searchTerm: effectiveSearchValue,
         op: 'icontains',
       });
     }
@@ -89,8 +86,7 @@ const BlogResultsList: React.FC = () => {
     languageValue,
     searchAutoValue,
     searchAutoKey,
-    blogURL,
-    localSearchValue,
+    routeSearchValue,
   ]);
 
   // Fetch blog data
@@ -145,7 +141,7 @@ const BlogResultsList: React.FC = () => {
     inputSearchValue,
     searchAutoKey,
     searchAutoValue,
-    blogURL,
+    routeSearchValue,
     resetToFirstPage,
   ]);
 
@@ -191,7 +187,7 @@ const BlogResultsList: React.FC = () => {
     );
   }
 
-  const displayTitle = blogURL ? reverseFormatTextURL(blogURL) : '';
+  const displayTitle = routeSearchValue;
   const hasData = BlogData && BlogData.length > 0;
 
   return (
@@ -202,7 +198,7 @@ const BlogResultsList: React.FC = () => {
       />
       {displayTitle && (
         <div id="blog_intro" className="blog_intro">
-          <h2>{searchAutoValue}</h2>
+          <h2>{displayTitle}</h2>
         </div>
       )}
 
