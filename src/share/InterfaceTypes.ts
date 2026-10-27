@@ -587,6 +587,7 @@ export interface CellValCard {
 export interface FieldCard {
   var_name: string;
   cell_fn: string;
+  node_class?: string;
 }
 
 export interface GeoTreeSelectValueInitialState {

@@ -193,7 +193,7 @@ export const LeafletMap = ({ setZoomLevel, zoomLevel }: LeafletMapProps) => {
       ),
     [filtersObj, styleNameRoute, clusterNodeKeyVariable, clusterNodeValue],
   );
-
+  // console.log('Map', {filters,filtersObj})
   const newFilters = useMemo(() => {
     return filters?.map(({ ...rest }) => rest) || [];
   }, [filters]);

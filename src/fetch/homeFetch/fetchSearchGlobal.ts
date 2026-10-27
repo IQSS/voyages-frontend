@@ -13,7 +13,7 @@ export const fetchSearchGlobal = async (
       },
       signal: signal,
     });
-    return response.data;
+    return response.data.results;
   } catch (error) {
     throw new Error('Failed to fetch fetchSearchGlobal data');
   }

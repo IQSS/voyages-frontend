@@ -9,47 +9,31 @@ import { useNavigate } from 'react-router-dom';
 
 import MetaTag from '@/components/MetaTag/MetaTag';
 import VoyageCard from '@/components/PresentationComponents/Cards/Cards';
+import CardModal from '@/components/PresentationComponents/Cards/CardModal';
 import MAPS from '@/components/PresentationComponents/Map/MAPS';
-import { NetworkDiagramSlaveVoyagesSVG } from '@/components/PresentationComponents/NetworkGraph/NetworkDiagramSlaveVoyagesSVG';
-import { fetchPastEnslavedCard } from '@/fetch/pastEnslavedFetch/fetchPastEnslavedCard';
-import { fetchPastEnslaversCard } from '@/fetch/pastEnslaversFetch/fetchPastEnslaversCard';
 import { fetchVoyageCard } from '@/fetch/voyagesFetch/fetchVoyageCard';
 import { usePageRouter } from '@/hooks/usePageRouter';
 import { setValueVariable } from '@/redux/getCardFlatObjectSlice';
-import {
-  setNetWorksID,
-  setNetWorksKEY,
-} from '@/redux/getPastNetworksGraphDataSlice';
 import { setCurrentBlockName } from '@/redux/getScrollEnslavedPageSlice';
 import { RootState, AppDispatch } from '@/redux/store';
-import {
-  VOYAGESNODECLASS,
-  VOYAGESNODE,
-  ENSLAVERSNODE,
-  ENSLAVEDNODE,
-} from '@/share/CONST_DATA';
+import { VOYAGESNODECLASS, VOYAGESNODE, ENSLAVERSNODE, ENSLAVEDNODE } from '@/share/CONST_DATA';
 import { styleCard, styleTapMap, styleTapNetWorkGraph } from '@/styleMUI';
-
-import {
-  generateEnslavedDescription,
-  generateEnslavedTitle,
-} from './generateEnslavedTitle';
-import {
-  generateEnslaverDescription,
-  generateEnslaverTitle,
-} from './generateEnslaverTitle';
-import {
-  generateVoyageDescription,
-  generateVoyageTitle,
-} from './generateVoyageTitle';
+import { NetworkDiagramSlaveVoyagesSVG } from '@/components/PresentationComponents/NetworkGraph/NetworkDiagramSlaveVoyagesSVG';
+import { setNetWorksID, setNetWorksKEY } from '@/redux/getPastNetworksGraphDataSlice';
+import { fetchPastEnslaversCard } from '@/fetch/pastEnslaversFetch/fetchPastEnslaversCard';
+import { fetchPastEnslavedCard } from '@/fetch/pastEnslavedFetch/fetchPastEnslavedCard';
+import { generateVoyageDescription, generateVoyageTitle } from './generateVoyageTitle';
+import { generateEnslaverDescription, generateEnslaverTitle } from './generateEnslaverTitle';
+import { generateEnslavedDescription, generateEnslavedTitle } from './generateEnslavedTitle';
 
 const TabsSelect = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { currentBlockName, voyageURLID: ID } = usePageRouter();
+  const { currentBlockName, voyageURLID: ID, endpointPath } = usePageRouter();
   const { variable, nodeTypeClass, cardRowID } = useSelector(
     (state: RootState) => state.getCardFlatObjectData,
   );
 
+  const pageEntityClass = endpointPath || nodeTypeClass;
   const voyageId = cardRowID || ID;
   const initialTitle = voyageId
     ? `Voyage ${voyageId} - SlaveVoyages Database`
@@ -61,12 +45,13 @@ const TabsSelect = () => {
   const [pageTitle, setPageTitle] = useState(initialTitle);
   const [pageDescription, setPageDescription] = useState(initialDescription);
   const navigate = useNavigate();
+  console.log({pageTitle , pageDescription})
 
   const fetchMap: Record<string, any> = {
     [VOYAGESNODECLASS]: fetchVoyageCard,
     [VOYAGESNODE]: fetchVoyageCard,
     [ENSLAVERSNODE]: fetchPastEnslaversCard,
-    [ENSLAVEDNODE]: fetchPastEnslavedCard,
+    [ENSLAVEDNODE]: fetchPastEnslavedCard
   };
 
   // Map of title generators by entity type
@@ -78,69 +63,70 @@ const TabsSelect = () => {
   };
 
   // Map of description generators by entity type
-  const descriptionGenerators: Record<
-    string,
-    (data: any, id: string) => string
-  > = {
+  const descriptionGenerators: Record<string, (data: any, id: string) => string> = {
     [VOYAGESNODECLASS]: generateVoyageDescription,
     [VOYAGESNODE]: generateVoyageDescription,
     [ENSLAVERSNODE]: generateEnslaverDescription,
-    [ENSLAVEDNODE]: generateEnslavedDescription,
+    [ENSLAVEDNODE]:generateEnslavedDescription,
   };
 
   useEffect(() => {
-    if (currentBlockName === 'network') {
-      dispatch(setNetWorksID(Number(ID)));
-      const networkKEY = nodeTypeClass === 'voyage' ? 'voyages' : nodeTypeClass;
-      dispatch(setNetWorksKEY(networkKEY));
-    }
+    if (currentBlockName !== 'network') return;
+    dispatch(setNetWorksID(Number(ID)));
+    dispatch(
+      setNetWorksKEY(
+        pageEntityClass === 'voyage' ? 'voyages' : pageEntityClass,
+      ),
+    );
+  }, [dispatch, currentBlockName, ID, pageEntityClass]);
 
+  useEffect(() => {
     const fetchData = async () => {
       const targetID = cardRowID || ID;
       if (!targetID) return;
-
-      const fetchFn = fetchMap[nodeTypeClass];
+      
+      const fetchFn = fetchMap[pageEntityClass];
       if (!fetchFn) return;
 
       try {
-        const numericID =
-          typeof targetID === 'string' ? parseInt(targetID) : targetID;
+        const numericID = typeof targetID === 'string' ? parseInt(targetID) : targetID;
         const response = await dispatch(fetchFn(numericID)).unwrap();
 
         if (response?.data) {
           // Get the appropriate generators for this entity type
-          const titleGenerator = titleGenerators[nodeTypeClass];
-          const descriptionGenerator = descriptionGenerators[nodeTypeClass];
+          const titleGenerator = titleGenerators[pageEntityClass];
+          const descriptionGenerator = descriptionGenerators[pageEntityClass];
 
           // Generate SEO-optimized title and description
-          const title = titleGenerator
+          const title = titleGenerator 
             ? titleGenerator(response.data, String(targetID))
-            : `${nodeTypeClass} ${targetID} - SlaveVoyages Database`;
-
+            : `${pageEntityClass} ${targetID} - SlaveVoyages Database`;
+            
           const description = descriptionGenerator
             ? descriptionGenerator(response.data, String(targetID))
-            : `Explore detailed historical records for ${nodeTypeClass} ${targetID}.`;
+            : `Explore detailed historical records for ${pageEntityClass} ${targetID}.`;
 
           setPageTitle(title);
           setPageDescription(description);
         }
       } catch (error) {
-        console.error('Error fetching page data:', error);
+        console.log('Error fetching page data:', error);
       }
     };
 
     fetchData();
-  }, [dispatch, nodeTypeClass, cardRowID, ID]);
+  }, [dispatch, pageEntityClass, cardRowID, ID]);
 
   const onChange = (key: string) => {
     dispatch(setValueVariable(key));
     dispatch(setCurrentBlockName(key));
     if (key === 'network') {
       dispatch(setNetWorksID(Number(ID)));
-      const networkKEY = nodeTypeClass === 'voyage' ? 'voyages' : nodeTypeClass;
+      const networkKEY =
+        pageEntityClass === 'voyage' ? 'voyages' : pageEntityClass;
       dispatch(setNetWorksKEY(networkKEY));
     }
-    navigate(`/${nodeTypeClass}/${ID}#${key.toLowerCase()}`);
+    navigate(`/${pageEntityClass}/${ID}#${key.toLowerCase()}`);
   };
 
   const items: TabsProps['items'] = [
@@ -193,6 +179,7 @@ const TabsSelect = () => {
         type="card"
         className="tab-container"
       />
+      <CardModal />
     </div>
   );
 };

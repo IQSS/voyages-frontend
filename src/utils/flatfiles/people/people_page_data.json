@@ -10,9 +10,9 @@
       },
       {
         "label": {
-          "en": "Enslavers",
-          "es": "Esclavistas",
-          "pt": "Escravizadores"
+			"en":"Slave Traders",
+			"es":"Traficantes de Esclavos",
+			"pt":"Traficantes de Escravos"
         }
       }
     ],
@@ -40,7 +40,7 @@
         "pt": "Crédito"
       },
       "artist_name": "April M. Frazier",
-      "hyperlink": "https://www.amfrazierfoto.com/"
+      "hyperlink": "https://www.slavevoyages.org/blog/april-frazier"
     }
   }
 ]

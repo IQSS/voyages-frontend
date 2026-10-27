@@ -76,9 +76,9 @@
   },
   {
     "label": {
-      "en": "Enslaver Details",
-      "es": "Detalles de los Esclavizadores ",
-      "pt": "Detalhes dos Escravizadores"
+      "en": "Slave Trader Details",
+      "es": "Detalles de los Traficantes de Esclavos",
+      "pt": "Detalhes dos Traficantes de Escravos"
     },
     "children": [
       {

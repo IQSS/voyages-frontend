@@ -25,6 +25,7 @@ export const NetworkDiagramSlaveVoyagesSVG = ({
   const { networkID, networkKEY } = useSelector(
     (state: RootState) => state.getPastNetworksGraphData
   );
+  const rootNodeRef = useRef({ networkID, networkKEY });
 
   const modalWidth = window.innerWidth;
   const modalHeight = window.innerHeight;
@@ -33,8 +34,9 @@ export const NetworkDiagramSlaveVoyagesSVG = ({
 
   useEffect(() => {
     let subscribed = true;
+    const { networkID: rootID, networkKEY: rootKEY } = rootNodeRef.current;
     const dataSend: { [key: string]: number[] } = {
-      [networkKEY]: [Number(networkID)],
+      [rootKEY]: [Number(rootID)],
     };
 
     const fetchPastNetworksGraph = async () => {
@@ -57,7 +59,7 @@ export const NetworkDiagramSlaveVoyagesSVG = ({
     return () => {
       subscribed = false;
     };
-  }, [dispatch, networkID, networkKEY]);
+  }, [dispatch]);
 
   if (width === 0 || !netWorkData) {
     return null;

@@ -13,7 +13,6 @@ import { usePageRouter } from '@/hooks/usePageRouter';
 import { resetAll } from '@/redux/resetAllSlice';
 import { AppDispatch, RootState } from '@/redux/store';
 import { translationLanguagesEstimatePage } from '@/utils/functions/translationLanguages';
-import { clearSavedData } from '@/utils/supabase/authStorage';
 
 interface EstimatesNavBarProps {
   handleViewAll: () => void;
@@ -40,7 +39,10 @@ const EstimatesNavBar: FunctionComponent<EstimatesNavBarProps> = ({
 
   const resetAllEstimate = () => {
     dispatch(resetAll());
-    clearSavedData();
+    const keysToRemove = Object.keys(localStorage);
+    keysToRemove.forEach((key) => {
+      localStorage.removeItem(key);
+    });
   };
 
   const translatedEstimates = translationLanguagesEstimatePage(languageValue);
@@ -124,7 +126,7 @@ const EstimatesNavBar: FunctionComponent<EstimatesNavBarProps> = ({
             </a>
           </div>
         </div>
-        <div>{currentBlockName !== 'maps' && <SaveSearchComponent />}</div>
+
       </div>
     </div>
   );

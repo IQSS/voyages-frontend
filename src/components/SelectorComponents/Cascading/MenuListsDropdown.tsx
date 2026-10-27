@@ -89,7 +89,6 @@ import GeoTreeSelected from '../../FilterComponents/GeoTreeSelect/GeoTreeSelecte
 import { RadioSelected } from '../RadioSelected/RadioSelected';
 import { SelectSearchDropdownEnslaversNameRole } from '../SelectDrowdown/SelectSearchDropdownEnslaversNameRole';
 import { SelectSearchDropdownList } from '../SelectDrowdown/SelectSearchDropdownList';
-import { clearSavedData } from '@/utils/supabase/authStorage';
 
 export const MenuListsDropdown = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -329,7 +328,10 @@ export const MenuListsDropdown = () => {
       dispatch(setIsChangeGeoTree(!value));
     }
     dispatch(resetAll());
-    clearSavedData();
+    const keysToRemove = Object.keys(localStorage);
+    keysToRemove.forEach((key) => {
+      localStorage.removeItem(key);
+    });
   };
 
   const handleApplyEnslaversDialog = (
@@ -338,10 +340,10 @@ export const MenuListsDropdown = () => {
     ops: string,
   ) => {
     if (roles.length === 0) {
-      setTextRoleListError('*Select the role(s) for this enslaver');
+      setTextRoleListError('*Please select the role(s) for this enslaver');
     }
     if (name === '') {
-      setTextError(`*Enter the enslaver's name`);
+      setTextError(`*Please enter the enslaver's name`);
     }
     const newRoles: string[] = roles.map((ele) => ele.value);
     updatedEnslaversRoleAndNameToLocalStorage(

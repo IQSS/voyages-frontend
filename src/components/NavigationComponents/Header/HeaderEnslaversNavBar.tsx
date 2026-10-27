@@ -4,6 +4,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import {
   AppBar,
   Box,
+  Hidden,
   Divider,
   IconButton,
   Menu,
@@ -63,7 +64,6 @@ import {
 import { DatasetButton } from './DatasetButton';
 import { DrawerMenuBar } from './DrawerMenuBar';
 import HeaderLogo from './HeaderLogo';
-import { clearSavedData } from '@/utils/supabase/authStorage';
 
 const HeaderEnslaversNavBar: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -103,7 +103,10 @@ const HeaderEnslaversNavBar: React.FC = () => {
     dispatch(resetAll());
     dispatch(resetBlockNameAndPageName());
     dispatch(resetAllStateToInitailState());
-    clearSavedData();
+    const keysToRemove = Object.keys(localStorage);
+    keysToRemove.forEach((key) => {
+      localStorage.removeItem(key);
+    });
   };
 
   const handleSelectEnslaversDataset = useCallback(
@@ -152,7 +155,12 @@ const HeaderEnslaversNavBar: React.FC = () => {
       };
       if (styleNameToPathMap[styleName])
         navigate(styleNameToPathMap[styleName]);
-      clearSavedData(['filterObject']);
+      const keysToRemove = Object.keys(localStorage);
+      keysToRemove.forEach((key) => {
+        if (key !== 'filterObject') {
+          localStorage.removeItem(key);
+        }
+      });
     },
     [navigate, dispatch, currentBlockName],
   );
@@ -181,17 +189,17 @@ const HeaderEnslaversNavBar: React.FC = () => {
         }}
       >
         <Toolbar sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+          <Hidden mdUp>
             <IconButton
               edge="start"
               color="inherit"
               aria-label="menu"
               onClick={handleMenuOpen}
-              sx={{ mr: 2 }}
+              sx={{ mr: 2, display: { md: 'none' } }}
             >
               <MenuIcon />
             </IconButton>
-          </Box>
+          </Hidden>
           <Typography
             component="div"
             sx={{
@@ -225,7 +233,7 @@ const HeaderEnslaversNavBar: React.FC = () => {
               {inputSearchValue && <GlobalSearchButton />}
             </Typography>
           </Typography>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>{!inputSearchValue && <CascadingMenu />}</Box>
+          <Hidden mdUp>{!inputSearchValue && <CascadingMenu />}</Hidden>
           <Box
             className="menu-nav-bar-select-box"
             sx={{
@@ -255,7 +263,7 @@ const HeaderEnslaversNavBar: React.FC = () => {
             <LanguagesDropdown />
           </Box>
         </Toolbar>
-        <Box sx={{ display: { xs: 'none', md: 'flex' }, flexDirection: 'column' }}>
+        <Hidden mdDown>
           <Divider
             sx={{
               borderWidth: '0.25px',
@@ -263,7 +271,7 @@ const HeaderEnslaversNavBar: React.FC = () => {
             }}
           />
           {!inputSearchValue && <CascadingMenu />}
-        </Box>
+        </Hidden>
         <Box component="nav">
           <Menu
             anchorEl={anchorEl}

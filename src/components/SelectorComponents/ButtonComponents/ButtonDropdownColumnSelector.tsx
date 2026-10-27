@@ -30,8 +30,8 @@ import {
   TableCellStructureInitialStateProp,
 } from '@/share/InterfaceTypesTable';
 import AFRICANORIGINS_TABLE from '@/utils/flatfiles/enslaved/enslaved_african_origins_table.json';
-import ENSLAVED_TABLE from '@/utils/flatfiles/enslaved/enslaved_all_table_menu.json';
-import TEXAS_TABLE from '@/utils/flatfiles/enslaved/enslaved_texas_table_cell_structure.json';
+import ENSLAVED_TABLE from '@/utils/flatfiles/enslaved/enslaved_all_table.json';
+import TEXAS_TABLE from '@/utils/flatfiles/enslaved/enslaved_texas_table.json';
 import ENSLAVERS_TABLE from '@/utils/flatfiles/enslavers/enslavers_table.json';
 import AllVoyages_TABLE_FLAT from '@/utils/flatfiles/voyages/voyages_all_table.json';
 import INDIANOCEANANDASIANFILE_TABLE_FLAT from '@/utils/flatfiles/voyages/voyages_indian_ocean_and_asia_slave_trade_database_table.json';

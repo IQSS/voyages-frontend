@@ -26,8 +26,8 @@
         }
       },
       {
-        "var_name": "gender",
-        "type": "IntegerField",
+        "var_name": "gender__name",
+        "type": "MultiselectList",
         "label": {
           "en": "Gender",
           "es": "Género",
@@ -95,18 +95,18 @@
         "var_name": "enslaved_relations__relation__voyage__voyage_itinerary__imp_principal_place_of_slave_purchase__value",
         "type": "GeoTreeSelect",
         "label": {
-          "en": "Place of Embarkation",
-          "es": "Lugar de Embarque",
-          "pt": "Local de Embarque"
+          "en": "Place of embarkation",
+          "es": "Lugar de embarque",
+          "pt": "Local de embarque"
         }
       },
       {
         "var_name": "enslaved_relations__relation__voyage__voyage_itinerary__imp_principal_port_slave_dis__value",
         "type": "GeoTreeSelect",
         "label": {
-          "en": "Place of Disembarkation",
-          "es": "Lugar de Desembarque",
-          "pt": "Local de Desembarque"
+          "en": "Place of disembarkation",
+          "es": "Lugar de desembarque",
+          "pt": "Local de desembarque"
         }
       },
       {

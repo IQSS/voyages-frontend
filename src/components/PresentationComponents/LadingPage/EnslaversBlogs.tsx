@@ -21,7 +21,7 @@ const EnslaversBlogs: React.FC = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <img src={ENSLAVERS} alt="Enslavers" className="register-img" />
+          <img src={ENSLAVERS} alt="Slave Traders" className="register-img" />
         </Link>
         <div className="enslavers-content-detail">
           <h1>{translatedHomepage.homeEnslavers}</h1>

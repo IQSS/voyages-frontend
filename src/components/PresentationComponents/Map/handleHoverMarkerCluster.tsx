@@ -19,8 +19,10 @@ export function handleHoverMarkerCluster(
 ) {
   hiddenEdgesLayer.clearLayers();
   const nodeLogValueScale = createLogNodeValueScale(nodesData);
-  const clusterLatLon = event.layer.getLatLng();
-  const clusterChildMarkers = event.layer.getAllChildMarkers();
+  const layer = (event.propagatedFrom ?? (event as any).layer) as any;
+  const isCluster = typeof layer.getAllChildMarkers === 'function';
+  const clusterLatLon = layer.getLatLng();
+  const clusterChildMarkers = isCluster ? layer.getAllChildMarkers() : [layer];
   const targetNodeMap = new Map<string, [NodeAggroutes, EdgesAggroutes]>();
 
   const nodeIdsClusters = clusterChildMarkers.map(
@@ -93,13 +95,20 @@ export function handleHoverMarkerCluster(
     );
   }
 
-  popupRoot.render(
-    <TooltipHoverTableOnNode
-      nodesDatas={childNodesData}
-      nodeType={nodeType}
-      handleSetClusterKeyValue={handleSetClusterKeyValue}
-    />
-  );
-
-  event.layer.bindPopup(popupContainer).openPopup();
+  if (!isCluster && childNodesData.length === 1) {
+    const singleNode = childNodesData[0];
+    const count = Number(singleNode.weights.post_disembarkation);
+    const peopleText = count === 1 ? 'person' : 'people';
+    const popupText = `<p>${singleNode.data.name} is the final known location for ${count} enslaved ${peopleText}.</p>`;
+    layer.bindPopup(popupText).openPopup();
+  } else {
+    popupRoot.render(
+      <TooltipHoverTableOnNode
+        nodesDatas={childNodesData}
+        nodeType={nodeType}
+        handleSetClusterKeyValue={handleSetClusterKeyValue}
+      />
+    );
+    layer.bindPopup(popupContainer).openPopup();
+  }
 }

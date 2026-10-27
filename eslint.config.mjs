@@ -67,14 +67,6 @@ export default [...fixupConfigRules(compat.extends(
             version: "detect",
         },
 
-        // The contribute package ships as one pre-bundled file, and since the
-        // imputation calculation landed in 0.6.2 it is large enough that the
-        // import plugin's own parser overflows its stack walking it. Nothing is
-        // wrong with the module -- TypeScript resolves it and the build uses it
-        // -- so the rules that need to read its contents are told to skip it.
-        // `import/no-unresolved` still applies, so a wrong path is still caught.
-        "import/ignore": ["node_modules/@slavevoyages/voyages-contribute"],
-
         "import/resolver": {
             typescript: {
                 alwaysTryTypes: true,

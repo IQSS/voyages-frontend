@@ -1,0 +1,887 @@
+{
+  "voyageComments": "comments voyages",
+  "Name of vessel": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Ship",
+      "schema": "VoyageShip",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "direct",
+        "property": "VoyageShip_ship_name",
+        "changed": "Name of vessel"
+      }
+    ]
+  },
+  "National carrier": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Ship",
+      "schema": "VoyageShip",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageShip_nationality_ship",
+        "changed": null
+      }
+    ]
+  },
+  "Ton type": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Ship",
+      "schema": "VoyageShip",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageShip_ton_type",
+        "changed": {
+          "id": 1,
+          "schema": "TonType",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Tonnage of vessel": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Ship",
+      "schema": "VoyageShip",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "direct",
+        "property": "VoyageShip_tonnage",
+        "changed": "10"
+      }
+    ]
+  },
+  "Rig of vessel": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Ship",
+      "schema": "VoyageShip",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageShip_rig_of_vessel",
+        "changed": {
+          "id": 2,
+          "schema": "RigOfVessel",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Guns mounted": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Ship",
+      "schema": "VoyageShip",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "direct",
+        "property": "VoyageShip_guns_mounted",
+        "changed": "10"
+      }
+    ]
+  },
+  "Year of vessel's construction": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Ship",
+      "schema": "VoyageShip",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "direct",
+        "property": "VoyageShip_year_of_construction",
+        "changed": "1960"
+      }
+    ]
+  },
+  "Construction place": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Ship",
+      "schema": "VoyageShip",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageShip_vessel_construction_place",
+        "changed": {
+          "id": 3,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Year of vessel's registeration": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Ship",
+      "schema": "VoyageShip",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "direct",
+        "property": "VoyageShip_registered_year",
+        "changed": "2015"
+      }
+    ]
+  },
+  "Registered place": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Ship",
+      "schema": "VoyageShip",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageShip_vessel_registered_place",
+        "changed": {
+          "id": 4,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Nationality": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Ship",
+      "schema": "VoyageShip",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageShip_imputed_nationality",
+        "changed": {
+          "id": 3,
+          "schema": "Nationality",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Tonnage standardized on British measured tons, 1773-1870": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Ship",
+      "schema": "VoyageShip",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "direct",
+        "property": "VoyageShip_tonnage_mod",
+        "changed": "1773"
+      }
+    ]
+  },
+  "Port of departure": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_port_of_departure",
+        "changed": {
+          "id": 1,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "First intended port of embarkation (EMBPORT)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_int_first_port_emb",
+        "changed": {
+          "id": 2,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Second intended port of embarkation (EMBPORT2)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_int_second_port_emb",
+        "changed": {
+          "id": 5,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "First intended port of disembarkation (ARRPORT)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_int_first_port_dis",
+        "changed": {
+          "id": 5,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Second intended port of disembarkation (ARRPORT2)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_int_second_port_dis",
+        "changed": {
+          "id": 4,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Third intended port of disembarkation (ARRPORT3)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_int_third_port_dis",
+        "changed": {
+          "id": 3,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Fourth intended port of disembarkation (ARRPORT4)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_int_fourth_port_dis",
+        "changed": {
+          "id": 4,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Number of ports of call prior to buying slaves (NPPRETRA)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "direct",
+        "property": "VoyageItinerary_ports_called_buying_slaves",
+        "changed": "10"
+      }
+    ]
+  },
+  "First place of slave purchase": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_first_place_slave_purchase",
+        "changed": {
+          "id": 4,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Second place of slave purchase ": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_second_place_slave_purchase",
+        "changed": {
+          "id": 1,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Third place of slave purchase": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_third_place_slave_purchase",
+        "changed": {
+          "id": 3,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Port of call before Atlantic crossing": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_Third place of slave purchase",
+        "changed": {
+          "id": 2,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Number of ports of call in Americas prior to sale of slaves": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "direct",
+        "property": "VoyageItinerary_number_of_ports_of_call",
+        "changed": "2015"
+      }
+    ]
+  },
+  "First place of slave landing": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_first_landing_place",
+        "changed": {
+          "id": 5,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Second place of slave landing": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_second_landing_place",
+        "changed": {
+          "id": 1,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Third place of slave landing": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_third_landing_place",
+        "changed": {
+          "id": 3,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Place at which voyage ended": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_place_voyage_ended",
+        "changed": {
+          "id": 2,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Imputed port where voyage began (PTDEPIMP)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_imp_port_voyage_begin",
+        "changed": {
+          "id": 2,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Principal place of slave purchase (MAJBUYPT)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_principal_place_of_slave_purchase",
+        "changed": {
+          "id": 3,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Imputed principal place of slave purchase": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_imp_principal_place_of_slave_purchase",
+        "changed": {
+          "id": 4,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Principal port of slave disembarkation (MAJSELPT)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_principal_port_of_slave_dis",
+        "changed": {
+          "id": 4,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Imputed principal port of slave disembarkation (MJSLPTIMP)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Itinerary",
+      "schema": "VoyageItinerary",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageItinerary_imp_principal_port_slave_dis",
+        "changed": {
+          "id": 2,
+          "schema": "Location",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Length of Middle Passage in (days)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "direct",
+        "property": "VoyageDates_length_middle_passage_days",
+        "changed": "10"
+      }
+    ]
+  },
+  "Voyage length from home port to disembarkation (days)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "direct",
+        "property": "VoyageDates_imp_length_home_to_disembark",
+        "changed": "10"
+      }
+    ]
+  },
+  "Voyage length from last slave embarkation to first disembarkation (days) (VOY2IMP)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "direct",
+        "property": "VoyageDates_imp_length_leaving_africa_to_disembark",
+        "changed": "10"
+      }
+    ]
+  },
+  "Date that voyage began (DATEDEPB,A,C)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageDates_voyage_began_sparsedate",
+        "changed": {
+          "id": 2,
+          "schema": "VoyageSparseDate",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Date that slave purchase began (D1SLATRB,A,C)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageDates_slave_purchase_began_sparsedate",
+        "changed": {
+          "id": 2,
+          "schema": "VoyageSparseDate",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Date that vessel left last slaving port (DLSLATRB,A,C)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageDates_vessel_left_port_sparsedate",
+        "changed": {
+          "id": 2,
+          "schema": "VoyageSparseDate",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Date of first disembarkation of slaves (DATARR33,32,34)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageDates_first_dis_of_slaves_sparsedate",
+        "changed": {
+          "id": 3,
+          "schema": "VoyageSparseDate",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Date vessel departed Africa (DATELEFTAFR)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageDates_date_departed_africa_sparsedate",
+        "changed": {
+          "id": 2,
+          "schema": "VoyageSparseDate",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Date of arrival at second place of landing (DATARR37,36,38)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageDates_arrival_at_second_place_landing_sparsedate",
+        "changed": {
+          "id": 3,
+          "schema": "VoyageSparseDate",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Date of third disembarkation of slaves (DATARR40,39,41)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageDates_third_dis_of_slaves_sparsedate",
+        "changed": {
+          "id": 3,
+          "schema": "VoyageSparseDate",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Date of departure from last place of landing (DDEPAMB,*,C)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageDates_departure_last_place_of_landing_sparsedate",
+        "changed": {
+          "id": 2,
+          "schema": "VoyageSparseDate",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Date on which slave voyage completed (DATARR44,43,45)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageDates_voyage_completed_sparsedate",
+        "changed": {
+          "id": 2,
+          "schema": "VoyageSparseDate",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Voyage began": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageDates_imp_voyage_began_sparsedate",
+        "changed": {
+          "id": 2,
+          "schema": "VoyageSparseDate",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Departed Africa": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageDates_imp_departed_africa_sparsedate",
+        "changed": {
+          "id": 4,
+          "schema": "VoyageSparseDate",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "Year of arrival at port of disembarkation (YEARAM)": {
+    "type": "update",
+    "entityRef": {
+      "id": "9999999_Dates",
+      "schema": "VoyageDates",
+      "type": "new"
+    },
+    "changes": [
+      {
+        "kind": "linked",
+        "property": "VoyageDates_imp_arrival_at_port_of_dis_sparsedate",
+        "changed": {
+          "id": 4,
+          "schema": "VoyageSparseDate",
+          "type": "existing"
+        }
+      }
+    ]
+  },
+  "comments": {}
+}

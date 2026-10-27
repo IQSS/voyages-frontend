@@ -9,8 +9,6 @@ import renderEdgesAnimatedLinesOnMap from './renderEdgesAnimatedLinesOnMap';
 import renderEdgesLinesOnMap from './renderEdgesLinesOnMap';
 import { createSourceAndTargetDictionariesNodeEdges } from '../../../utils/functions/createSourceAndTargetDictionariesNodeEdges';
 import { createLogNodeValueScale } from '@/utils/functions/createLogNodeValueScale';
-import { createRoot } from 'react-dom/client';
-import { TooltipHoverTableOnNode } from './TooltipHoverTableOnNode';
 import { createTooltipClusterEdges } from '@/utils/functions/createTooltipClusterEdges';
 
 export function handleHoverCircleMarker(
@@ -68,22 +66,7 @@ export function handleHoverCircleMarker(
       }
     }
   });
-  /**
-   ====  WAIT To discuss Keep the labes for now ===== 
-   const popupContainer = document.createElement('center');
-   popupContainer.className = 'tablePopup'
-  popupContainer.style.width = '300px'
-  const popupRoot = createRoot(popupContainer);
-  popupRoot.render(
-    <TooltipHoverTableOnNode
-      nodesDatas={nodesData}
-      nodeType={''}
-      handleSetClusterKeyValue={handleSetClusterKeyValue}
-    />
-  );
-  event.target.bindPopup(popupContainer).openPopup();
-   **/
-
+  
   for (const [, edgeData] of aggregatedEdges) {
     const { sourceLatlng, targetLatlng, controls, type, weight } = edgeData;
 

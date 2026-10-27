@@ -2,10 +2,6 @@
 import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 
 import { DownloadOutlined } from '@ant-design/icons';
-import {
-  ModuleRegistry,
-  AllCommunityModule, // or AllEnterpriseModule
-} from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { Button, Pagination } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
@@ -51,11 +47,6 @@ import { SelectDropdownPivotable } from '../../SelectorComponents/SelectDrowdown
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-
-// Register the module
-ModuleRegistry.registerModules([
-  AllCommunityModule, // or AllEnterpriseModule
-]);
 
 const PivotTables = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -119,9 +110,6 @@ const PivotTables = () => {
   // Enhanced defaultColDef with better configuration
   const defaultColDef = useMemo(() => {
     return {
-      enableRowGroup: true,
-      enablePivot: true,
-      enableValue: true,
       sortable: true,
       resizable: true,
       filter: true,
@@ -132,6 +120,8 @@ const PivotTables = () => {
       cellDataType: false,
       valueGetter: undefined,
       cellRenderer: undefined,
+      wrapHeaderText: true,
+      autoHeaderHeight: true,
       cellStyle: {
         textAlign: 'right',
         paddingRight: '8px',
@@ -187,7 +177,6 @@ const PivotTables = () => {
       ),
     [filtersObj, styleName, clusterNodeKeyVariable, clusterNodeValue],
   );
-
   const newFilters = useMemo(() => {
     return filters?.map(({ ...rest }) => rest) || [];
   }, [filters]);
@@ -381,13 +370,14 @@ const PivotTables = () => {
   // Enhanced grid options
   const gridOptions = useMemo(
     () => ({
-      headerHeight: 35,
+      headerHeight: undefined,
       suppressHorizontalScroll: false,
       suppressRowVirtualisation: false,
       suppressColumnVirtualisation: false,
       animateRows: true,
       enableCellTextSelection: true,
       ensureDomOrder: true,
+      autoHeaderHeight: true,
     }),
     [],
   );
@@ -557,41 +547,41 @@ const PivotTables = () => {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            overflowY: 'auto',
-            maxHeight: '75vh',
+            height: 'calc(100vh - 300px)',
+            minHeight: '400px',
           }}
         >
-          <AgGridReact
-            theme="legacy"
-            domLayout={'autoHeight'}
-            ref={gridRef}
-            pinnedBottomRowData={totalItemData}
-            rowData={newRowsData}
-            columnDefs={columnDefs as any}
-            suppressMenuHide={true}
-            animateRows={true}
-            defaultColDef={defaultColDef}
-            gridOptions={gridOptions}
-            getRowHeight={getRowHeightPivotTable}
-            paginationPageSize={rowsPerPage}
-            components={components}
-            getRowStyle={getRowStyle}
-            enableBrowserTooltips={true}
-            tooltipShowDelay={0}
-            tooltipHideDelay={1000}
-            groupDefaultExpanded={-1}
-            suppressPropertyNamesCheck={true}
-          />
-
           <div
             style={{
-              marginTop: 16,
-              textAlign: 'center',
-              display: 'flex',
-              alignContent: 'center',
-              justifyContent: 'flex-end',
+              flex: 1,
+              overflow: 'auto',
+              position: 'relative',
             }}
           >
+            <AgGridReact
+              theme="legacy"
+              domLayout={'normal'}
+              ref={gridRef}
+              pinnedBottomRowData={totalItemData}
+              rowData={newRowsData}
+              columnDefs={columnDefs as any}
+              suppressMenuHide={true}
+              animateRows={true}
+              defaultColDef={defaultColDef}
+              gridOptions={gridOptions}
+              getRowHeight={getRowHeightPivotTable}
+              paginationPageSize={rowsPerPage}
+              components={components}
+              getRowStyle={getRowStyle}
+              enableBrowserTooltips={true}
+              tooltipShowDelay={0}
+              tooltipHideDelay={1000}
+              groupDefaultExpanded={-1}
+              suppressPropertyNamesCheck={true}
+            />
+          </div>
+
+          <div className="pivot-table-pagination-container">
             <Pagination
               current={page}
               total={totalResultsCount}

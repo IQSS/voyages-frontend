@@ -1,7 +1,6 @@
 import { NodeAggroutes } from '@/share/InterfaceTypesMap';
 import '@/style/table-popup.scss';
 import { nodeTypeOrigin, nodeTypePostDisembarkation } from '@/share/CONST_DATA';
-
 import { Divider } from '@mui/material';
 
 interface TooltipHoverTableOnNodeProps {
@@ -26,12 +25,12 @@ export const TooltipHoverTableOnNode = ({
 
   const tatalOriginCount = nodesDatas?.reduce(
     (total, node) => total + node.weights.origin!,
-    0,
+    0
   );
 
   const tatalPostDisembarkationCount = nodesDatas?.reduce(
     (total, node) => total + node.weights.post_disembarkation!,
-    0,
+    0
   );
 
   const totalTextOrigin = 'other Language Groups';
@@ -82,9 +81,14 @@ export const TooltipHoverTableOnNode = ({
 
   const textHederOfTableOtherType = (
     <div className="embarkations-type">
-      <a href="#">1926 Liberated Africans embarked</a> in Loango, of whom{' '}
-      {tatalPostDisembarkationCount} have been identified as belonging to
-      <a href="#">16 language groups</a>
+      <a href="#" onClick={() => console.log('textHederOfTableOtherType')}>
+        1926 Liberated Africans embarked
+      </a>{' '}
+      in Loango, of whom {tatalPostDisembarkationCount} have been identified as
+      belonging to
+      <a href="#" onClick={() => console.log('textHederOfTableOtherType')}>
+        16 language groups
+      </a>
       <Divider style={{ margin: '0.75rem 0', opacity: 0.5 }} />
     </div>
   );
@@ -127,13 +131,12 @@ export const TooltipHoverTableOnNode = ({
             <tr>
               <td>
                 {remainingNodes.length}{' '}
-                {` ${
-                  nodeType === nodeTypeOrigin
+                {` ${nodeType === nodeTypeOrigin
                     ? totalTextOrigin
                     : nodeType === nodeTypePostDisembarkation
                       ? totalTextPostDisembarkation
                       : hederOtherType
-                } `}
+                  } `}
               </td>
               <td>
                 {remainingNodes.reduce(
@@ -142,7 +145,7 @@ export const TooltipHoverTableOnNode = ({
                     (nodeType === nodeTypeOrigin
                       ? node.weights.origin!
                       : node.weights.post_disembarkation!),
-                  0,
+                  0
                 )}
               </td>
             </tr>

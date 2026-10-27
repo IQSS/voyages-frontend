@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
   faWhatsapp,
@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 
 import defaultImage from '@/assets/voyage-blog.png';
+import NoDataState from '@/components/NoResultComponents/NoDataState';
 import { fetchBlogData } from '@/fetch/blogFetch/fetchBlogData';
 import { setBlogPost } from '@/redux/getBlogDataSlice';
 import { AppDispatch, RootState } from '@/redux/store';
@@ -20,8 +21,13 @@ import { BLOGPAGE } from '@/share/CONST_DATA';
 import {
   BlogDataPropsRequest,
   BlogFilter,
+  InitialStateBlog,
   InitialStateBlogProps,
 } from '@/share/InterfaceTypesBlog';
+import {
+  currentBlogCanonicalUrl,
+  selectBlogPostResult,
+} from '@/utils/functions/blogPostDetail';
 
 const BlogCardHeaderBody = () => {
   const { ID } = useParams();
@@ -31,55 +37,102 @@ const BlogCardHeaderBody = () => {
     (state: RootState) => state.getBlogData as InitialStateBlogProps,
   );
 
-  const { title, thumbnail, authors, subtitle, tags, updated_on } = post;
-  const effectOnce = useRef(false);
+  const { title, thumbnail, authors, subtitle, tags, updated_on } =
+    post || InitialStateBlog.post;
+  const [postMissing, setPostMissing] = useState(false);
+  const [loadingPost, setLoadingPost] = useState(false);
 
   useEffect(() => {
-    if (!effectOnce.current) {
-      const fetchDataBlog = async () => {
-        const filters: BlogFilter[] = [];
-        const parsedId = parseInt(ID!);
-        if (!isNaN(parsedId)) {
-          filters.push({
-            varName: 'id',
-            searchTerm: [parseInt(ID!)],
-            op: 'in',
-          });
-        }
-        const dataSend: BlogDataPropsRequest = {
-          filter: filters || [],
-        };
+    let isMounted = true;
 
-        try {
-          const response = await dispatch(fetchBlogData(dataSend)).unwrap();
-          if (response) {
-            dispatch(setBlogPost(response.results?.[0]));
-          }
-        } catch (error) {
-          console.log('error', error);
-        }
+    const fetchDataBlog = async () => {
+      setLoadingPost(true);
+      setPostMissing(false);
+      dispatch(setBlogPost({ ...InitialStateBlog.post }));
+
+      const filters: BlogFilter[] = [];
+      const parsedId = Number.parseInt(ID || '', 10);
+      if (!Number.isNaN(parsedId)) {
+        filters.push({
+          varName: 'id',
+          searchTerm: [parsedId],
+          op: 'in',
+        });
+      }
+
+      if (filters.length === 0) {
+        setPostMissing(true);
+        setLoadingPost(false);
+        return;
+      }
+
+      const dataSend: BlogDataPropsRequest = {
+        filter: filters,
       };
-      fetchDataBlog();
-    }
+
+      try {
+        const response = await dispatch(fetchBlogData(dataSend)).unwrap();
+        if (!isMounted) {
+          return;
+        }
+        const fetchedPost = selectBlogPostResult(response);
+        if (fetchedPost) {
+          dispatch(setBlogPost(fetchedPost));
+        } else {
+          setPostMissing(true);
+        }
+      } catch (error) {
+        console.log('error', error);
+        if (isMounted) {
+          setPostMissing(true);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingPost(false);
+        }
+      }
+    };
+
+    fetchDataBlog();
+
+    return () => {
+      isMounted = false;
+    };
   }, [dispatch, ID]);
 
-  const dateObj = updated_on ? new Date(updated_on) : new Date(updated_on);
+  const formattedDateTime = useMemo(() => {
+    if (!updated_on) {
+      return '';
+    }
+    const dateObj = new Date(updated_on);
+    if (Number.isNaN(dateObj.getTime())) {
+      return '';
+    }
+    const formattedDate = dateObj.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+    const formattedTime = dateObj.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: 'numeric',
+    });
+    return `${formattedDate}, ${formattedTime}`;
+  }, [updated_on]);
 
-  const formattedDate = dateObj.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const canonicalUrl = useMemo(() => currentBlogCanonicalUrl(), [ID]);
+  const shareUrl = canonicalUrl || '#';
 
-  const formattedTime = dateObj.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: 'numeric',
-  });
-
-  const formattedDateTime = `${formattedDate}, ${formattedTime}`;
+  if (postMissing) {
+    return (
+      <div className="card-body">
+        <NoDataState text="Blog Post" />
+      </div>
+    );
+  }
 
   return (
-    <div className="card-body">
+    <div className="card-body" aria-busy={loadingPost}>
       <img
         className="blog-detail-thumbnail"
         src={thumbnail ? `${BASEURL}${thumbnail}` : defaultImage}
@@ -87,14 +140,18 @@ const BlogCardHeaderBody = () => {
       />
       <h1 className="titleText">{title ? title : ''}</h1>
       <h3 className="subtitle">{subtitle ? subtitle : ''}</h3>
-      <p className="card-text text-muted">{formattedDateTime}</p>
+      {formattedDateTime && (
+        <p className="card-text text-muted">{formattedDateTime}</p>
+      )}
       {authors?.length > 0 &&
         authors?.map((author, index) => {
           return (
             <div className="media" key={`${author.id}-${index}`}>
               <div
                 className="media-left media-top"
-                key={`${index}-${author.photo || author.institution.image}`}
+                key={`${index}-${
+                  author.photo || author.institution?.image || 'avatar'
+                }`}
               >
                 {author.photo ? (
                   <img
@@ -112,7 +169,7 @@ const BlogCardHeaderBody = () => {
               </div>
               <div className="media-body" key={`${index}-${author.name}`}>
                 <h4 className="media-heading">{author.name}</h4>
-                {author.description}
+                {author?.institution?.name}
               </div>
             </div>
           );
@@ -130,47 +187,47 @@ const BlogCardHeaderBody = () => {
 
       <div className="social">
         <a
-          href="#"
+          href={shareUrl}
           id="share-wa"
           data-sharer="whatsapp"
           className="icon-share"
-          data-url="http://www.slavevoyages.org/blog/siblings"
+          data-url={shareUrl}
         >
           <FontAwesomeIcon icon={faWhatsapp} size="lg" />
         </a>
         <a
-          href="#"
+          href={shareUrl}
           id="share-fb"
           data-sharer="facebook"
           className="icon-share"
-          data-url="http://www.slavevoyages.org/blog/siblings"
+          data-url={shareUrl}
         >
           <FontAwesomeIcon icon={faSquareFacebook} size="lg" />
         </a>
         <a
-          href="#"
+          href={shareUrl}
           id="share-tw"
           className="icon-share"
           data-sharer="twitter"
-          data-url="http://www.slavevoyages.org/blog/siblings"
+          data-url={shareUrl}
         >
           <FontAwesomeIcon icon={faTwitterSquare} size="lg" />
         </a>
         <a
-          href="#"
+          href={shareUrl}
           id="share-li"
           data-sharer="linkedin"
           className="icon-share"
-          data-url="http://www.slavevoyages.org/blog/siblings"
+          data-url={shareUrl}
         >
           <FontAwesomeIcon icon={faLinkedin} size="lg" />
         </a>
         <a
-          href="#"
+          href={shareUrl}
           id="share-em"
           data-sharer="email"
           className="icon-share"
-          data-url="http://www.slavevoyages.org/blog/siblings"
+          data-url={shareUrl}
         >
           <FontAwesomeIcon icon={faSquareEnvelope} size="lg" />
         </a>

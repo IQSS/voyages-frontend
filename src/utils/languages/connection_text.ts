@@ -17,9 +17,9 @@ export const connectionTranslated: TranslateType = {
   },
   enslavers: {
     label: {
-      en: 'Enslavers',
-      es: 'Esclavizadores',
-      pt: 'Escravizadores',
+		en:"Slave Traders",
+		es:"Traficantes de Esclavos",
+		pt:"Traficantes de Escravos"
     },
   },
   enslavedPeople: {

@@ -15,7 +15,7 @@
       "cell_val": {
         "fields": [
           {
-            "var_name": "principal_alias",
+            "var_name": "names",
             "cell_fn": "enslavers"
           }
         ]
@@ -27,7 +27,7 @@
         "es": "Birth ES",
         "pt": "Birth PT"
       },
-      "cell_type": "literal-concat",
+      "cell_type": "literal",
       "visible": true,
       "number_format": null,
       "order_by": ["birth_year"],
@@ -36,15 +36,10 @@
       "cell_val": {
         "fields": [
           {
-            "var_name": "birth_place__name",
-            "cell_fn": "enslavers"
-          },
-          {
-            "var_name": "birth_year",
+            "var_name": "birth",
             "cell_fn": "enslavers"
           }
-        ],
-        "join": " : "
+        ]
       }
     },
     {
@@ -53,7 +48,7 @@
         "es": "Death ES",
         "pt": "Death PT"
       },
-      "cell_type": "literal-concat",
+      "cell_type": "literal",
       "visible": true,
       "number_format": null,
       "order_by": ["death_year"],
@@ -62,15 +57,10 @@
       "cell_val": {
         "fields": [
           {
-            "var_name": "death_place__name",
-            "cell_fn": "enslavers"
-          },
-          {
-            "var_name": "death_year",
+            "var_name": "death",
             "cell_fn": "enslavers"
           }
-        ],
-        "join": " : "
+        ]
       }
     },
     {
@@ -79,7 +69,7 @@
         "es": "Voyages ES",
         "pt": "Voyages PT"
       },
-      "cell_type": "literal-concat",
+      "cell_type": "literal",
       "visible": true,
       "number_format": null,
       "order_by": [
@@ -93,27 +83,10 @@
       "cell_val": {
         "fields": [
           {
-            "var_name": "voyages__voyage_id",
-            "cell_fn": "enslavers"
-          },
-          {
-            "var_name": "voyages__voyage_ship__ship_name",
-            "cell_fn": "enslavers"
-          },
-          {
-            "var_name": "voyages__voyage_dates__imp_arrival_at_port_of_dis_sparsedate__year",
-            "cell_fn": "enslavers"
-          },
-          {
-            "var_name": "voyages__voyage_itinerary__imp_principal_region_of_slave_purchase__name",
-            "cell_fn": "enslavers"
-          },
-          {
-            "var_name": "voyages__voyage_itinerary__imp_principal_port_slave_dis__name",
+            "var_name": "voyages",
             "cell_fn": "enslavers"
           }
-        ],
-        "join": " : "
+        ]
       }
     },
     {
@@ -133,7 +106,7 @@
       "cell_val": {
         "fields": [
           {
-            "var_name": "named_enslaved_people__enslaved__documented_name",
+            "var_name": "named_enslaved_people__documented_name",
             "cell_fn": "enslavers"
           }
         ]

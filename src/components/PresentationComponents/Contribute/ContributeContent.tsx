@@ -9,7 +9,7 @@ import MergeVoyages from '@/components/PresentationComponents/Contribute/Form/Me
 import NewVoyage from '@/components/PresentationComponents/Contribute/Form/NewVoyage';
 import PasswordChangeForm from '@/components/PresentationComponents/Contribute/Form/PasswordChangeForm';
 import RecommendVoyageDeletion from '@/components/PresentationComponents/Contribute/Form/RecommendVoyageDeletion';
-import SignInForm from '@/components/PresentationComponents/Contribute/Form/SignInForm';
+import SignInForm from '@/components/PresentationComponents/Contribute/Form/SingInForm';
 import SignUpForm from '@/components/PresentationComponents/Contribute/Form/SignUpForm';
 // Editorial Platform Components
 import { useNavigation } from '@/hooks/useNavigation';

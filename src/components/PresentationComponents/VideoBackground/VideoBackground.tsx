@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux';
 
 import XICON from '@/assets/pages/X_icon.svg';
 import BackGroundVideo from '@/assets/wavesBG.mp4';
+import { HostInstitutionLogos } from '@/components/PresentationComponents/HostInstitutionLogos/HostInstitutionLogos';
 import { RootState } from '@/redux/store';
 import '@/style/page.scss';
 import { translationHomepage } from '@/utils/functions/translationLanguages';
@@ -26,7 +27,7 @@ const VideoBackground = () => {
         data-aos-anchor="#bgvid-container"
       >
         <div className="social-flex-container">
-          <div className="social-icon-container">
+          <div className="social-icon-container social-icon-container--utilities">
             <span>
               <a
                 href="https://www.facebook.com/Voyages-The-Trans-Atlantic-Slave-Trade-Database-125441173016/"
@@ -99,22 +100,7 @@ const VideoBackground = () => {
             <div className="scroll">{translatedHomepage.scrollMore}</div>
           </div>
 
-          <div className="social-icon-container">
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Rice University"
-              href="https://www.rice.edu"
-            >
-              <img
-                className="cover-logo lazy initial loaded"
-                data-src="https://www.slavevoyages.org/static/uploads/rice_logo_reverse_white.png"
-                alt="Rice University Logo"
-                src="https://api.slavevoyages.org/static/uploads/rice_logo_reverse_white.png"
-                data-was-processed="true"
-              />
-            </a>
-          </div>
+          <HostInstitutionLogos placement="hero" />
         </div>
       </div>
     </div>

@@ -173,9 +173,9 @@
     },
     {
       "header_label": {
-        "en": "Enslavers",
-        "es": "Enslavers ES",
-        "pt": "Enslavers PT"
+        "en":"Slave Traders",
+  		"es":"Traficantes de Esclavos",
+  		"pt":"Traficantes de Escravos"
       },
       "cell_type": "literal-concat",
       "visible": true,
@@ -509,18 +509,18 @@
     },
     {
       "label": {
-        "en": "Enslavers",
-        "es": "Enslavers ES",
-        "pt": "Enslavers PT"
+        "en":"Slave Traders",
+  		"es":"Traficantes de Esclavos",
+  		"pt":"Traficantes de Escravos"
       },
       "children": [
         {
           "col_width_px": 300,
           "colID": "enslavers",
           "label": {
-            "en": "Enslavers",
-            "es": "Enslavers ES",
-            "pt": "Enslavers PT"
+            "en":"Slave Traders",
+			"es":"Traficantes de Esclavos",
+			"pt":"Traficantes de Escravos"
           }
         }
       ]

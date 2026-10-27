@@ -232,9 +232,9 @@
   },
   {
     "label": {
-      "en": "Enslavers",
-      "es": "Enslavers",
-      "pt": "Enslavers"
+		"en":"Slave Traders",
+		"es":"Traficantes de Esclavos",
+		"pt":"Traficantes de Escravos"
     },
     "children": [
       {"cell_type": "literal",
@@ -248,9 +248,9 @@
           ]
         },
         "label": {
-          "en": "Enslavers",
-          "es": "ES: Enslavers",
-          "pt": "PT: Enslavers"
+			"en":"Slave Traders",
+			"es":"Traficantes de Esclavos",
+			"pt":"Traficantes de Escravos"
         }
       }
     ]
@@ -542,6 +542,24 @@
           "es": "Place where vessel's voyage ended",
           "pt": "Place where vessel's voyage ended"
         }
+      },
+      {
+        "cell_type": "literal-concat",
+        "number_format": null,
+        "cell_val": {
+          "fields": [
+            {
+              "var_name": "linked_voyages__voyage_id",
+              "cell_fn": "literal-concat",
+              "node_class": "voyages"
+            }
+          ]
+        },
+        "label": {
+          "en": "Linked voyages",
+          "es": "Viajes conectados",
+          "pt": "Viagens conectadas"
+        }
       }
     ]
   },
@@ -652,6 +670,23 @@
           "en": "Date vessel departed with captives",
           "es": "Date vessel departed with captives",
           "pt": "Date vessel departed with captives"
+        }
+      },
+      {
+        "cell_type": "literal",
+        "number_format": null,
+        "cell_val": {
+          "fields": [
+            {
+              "var_name": "voyage_dates__first_dis_of_slaves_sparsedate__date_str",
+              "cell_fn": "literal"
+            }
+          ]
+        },
+        "label": {
+          "en": "Date vessel arrived with captives",
+          "es": "Date vessel arrived with captives",
+          "pt": "Date vessel arrived with captives"
         }
       },
       {

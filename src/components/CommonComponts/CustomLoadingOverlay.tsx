@@ -1,4 +1,4 @@
-import { CircularProgress, Box } from '@mui/material';
+import {  CircularProgress, Box } from '@mui/material';
 export const CustomLoadingOverlay = () => {
   return (
     <Box
@@ -16,11 +16,11 @@ export const CustomLoadingOverlay = () => {
         zIndex: 4000,
       }}
     >
-      <CircularProgress
+      <CircularProgress 
         size={40}
         thickness={4}
         sx={{
-          color: 'var(--pagination-table--, #007269)',
+          color: 'var(--pagination-table--, #007269)'
         }}
       />
     </Box>

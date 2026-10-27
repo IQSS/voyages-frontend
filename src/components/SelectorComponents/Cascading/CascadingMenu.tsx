@@ -8,8 +8,8 @@ import { setPeopleEnslavedBlocksMenuList } from '@/redux/getPeopleEnslavedDataSe
 import { setViewAll } from '@/redux/getShowFilterObjectSlice';
 import { resetAllStateToInitailState } from '@/redux/resetAllSlice';
 import { AppDispatch, RootState } from '@/redux/store';
-import { VOYAGE } from '@/share/CONST_DATA';
 import { TYPESOFDATASETPEOPLE } from '@/share/InterfaceTypes';
+import { isSaveSearchEnabledBlock } from '@/utils/functions/saveSearchRoutes';
 import jsonDataPEOPLECOLLECTIONS from '@/utils/flatfiles/people/people_collections.json';
 
 import { MenuListsDropdown } from './MenuListsDropdown';
@@ -85,9 +85,7 @@ export default function CascadingMenu() {
             </>
           ) : null}
         </div>
-        {(currentBlockName === '' ||
-          currentBlockName === VOYAGE ||
-          currentBlockName === 'people') && <SaveSearchComponent />}
+        {isSaveSearchEnabledBlock(currentBlockName) && <SaveSearchComponent />}
       </div>
       <div className={`panel-list-unshow${viewAll ? '-show' : ''}`}>
         <ShowFilterObject

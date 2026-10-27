@@ -16,6 +16,8 @@ import {
 import { RootState, AppDispatch } from '@/redux/store';
 import {
   DISPOSTIONNODE,
+  EDGES_ANIMATED_PANE,
+  EDGES_MAIN_PANE,
   FILTER_OBJECT_KEY,
   nodeTypeOrigin,
   nodeTypePostDisembarkation,
@@ -84,6 +86,17 @@ const NodeEdgesCurvedLinesMap = () => {
   };
 
   const updateEdgesAndNodes = () => {
+    [
+      [EDGES_MAIN_PANE, '390'],
+      [EDGES_ANIMATED_PANE, '395'],
+    ].forEach(([name, zIndex]) => {
+      if (!map.getPane(name)) {
+        const pane = map.createPane(name);
+        pane.style.zIndex = zIndex;
+        map.getPanes().overlayPane.before(pane);
+      }
+    });
+
     const hiddenEdgesLayer = L.layerGroup().addTo(map);
 
     map.eachLayer((layer) => {
@@ -128,7 +141,7 @@ const NodeEdgesCurvedLinesMap = () => {
         }
         const backgroundColor = 'rgb(96, 192, 171)';
         const borderColor = 'black';
-        const opacity = 1.5;
+        const opacity = 0.9;
         return new L.DivIcon({
           html:
             '<div style="background-color:' +
@@ -172,7 +185,7 @@ const NodeEdgesCurvedLinesMap = () => {
 
         const backgroundColor = 'rgb(246,193,60)';
         const borderColor = 'black';
-        const opacity = 1.5;
+        const opacity = 0.9;
         return new L.DivIcon({
           html:
             '<div style="background-color:' +
@@ -186,7 +199,19 @@ const NodeEdgesCurvedLinesMap = () => {
           iconSize: new L.Point(40, 40, true),
         });
       },
-    }).on('clustermouseover', (event) => {
+    })
+    .on('clustermouseover', (event) => {
+      handleHoverMarkerCluster(
+        event,
+        hiddenEdgesLayer,
+        hiddenEdges,
+        nodesData,
+        nodeTypePostDisembarkation,
+        handleSetClusterKeyValue,
+        map,
+      );
+    })
+    .on('mouseover', (event) => {
       handleHoverMarkerCluster(
         event,
         hiddenEdgesLayer,
@@ -209,6 +234,12 @@ const NodeEdgesCurvedLinesMap = () => {
 
       const nodeColor = getNodeColorMapVoyagesStyle(node);
    
+      const embarkDisembarkTotal = (embarkation ?? 0) + (disembarkation ?? 0);
+      const nodeOpacity =
+        embarkDisembarkTotal > 0
+          ? 0.5 + 0.35 * ((embarkation ?? 0) / embarkDisembarkTotal)
+          : 0.9;
+
       const logSize = nodeLogValueScale(size);
       const radius = isNaN(logSize) ? 0 : (logSize as number);
       if (lat && lon) {
@@ -218,33 +249,47 @@ const NodeEdgesCurvedLinesMap = () => {
           radius,
           radius === 0 ? 'transparent' : '#000000',
           radius === 0 ? 'transparent' : nodeColor,
-          0.8,
+          nodeOpacity,
           nodeID,
         );
 
-        const popupContent = createTooltipEmbarkDiseEmbarkEdges(node);
-
-        circleMarker.bindPopup(popupContent).bringToFront();
-
         const originMarker = L.marker(latlon);
-        circleMarker.on('mouseover', (event) => {
-          circleMarker.openPopup();
-          handleHoverCircleMarker(
-            event,
-            hiddenEdgesLayer,
-            edgesData,
-            nodesData,
-            node,
-            originNodeMarkersMap,
-            originMarkerCluster,
-            handleSetClusterKeyValue, // WAIT To Change if want to show table,
-            map,
-          );
-        });
 
         if (disembarkation !== 0 || embarkation !== 0) {
+          const popupContent = createTooltipEmbarkDiseEmbarkEdges(node);
+          circleMarker.bindPopup(popupContent).bringToFront();
+          circleMarker.on('mouseover', (event) => {
+            circleMarker.openPopup();
+            handleHoverCircleMarker(
+              event,
+              hiddenEdgesLayer,
+              edgesData,
+              nodesData,
+              node,
+              originNodeMarkersMap,
+              originMarkerCluster,
+              handleSetClusterKeyValue,
+              map,
+            );
+          });
           circleMarker.addTo(map).bringToFront();
         } else if (origin && origin > 0) {
+          const popupContent = createTooltipEmbarkDiseEmbarkEdges(node);
+          circleMarker.bindPopup(popupContent).bringToFront();
+          circleMarker.on('mouseover', (event) => {
+            circleMarker.openPopup();
+            handleHoverCircleMarker(
+              event,
+              hiddenEdgesLayer,
+              edgesData,
+              nodesData,
+              node,
+              originNodeMarkersMap,
+              originMarkerCluster,
+              handleSetClusterKeyValue,
+              map,
+            );
+          });
           originNodeMarkersMap.set(nodeID, originMarker);
           originMarkerCluster.addLayer(circleMarker).bringToFront();
           originMarkerCluster.addLayer(originMarker).bringToFront();

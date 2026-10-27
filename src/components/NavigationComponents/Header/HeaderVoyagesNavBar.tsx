@@ -1,10 +1,17 @@
-import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
+import {
+  MouseEventHandler,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import MenuIcon from '@mui/icons-material/Menu';
 import {
   AppBar,
   Box,
   IconButton,
+  Hidden,
   Divider,
   Menu,
   Typography,
@@ -37,6 +44,9 @@ import {
   ALLVOYAGES,
   ALLVOYAGESPAGE,
   AllVoyagesTitle,
+  INDIANOCEANANDASIANSLAVETRADEDATABASE,
+  INDIANOCEANANDASIANSLAVETRADEDATABASEPAGE,
+  IndianOceanAndAsiaSlaveTradesTitle,
   INTRAAMERICAN,
   INTRAAMERICANPAGE,
   IntraAmericanTitle,
@@ -62,7 +72,6 @@ import { DrawerMenuBar } from './DrawerMenuBar';
 import HeaderLogo from './HeaderLogo';
 import GlobalSearchButton from '../../PresentationComponents/GlobalSearch/GlobalSearchButton';
 import CascadingMenu from '../../SelectorComponents/Cascading/CascadingMenu';
-import { clearSavedData } from '@/utils/supabase/authStorage';
 
 export default function HeaderVoyagesNavBar() {
   const dispatch: AppDispatch = useDispatch();
@@ -87,6 +96,8 @@ export default function HeaderVoyagesNavBar() {
       dispatch(setDataSetHeader(IntraAmericanTitle));
     } else if (styleNameRoute === ALLVOYAGES) {
       dispatch(setDataSetHeader(AllVoyagesTitle));
+    } else if (styleNameRoute === INDIANOCEANANDASIANSLAVETRADEDATABASE) {
+      dispatch(setDataSetHeader(IndianOceanAndAsiaSlaveTradesTitle));
     }
   }, []);
 
@@ -94,11 +105,15 @@ export default function HeaderVoyagesNavBar() {
   const [anchorFilterMobileEl, setAnchorFilterMobileEl] =
     useState<null | HTMLElement>(null);
 
-  const styleNameToPathMap: { [key: string]: string } = {
-    [ALLVOYAGES]: `${ALLVOYAGESPAGE}#${currentVoyageBlockName}`,
-    [INTRAAMERICAN]: `${INTRAAMERICANPAGE}#${currentVoyageBlockName}`,
-    [TRANSATLANTIC]: `${TRANSATLANTICPAGE}#${currentVoyageBlockName}`,
-  };
+  const styleNameToPathMap: { [key: string]: string } = useMemo(
+    () => ({
+      [ALLVOYAGES]: `${ALLVOYAGESPAGE}#${currentVoyageBlockName}`,
+      [INTRAAMERICAN]: `${INTRAAMERICANPAGE}#${currentVoyageBlockName}`,
+      [TRANSATLANTIC]: `${TRANSATLANTICPAGE}#${currentVoyageBlockName}`,
+      [INDIANOCEANANDASIANSLAVETRADEDATABASE]: `${INDIANOCEANANDASIANSLAVETRADEDATABASEPAGE}#${currentVoyageBlockName}`,
+    }),
+    [currentVoyageBlockName],
+  );
 
   const handleSelectDataset = useCallback(
     (
@@ -155,9 +170,14 @@ export default function HeaderVoyagesNavBar() {
       }
 
       // Cleanup LocalStorage (only remove specific keys if needed)
-      clearSavedData(['filterObject']);
+      const keysToRemove = Object.keys(localStorage);
+      keysToRemove.forEach((key) => {
+        if (key !== 'filterObject') {
+          localStorage.removeItem(key);
+        }
+      });
     },
-    [value, currentVoyageBlockName, navigate, dispatch],
+    [currentVoyageBlockName, navigate, dispatch, styleNameToPathMap],
   );
 
   const handleMenuFilterMobileClose = () => {
@@ -173,7 +193,10 @@ export default function HeaderVoyagesNavBar() {
   };
   const onClickReset = () => {
     dispatch(resetAllStateToInitailState());
-    clearSavedData();
+    const keysToRemove = Object.keys(localStorage);
+    keysToRemove.forEach((key) => {
+      localStorage.removeItem(key);
+    });
   };
 
   return (
@@ -191,17 +214,17 @@ export default function HeaderVoyagesNavBar() {
         }}
       >
         <Toolbar sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+          <Hidden mdUp>
             <IconButton
               edge="start"
               color="default"
               aria-label="menu"
               onClick={handleMenuOpen}
-              sx={{ mr: 2 }}
+              sx={{ mr: 2, display: { md: 'none' } }}
             >
               <MenuIcon style={{ color: 'fff' }} />
             </IconButton>
-          </Box>
+          </Hidden>
           <Typography
             component="div"
             sx={{
@@ -235,7 +258,7 @@ export default function HeaderVoyagesNavBar() {
               {inputSearchValue && <GlobalSearchButton />}
             </Typography>
           </Typography>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>{!inputSearchValue && <CascadingMenu />}</Box>
+          <Hidden mdUp>{!inputSearchValue && <CascadingMenu />}</Hidden>
           <Box
             className="menu-nav-bar-select-box"
             sx={{
@@ -273,7 +296,7 @@ export default function HeaderVoyagesNavBar() {
             borderClor: 'rgb(0 0 0 / 50%)',
           }}
         />
-        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>{!inputSearchValue && <CascadingMenu />}</Box>
+        <Hidden mdDown>{!inputSearchValue && <CascadingMenu />}</Hidden>
         <Box component="nav">
           <Menu
             anchorEl={anchorEl}

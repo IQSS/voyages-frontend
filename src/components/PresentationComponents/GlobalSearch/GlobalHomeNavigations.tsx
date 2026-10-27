@@ -21,7 +21,6 @@ import {
   TRANSATLANTICTIMELAPSE,
 } from '@/share/CONST_DATA';
 import { translationHomepage } from '@/utils/functions/translationLanguages';
-import { clearSavedData } from '@/utils/supabase/authStorage';
 
 const GlobalHomeNavigations = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -34,7 +33,10 @@ const GlobalHomeNavigations = () => {
     dispatch(setCurrentPage(1));
     dispatch(setPathNameVoyages(ALLVOYAGES));
     dispatch(resetAll());
-    clearSavedData();
+    const keysToRemove = Object.keys(localStorage);
+    keysToRemove.forEach((key) => {
+      localStorage.removeItem(key);
+    });
   };
   return (
     <>
@@ -76,7 +78,10 @@ const GlobalHomeNavigations = () => {
             type="button"
             className="voyages-people-places-link-btn"
             onClick={() => {
-              clearSavedData();
+              const keysToRemove = Object.keys(localStorage);
+              keysToRemove.forEach((key) => {
+                localStorage.removeItem(key);
+              });
               dispatch(setPathNameEnslaved(ALLENSLAVED));
               window.location.assign(`/${PASTHOMEPAGE}`);
             }}

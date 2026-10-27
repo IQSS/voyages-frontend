@@ -1,7 +1,6 @@
 import React from 'react';
-
-import { CookieSharp } from '@mui/icons-material';
 import { Select } from 'antd';
+import { CookieSharp } from '@mui/icons-material';
 
 const { Option } = Select;
 
@@ -38,6 +37,16 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
     { label: 'November', value: '11' },
     { label: 'December', value: '12' },
   ];
+
+  const handleDateChange = () => {
+    // console.log({ year, month, day })
+    // if (year && month && day) {
+    //     const formattedDate = `${year}-${month}-${String(day).padStart(2, "0")}`;
+    //     onDateChange(formattedDate);
+    // } else {
+    //     onDateChange("");
+    // }
+  };
 
   return (
     <div>

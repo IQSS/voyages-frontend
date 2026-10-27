@@ -1,0 +1,1682 @@
+{
+  "data": {
+    "Voyage ID": 11586,
+    "Dataset": 0,
+    "Crew": {
+      "data": {
+        "Crew at voyage outset": null,
+        "Crew at departure from last port of slave purchase": null,
+        "Crew at first landing of slaves": null,
+        "Crew when return voyage begin": null,
+        "Crew at end of voyage": null,
+        "Number of crew unspecified": null,
+        "Crew died before first place of trade in Africa": null,
+        "Crew died while ship was on African coast": null,
+        "Crew died during Middle Passage": null,
+        "Crew died in the Americas": null,
+        "Crew died on return voyage": null,
+        "Crew died during complete voyage": null,
+        "Total number of crew deserted": null,
+        "id": 7968
+      },
+      "state": "original",
+      "entityRef": {
+        "type": "existing",
+        "schema": "VoyageCrew",
+        "id": 7968
+      }
+    },
+    "Slave Numbers": {
+      "data": {
+        "SlavesIntendedFirstPortPurchase": null,
+        "num_men_embark_first_port_purchase": null,
+        "num_women_embark_first_port_purchase": null,
+        "num_boy_embark_first_port_purchase": null,
+        "num_girl_embark_first_port_purchase": null,
+        "num_males_embark_first_port_purchase": null,
+        "num_females_embark_first_port_purchase": null,
+        "num_adult_embark_first_port_purchase": null,
+        "num_child_embark_first_port_purchase": null,
+        "num_infant_embark_first_port_purchase": null,
+        "num_men_embark_second_port_purchase": null,
+        "num_women_embark_second_port_purchase": null,
+        "num_boy_embark_second_port_purchase": null,
+        "num_girl_embark_second_port_purchase": null,
+        "num_males_embark_second_port_purchase": null,
+        "num_females_embark_second_port_purchase": null,
+        "num_adult_embark_second_port_purchase": null,
+        "num_child_embark_second_port_purchase": null,
+        "num_infant_embark_second_port_purchase": null,
+        "num_men_embark_third_port_purchase": null,
+        "num_women_embark_third_port_purchase": null,
+        "num_boy_embark_third_port_purchase": null,
+        "num_girl_embark_third_port_purchase": null,
+        "num_males_embark_third_port_purchase": null,
+        "num_females_embark_third_port_purchase": null,
+        "num_adult_embark_third_port_purchase": null,
+        "num_child_embark_third_port_purchase": null,
+        "num_infant_embark_third_port_purchase": null,
+        "num_men_died_middle_passage": null,
+        "num_women_died_middle_passage": null,
+        "num_boy_died_middle_passage": null,
+        "num_girl_died_middle_passage": null,
+        "num_males_died_middle_passage": null,
+        "num_females_died_middle_passage": null,
+        "num_adult_died_middle_passage": null,
+        "num_child_died_middle_passage": null,
+        "num_infant_died_middle_passage": null,
+        "num_men_disembark_first_landing": null,
+        "num_women_disembark_first_landing": null,
+        "num_boy_disembark_first_landing": null,
+        "num_girl_disembark_first_landing": null,
+        "num_males_disembark_first_landing": null,
+        "num_females_disembark_first_landing": null,
+        "num_adult_disembark_first_landing": null,
+        "num_child_disembark_first_landing": null,
+        "num_infant_disembark_first_landing": null,
+        "num_men_disembark_second_landing": null,
+        "num_women_disembark_second_landing": null,
+        "num_boy_disembark_second_landing": null,
+        "num_girl_disembark_second_landing": null,
+        "num_males_disembark_second_landing": null,
+        "num_females_disembark_second_landing": null,
+        "num_adult_disembark_second_landing": null,
+        "num_child_disembark_second_landing": null,
+        "num_infant_disembark_second_landing": null,
+        "imp_num_male_embarked": null,
+        "imp_num_female_embarked": null,
+        "imp_num_adult_embarked": null,
+        "imp_num_children_embarked": null,
+        "imp_num_male_landed": null,
+        "imp_num_female_landed": null,
+        "imp_num_adult_landed": null,
+        "imp_num_child_landed": null,
+        "imp_num_men_total": null,
+        "imp_num_women_total": null,
+        "imp_num_boy_total": null,
+        "imp_num_girl_total": null,
+        "imp_num_males_total": null,
+        "imp_num_females_total": null,
+        "imp_num_adult_total": null,
+        "imp_num_child_total": null,
+        "imp_male_death_middle_passage": null,
+        "imp_female_death_middle_passage": null,
+        "imp_adult_death_middle_passage": null,
+        "imp_child_death_middle_passage": null,
+        "id": 7968
+      },
+      "state": "original",
+      "entityRef": {
+        "type": "existing",
+        "schema": "VoyageSlaveNumbers",
+        "id": 7968
+      }
+    },
+    "Cargo": [],
+    "Ship": {
+      "data": {
+        "Name of vessel": "Verstoorde Leeuw",
+        "National carrier": null,
+        "Ton type": null,
+        "Tonnage of vessel": null,
+        "Rig of vessel": null,
+        "Guns mounted": null,
+        "Year of vessel's construction": null,
+        "Construction place": null,
+        "Year of vessel's registration": null,
+        "Registered place": null,
+        "Nationality": {
+          "data": {
+            "Nation name": "Netherlands",
+            "Code": 8,
+            "id": 8
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "Nationality",
+            "id": 8
+          }
+        },
+        "Tonnage standardized on British measured tons, 1773-1870": null,
+        "id": 7968
+      },
+      "state": "original",
+      "entityRef": {
+        "type": "existing",
+        "schema": "VoyageShip",
+        "id": 7968
+      }
+    },
+    "Outcome": {
+      "data": {
+        "Particular Outcome": {
+          "data": {
+            "Name": "Voyage completed as intended",
+            "Value": 1,
+            "id": 2
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "ParticularOutcome",
+            "id": 2
+          }
+        },
+        "Resistance": null,
+        "Enslaved Outcome": {
+          "data": {
+            "Name": "Slaves disembarked in Americas",
+            "Value": 1,
+            "id": 1
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "SlavesOutcome",
+            "id": 1
+          }
+        },
+        "Vessel Outcome": {
+          "data": {
+            "Name": "Not captured",
+            "Value": 14,
+            "id": 1
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "VesselOutcomeSchema",
+            "id": 1
+          }
+        },
+        "Owner Outcome": {
+          "data": {
+            "Name": "Delivered slaves for original owners",
+            "Value": 1,
+            "id": 1
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "OwnerOutcome",
+            "id": 1
+          }
+        },
+        "id": 7968
+      },
+      "state": "original",
+      "entityRef": {
+        "type": "existing",
+        "schema": "VoyageOutcome",
+        "id": 7968
+      }
+    },
+    "Itinerary": {
+      "data": {
+        "Port of departure": {
+          "data": {
+            "Name": "Rotterdam",
+            "Code": 10830,
+            "id": 435
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "Location",
+            "id": 435
+          }
+        },
+        "First intended port of embarkation": {
+          "data": {
+            "Name": "São Tomé",
+            "Code": 60673,
+            "id": 1774
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "Location",
+            "id": 1774
+          }
+        },
+        "Second intended port of embarkation": null,
+        "First intended port of disembarkation": {
+          "data": {
+            "Name": "Cadiz",
+            "Code": 10104,
+            "id": 120
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "Location",
+            "id": 120
+          }
+        },
+        "Second intended port of disembarkation": null,
+        "Third intended port of disembarkation": null,
+        "Fourth intended port of disembarkation": null,
+        "Number of ports of call prior to buying slaves": null,
+        "First place of slave purchase": {
+          "data": {
+            "Name": "New Calabar",
+            "Code": 60622,
+            "id": 1749
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "Location",
+            "id": 1749
+          }
+        },
+        "Second place of slave purchase": null,
+        "Third place of slave purchase": null,
+        "Port of call before Atlantic crossing": null,
+        "Number of ports of call in Americas prior to sale of slaves": null,
+        "First place of slave landing": {
+          "data": {
+            "Name": "Cadiz",
+            "Code": 10104,
+            "id": 120
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "Location",
+            "id": 120
+          }
+        },
+        "Second place of slave landing": null,
+        "Third place of slave landing": null,
+        "Place at which voyage ended": {
+          "data": {
+            "Name": "Texel",
+            "Code": 10829,
+            "id": 434
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "Location",
+            "id": 434
+          }
+        },
+        "Imputed port where voyage began": {
+          "data": {
+            "Name": "Rotterdam",
+            "Code": 10830,
+            "id": 435
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "Location",
+            "id": 435
+          }
+        },
+        "Principal place of slave purchase": {
+          "data": {
+            "Name": "New Calabar",
+            "Code": 60622,
+            "id": 1749
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "Location",
+            "id": 1749
+          }
+        },
+        "Imputed principal place of slave purchase": {
+          "data": {
+            "Name": "New Calabar",
+            "Code": 60622,
+            "id": 1749
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "Location",
+            "id": 1749
+          }
+        },
+        "Principal port of slave disembarkation": {
+          "data": {
+            "Name": "Cadiz",
+            "Code": 10104,
+            "id": 120
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "Location",
+            "id": 120
+          }
+        },
+        "Imputed principal port of slave disembarkation": {
+          "data": {
+            "Name": "Cadiz",
+            "Code": 10104,
+            "id": 120
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "Location",
+            "id": 120
+          }
+        },
+        "id": 7968
+      },
+      "state": "original",
+      "entityRef": {
+        "type": "existing",
+        "schema": "VoyageItinerary",
+        "id": 7968
+      }
+    },
+    "Dates": {
+      "data": {
+        "Length of Middle Passage in (days)": null,
+        "Voyage length from home port to disembarkation (days)": null,
+        "Voyage length from last slave embarkation to first disembarkation (days)": null,
+        "Date that voyage began": {
+          "data": {
+            "Year": 1669,
+            "Month": 11,
+            "Day": null,
+            "id": 44998
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "VoyageSparseDate",
+            "id": 44998
+          }
+        },
+        "Date that slave purchase began": {
+          "data": {
+            "Year": 1670,
+            "Month": 1,
+            "Day": 31,
+            "id": 44999
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "VoyageSparseDate",
+            "id": 44999
+          }
+        },
+        "Date that vessel left last slaving port": {
+          "data": {
+            "Year": 1670,
+            "Month": null,
+            "Day": null,
+            "id": 45000
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "VoyageSparseDate",
+            "id": 45000
+          }
+        },
+        "Date of first disembarkation of slaves": {
+          "data": {
+            "Year": 1670,
+            "Month": 10,
+            "Day": null,
+            "id": 45001
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "VoyageSparseDate",
+            "id": 45001
+          }
+        },
+        "Date vessel departed Africa": null,
+        "Date of arrival at second place of landing": null,
+        "Date of third disembarkation of slaves": null,
+        "Date of departure from last place of landing": {
+          "data": {
+            "Year": 1670,
+            "Month": null,
+            "Day": null,
+            "id": 45002
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "VoyageSparseDate",
+            "id": 45002
+          }
+        },
+        "Date on which slave voyage completed": {
+          "data": {
+            "Year": 1670,
+            "Month": 12,
+            "Day": 17,
+            "id": 45003
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "VoyageSparseDate",
+            "id": 45003
+          }
+        },
+        "Voyage began": {
+          "data": {
+            "Year": 1669,
+            "Month": null,
+            "Day": null,
+            "id": 45004
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "VoyageSparseDate",
+            "id": 45004
+          }
+        },
+        "Departed Africa": {
+          "data": {
+            "Year": 1670,
+            "Month": null,
+            "Day": null,
+            "id": 45005
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "VoyageSparseDate",
+            "id": 45005
+          }
+        },
+        "Year of arrival at port of disembarkation": {
+          "data": {
+            "Year": 1670,
+            "Month": null,
+            "Day": null,
+            "id": 45006
+          },
+          "state": "original",
+          "entityRef": {
+            "type": "existing",
+            "schema": "VoyageSparseDate",
+            "id": 45006
+          }
+        },
+        "id": 7968
+      },
+      "state": "original",
+      "entityRef": {
+        "type": "existing",
+        "schema": "VoyageDates",
+        "id": 7968
+      }
+    },
+    "Sources": [
+      {
+        "data": {
+          "voyage_id": 11586,
+          "Source": {
+            "data": {
+              "Title": "Dataset of 17th century Dutch slave trading voyages",
+              "id": 998
+            },
+            "state": "original",
+            "entityRef": {
+              "type": "existing",
+              "schema": "Voyage Source",
+              "id": 998
+            }
+          },
+          "Page range": "BDB118",
+          "id": 26704
+        },
+        "state": "original",
+        "entityRef": {
+          "type": "existing",
+          "schema": "Voyage Source Connection",
+          "id": 26704
+        }
+      },
+      {
+        "data": {
+          "voyage_id": 11586,
+          "Source": {
+            "data": {
+              "Title": "Archival and library notes on the 17th century slave trade; notes from the Nationaal Archief",
+              "id": 1038
+            },
+            "state": "original",
+            "entityRef": {
+              "type": "existing",
+              "schema": "Voyage Source",
+              "id": 1038
+            }
+          },
+          "Page range": "Binder:ARA,SG,5768,17/12/1670",
+          "id": 27782
+        },
+        "state": "original",
+        "entityRef": {
+          "type": "existing",
+          "schema": "Voyage Source Connection",
+          "id": 27782
+        }
+      },
+      {
+        "data": {
+          "voyage_id": 11586,
+          "Source": {
+            "data": {
+              "Title": "N",
+              "id": 1391
+            },
+            "state": "original",
+            "entityRef": {
+              "type": "existing",
+              "schema": "Voyage Source",
+              "id": 1391
+            }
+          },
+          "Page range": "GAA,NA,2956:897,25April1672",
+          "id": 68092
+        },
+        "state": "original",
+        "entityRef": {
+          "type": "existing",
+          "schema": "Voyage Source Connection",
+          "id": 68092
+        }
+      },
+      {
+        "data": {
+          "voyage_id": 11586,
+          "Source": {
+            "data": {
+              "Title": "N",
+              "id": 1391
+            },
+            "state": "original",
+            "entityRef": {
+              "type": "existing",
+              "schema": "Voyage Source",
+              "id": 1391
+            }
+          },
+          "Page range": "GAA,NA,2231:2Nov1669",
+          "id": 68093
+        },
+        "state": "original",
+        "entityRef": {
+          "type": "existing",
+          "schema": "Voyage Source Connection",
+          "id": 68093
+        }
+      },
+      {
+        "data": {
+          "voyage_id": 11586,
+          "Source": {
+            "data": {
+              "Title": "N",
+              "id": 1391
+            },
+            "state": "original",
+            "entityRef": {
+              "type": "existing",
+              "schema": "Voyage Source",
+              "id": 1391
+            }
+          },
+          "Page range": "GAA,NA,3205:398,17/12/1670",
+          "id": 68094
+        },
+        "state": "original",
+        "entityRef": {
+          "type": "existing",
+          "schema": "Voyage Source Connection",
+          "id": 68094
+        }
+      },
+      {
+        "data": {
+          "voyage_id": 11586,
+          "Source": {
+            "data": {
+              "Title": "N",
+              "id": 1391
+            },
+            "state": "original",
+            "entityRef": {
+              "type": "existing",
+              "schema": "Voyage Source",
+              "id": 1391
+            }
+          },
+          "Page range": "GAA,NA,3206:336,28/3/1671",
+          "id": 68095
+        },
+        "state": "original",
+        "entityRef": {
+          "type": "existing",
+          "schema": "Voyage Source Connection",
+          "id": 68095
+        }
+      },
+      {
+        "data": {
+          "voyage_id": 11586,
+          "Source": {
+            "data": {
+              "Title": "Dataset of 17th century Dutch slave trading voyages",
+              "id": 998
+            },
+            "state": "original",
+            "entityRef": {
+              "type": "existing",
+              "schema": "Voyage Source",
+              "id": 998
+            }
+          },
+          "Page range": null,
+          "id": 173625
+        },
+        "state": "original",
+        "entityRef": {
+          "type": "existing",
+          "schema": "Voyage Source Connection",
+          "id": 173625
+        }
+      },
+      {
+        "data": {
+          "voyage_id": 11586,
+          "Source": {
+            "data": {
+              "Title": "Archival and library notes on the 17th century slave trade; notes from the Nationaal Archief",
+              "id": 1038
+            },
+            "state": "original",
+            "entityRef": {
+              "type": "existing",
+              "schema": "Voyage Source",
+              "id": 1038
+            }
+          },
+          "Page range": null,
+          "id": 174703
+        },
+        "state": "original",
+        "entityRef": {
+          "type": "existing",
+          "schema": "Voyage Source Connection",
+          "id": 174703
+        }
+      },
+      {
+        "data": {
+          "voyage_id": 11586,
+          "Source": {
+            "data": {
+              "Title": "N",
+              "id": 1391
+            },
+            "state": "original",
+            "entityRef": {
+              "type": "existing",
+              "schema": "Voyage Source",
+              "id": 1391
+            }
+          },
+          "Page range": null,
+          "id": 215014
+        },
+        "state": "original",
+        "entityRef": {
+          "type": "existing",
+          "schema": "Voyage Source Connection",
+          "id": 215014
+        }
+      },
+      {
+        "data": {
+          "voyage_id": 11586,
+          "Source": {
+            "data": {
+              "Title": "N",
+              "id": 1391
+            },
+            "state": "original",
+            "entityRef": {
+              "type": "existing",
+              "schema": "Voyage Source",
+              "id": 1391
+            }
+          },
+          "Page range": null,
+          "id": 215015
+        },
+        "state": "original",
+        "entityRef": {
+          "type": "existing",
+          "schema": "Voyage Source Connection",
+          "id": 215015
+        }
+      },
+      {
+        "data": {
+          "voyage_id": 11586,
+          "Source": {
+            "data": {
+              "Title": "N",
+              "id": 1391
+            },
+            "state": "original",
+            "entityRef": {
+              "type": "existing",
+              "schema": "Voyage Source",
+              "id": 1391
+            }
+          },
+          "Page range": null,
+          "id": 215016
+        },
+        "state": "original",
+        "entityRef": {
+          "type": "existing",
+          "schema": "Voyage Source Connection",
+          "id": 215016
+        }
+      },
+      {
+        "data": {
+          "voyage_id": 11586,
+          "Source": {
+            "data": {
+              "Title": "N",
+              "id": 1391
+            },
+            "state": "original",
+            "entityRef": {
+              "type": "existing",
+              "schema": "Voyage Source",
+              "id": 1391
+            }
+          },
+          "Page range": null,
+          "id": 215017
+        },
+        "state": "original",
+        "entityRef": {
+          "type": "existing",
+          "schema": "Voyage Source Connection",
+          "id": 215017
+        }
+      }
+    ],
+    "Enslavement relations": [
+      {
+        "data": {
+          "Relation type": {
+            "data": {
+              "Relation type": "Transportation",
+              "id": 1
+            },
+            "state": "original",
+            "entityRef": {
+              "type": "existing",
+              "schema": "EnslavementRelationType",
+              "id": 1
+            }
+          },
+          "Place": null,
+          "Date": null,
+          "Amount": null,
+          "id": 8293,
+          "Enslaved in relation": [],
+          "Enslavers in relation": [
+            {
+              "data": {
+                "relation_id": 8293,
+                "Enslaver alias": {
+                  "data": {
+                    "Alias": "Bessels, Gerard",
+                    "Identity": {
+                      "data": {
+                        "Principal alias": "Bessels, Gerard",
+                        "Birth year": 1627,
+                        "Birth month": 3,
+                        "Birth day": 28,
+                        "Birth place": null,
+                        "Death year": null,
+                        "Death month": null,
+                        "Death day": null,
+                        "Death place": null,
+                        "Father name": "Bessels, Adam",
+                        "Father occupation": "Merchant",
+                        "Mother name": "Reynst, Margrieta",
+                        "Probate date": null,
+                        "Will value (pounds)": null,
+                        "Will value (dollars)": null,
+                        "Will court": null,
+                        "Principal location": null,
+                        "Notes": null,
+                        "id": 1001574,
+                        "Aliases": [
+                          {
+                            "data": {
+                              "Alias": "Bessels, Gerrit",
+                              "id": 1022942
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1022942
+                            }
+                          },
+                          {
+                            "data": {
+                              "Alias": "Bessels, Gerard",
+                              "id": 1022943
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1022943
+                            }
+                          },
+                          {
+                            "data": {
+                              "Alias": "Bessels, Gerard",
+                              "id": 1023726
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023726
+                            }
+                          }
+                        ]
+                      },
+                      "state": "original",
+                      "entityRef": {
+                        "type": "existing",
+                        "schema": "Enslaver",
+                        "id": 1001574
+                      }
+                    },
+                    "id": 1023726
+                  },
+                  "state": "original",
+                  "entityRef": {
+                    "type": "existing",
+                    "schema": "EnslaverAliasWithIdentity",
+                    "id": 1023726
+                  }
+                },
+                "id": 11326,
+                "Roles": [
+                  {
+                    "data": {
+                      "enslaverinrelation_id": 11326,
+                      "Role": {
+                        "data": {
+                          "Enslaver role": "Investor",
+                          "id": 2
+                        },
+                        "state": "original",
+                        "entityRef": {
+                          "type": "existing",
+                          "schema": "EnslaverRole",
+                          "id": 2
+                        }
+                      },
+                      "id": 12226
+                    },
+                    "state": "original",
+                    "entityRef": {
+                      "type": "existing",
+                      "schema": "EnslaverRelationRoleConn",
+                      "id": 12226
+                    }
+                  }
+                ]
+              },
+              "state": "original",
+              "entityRef": {
+                "type": "existing",
+                "schema": "EnslaverInRelation",
+                "id": 11326
+              }
+            },
+            {
+              "data": {
+                "relation_id": 8293,
+                "Enslaver alias": {
+                  "data": {
+                    "Alias": "Vieger, Jacobus de",
+                    "Identity": {
+                      "data": {
+                        "Principal alias": "Vieger, Jacobus de",
+                        "Birth year": null,
+                        "Birth month": null,
+                        "Birth day": null,
+                        "Birth place": null,
+                        "Death year": null,
+                        "Death month": null,
+                        "Death day": null,
+                        "Death place": null,
+                        "Father name": null,
+                        "Father occupation": null,
+                        "Mother name": null,
+                        "Probate date": null,
+                        "Will value (pounds)": null,
+                        "Will value (dollars)": null,
+                        "Will court": null,
+                        "Principal location": null,
+                        "Notes": null,
+                        "id": 1019565,
+                        "Aliases": [
+                          {
+                            "data": {
+                              "Alias": "Vieger, Jacobus de",
+                              "id": 1023727
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023727
+                            }
+                          }
+                        ]
+                      },
+                      "state": "original",
+                      "entityRef": {
+                        "type": "existing",
+                        "schema": "Enslaver",
+                        "id": 1019565
+                      }
+                    },
+                    "id": 1023727
+                  },
+                  "state": "original",
+                  "entityRef": {
+                    "type": "existing",
+                    "schema": "EnslaverAliasWithIdentity",
+                    "id": 1023727
+                  }
+                },
+                "id": 11327,
+                "Roles": [
+                  {
+                    "data": {
+                      "enslaverinrelation_id": 11327,
+                      "Role": {
+                        "data": {
+                          "Enslaver role": "Investor",
+                          "id": 2
+                        },
+                        "state": "original",
+                        "entityRef": {
+                          "type": "existing",
+                          "schema": "EnslaverRole",
+                          "id": 2
+                        }
+                      },
+                      "id": 12227
+                    },
+                    "state": "original",
+                    "entityRef": {
+                      "type": "existing",
+                      "schema": "EnslaverRelationRoleConn",
+                      "id": 12227
+                    }
+                  }
+                ]
+              },
+              "state": "original",
+              "entityRef": {
+                "type": "existing",
+                "schema": "EnslaverInRelation",
+                "id": 11327
+              }
+            },
+            {
+              "data": {
+                "relation_id": 8293,
+                "Enslaver alias": {
+                  "data": {
+                    "Alias": "Raket, David",
+                    "Identity": {
+                      "data": {
+                        "Principal alias": "Raket, David",
+                        "Birth year": null,
+                        "Birth month": null,
+                        "Birth day": null,
+                        "Birth place": null,
+                        "Death year": 1671,
+                        "Death month": 6,
+                        "Death day": 13,
+                        "Death place": {
+                          "data": {
+                            "Name": "Amsterdam",
+                            "Code": 10810,
+                            "id": 416
+                          },
+                          "state": "original",
+                          "entityRef": {
+                            "type": "existing",
+                            "schema": "Location",
+                            "id": 416
+                          }
+                        },
+                        "Father name": "Stockum, Caspar Gerardts van",
+                        "Father occupation": "Bookseller",
+                        "Mother name": "Racket, Suzanna",
+                        "Probate date": null,
+                        "Will value (pounds)": null,
+                        "Will value (dollars)": null,
+                        "Will court": null,
+                        "Principal location": null,
+                        "Notes": "approx dod buried",
+                        "id": 1001801,
+                        "Aliases": [
+                          {
+                            "data": {
+                              "Alias": "Raccedt, David",
+                              "id": 1023507
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023507
+                            }
+                          },
+                          {
+                            "data": {
+                              "Alias": "Raket, David",
+                              "id": 1023548
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023548
+                            }
+                          },
+                          {
+                            "data": {
+                              "Alias": "Raket, David",
+                              "id": 1023728
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023728
+                            }
+                          },
+                          {
+                            "data": {
+                              "Alias": "Raccedt, David",
+                              "id": 1023729
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023729
+                            }
+                          },
+                          {
+                            "data": {
+                              "Alias": "Raket, David Gerardsz",
+                              "id": 1023730
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023730
+                            }
+                          }
+                        ]
+                      },
+                      "state": "original",
+                      "entityRef": {
+                        "type": "existing",
+                        "schema": "Enslaver",
+                        "id": 1001801
+                      }
+                    },
+                    "id": 1023728
+                  },
+                  "state": "original",
+                  "entityRef": {
+                    "type": "existing",
+                    "schema": "EnslaverAliasWithIdentity",
+                    "id": 1023728
+                  }
+                },
+                "id": 11328,
+                "Roles": [
+                  {
+                    "data": {
+                      "enslaverinrelation_id": 11328,
+                      "Role": {
+                        "data": {
+                          "Enslaver role": "Investor",
+                          "id": 2
+                        },
+                        "state": "original",
+                        "entityRef": {
+                          "type": "existing",
+                          "schema": "EnslaverRole",
+                          "id": 2
+                        }
+                      },
+                      "id": 12228
+                    },
+                    "state": "original",
+                    "entityRef": {
+                      "type": "existing",
+                      "schema": "EnslaverRelationRoleConn",
+                      "id": 12228
+                    }
+                  }
+                ]
+              },
+              "state": "original",
+              "entityRef": {
+                "type": "existing",
+                "schema": "EnslaverInRelation",
+                "id": 11328
+              }
+            },
+            {
+              "data": {
+                "relation_id": 8293,
+                "Enslaver alias": {
+                  "data": {
+                    "Alias": "Croesen, Hendrik",
+                    "Identity": {
+                      "data": {
+                        "Principal alias": "Croesen, Hendrik",
+                        "Birth year": null,
+                        "Birth month": null,
+                        "Birth day": null,
+                        "Birth place": null,
+                        "Death year": null,
+                        "Death month": null,
+                        "Death day": null,
+                        "Death place": null,
+                        "Father name": null,
+                        "Father occupation": null,
+                        "Mother name": null,
+                        "Probate date": null,
+                        "Will value (pounds)": null,
+                        "Will value (dollars)": null,
+                        "Will court": null,
+                        "Principal location": null,
+                        "Notes": null,
+                        "id": 1001633,
+                        "Aliases": [
+                          {
+                            "data": {
+                              "Alias": "Croesen, Hendrik",
+                              "id": 1023137
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023137
+                            }
+                          },
+                          {
+                            "data": {
+                              "Alias": "Croese, Hendrik",
+                              "id": 1023138
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023138
+                            }
+                          },
+                          {
+                            "data": {
+                              "Alias": "Croesen, Hendrik",
+                              "id": 1023732
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023732
+                            }
+                          }
+                        ]
+                      },
+                      "state": "original",
+                      "entityRef": {
+                        "type": "existing",
+                        "schema": "Enslaver",
+                        "id": 1001633
+                      }
+                    },
+                    "id": 1023732
+                  },
+                  "state": "original",
+                  "entityRef": {
+                    "type": "existing",
+                    "schema": "EnslaverAliasWithIdentity",
+                    "id": 1023732
+                  }
+                },
+                "id": 11329,
+                "Roles": [
+                  {
+                    "data": {
+                      "enslaverinrelation_id": 11329,
+                      "Role": {
+                        "data": {
+                          "Enslaver role": "Investor",
+                          "id": 2
+                        },
+                        "state": "original",
+                        "entityRef": {
+                          "type": "existing",
+                          "schema": "EnslaverRole",
+                          "id": 2
+                        }
+                      },
+                      "id": 12229
+                    },
+                    "state": "original",
+                    "entityRef": {
+                      "type": "existing",
+                      "schema": "EnslaverRelationRoleConn",
+                      "id": 12229
+                    }
+                  }
+                ]
+              },
+              "state": "original",
+              "entityRef": {
+                "type": "existing",
+                "schema": "EnslaverInRelation",
+                "id": 11329
+              }
+            },
+            {
+              "data": {
+                "relation_id": 8293,
+                "Enslaver alias": {
+                  "data": {
+                    "Alias": "Rosenberg, Paulus",
+                    "Identity": {
+                      "data": {
+                        "Principal alias": "Rosenberg, Paulus",
+                        "Birth year": null,
+                        "Birth month": null,
+                        "Birth day": null,
+                        "Birth place": null,
+                        "Death year": 1694,
+                        "Death month": 9,
+                        "Death day": 11,
+                        "Death place": {
+                          "data": {
+                            "Name": "Amsterdam",
+                            "Code": 10810,
+                            "id": 416
+                          },
+                          "state": "original",
+                          "entityRef": {
+                            "type": "existing",
+                            "schema": "Location",
+                            "id": 416
+                          }
+                        },
+                        "Father name": null,
+                        "Father occupation": null,
+                        "Mother name": null,
+                        "Probate date": null,
+                        "Will value (pounds)": null,
+                        "Will value (dollars)": null,
+                        "Will court": null,
+                        "Principal location": null,
+                        "Notes": "approx dod buried",
+                        "id": 1001805,
+                        "Aliases": [
+                          {
+                            "data": {
+                              "Alias": "Rosenburg, Paulus",
+                              "id": 1023136
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023136
+                            }
+                          },
+                          {
+                            "data": {
+                              "Alias": "Rosenberg, Paulus",
+                              "id": 1023368
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023368
+                            }
+                          },
+                          {
+                            "data": {
+                              "Alias": "Rosenberg, Paulus",
+                              "id": 1023733
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023733
+                            }
+                          },
+                          {
+                            "data": {
+                              "Alias": "Rosenburg, Paulus",
+                              "id": 1023734
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023734
+                            }
+                          }
+                        ]
+                      },
+                      "state": "original",
+                      "entityRef": {
+                        "type": "existing",
+                        "schema": "Enslaver",
+                        "id": 1001805
+                      }
+                    },
+                    "id": 1023733
+                  },
+                  "state": "original",
+                  "entityRef": {
+                    "type": "existing",
+                    "schema": "EnslaverAliasWithIdentity",
+                    "id": 1023733
+                  }
+                },
+                "id": 11330,
+                "Roles": [
+                  {
+                    "data": {
+                      "enslaverinrelation_id": 11330,
+                      "Role": {
+                        "data": {
+                          "Enslaver role": "Investor",
+                          "id": 2
+                        },
+                        "state": "original",
+                        "entityRef": {
+                          "type": "existing",
+                          "schema": "EnslaverRole",
+                          "id": 2
+                        }
+                      },
+                      "id": 12230
+                    },
+                    "state": "original",
+                    "entityRef": {
+                      "type": "existing",
+                      "schema": "EnslaverRelationRoleConn",
+                      "id": 12230
+                    }
+                  }
+                ]
+              },
+              "state": "original",
+              "entityRef": {
+                "type": "existing",
+                "schema": "EnslaverInRelation",
+                "id": 11330
+              }
+            },
+            {
+              "data": {
+                "relation_id": 8293,
+                "Enslaver alias": {
+                  "data": {
+                    "Alias": "Hoogkamer, Markus",
+                    "Identity": {
+                      "data": {
+                        "Principal alias": "Hoogkamer, Markus",
+                        "Birth year": null,
+                        "Birth month": null,
+                        "Birth day": null,
+                        "Birth place": null,
+                        "Death year": null,
+                        "Death month": null,
+                        "Death day": null,
+                        "Death place": null,
+                        "Father name": null,
+                        "Father occupation": null,
+                        "Mother name": null,
+                        "Probate date": null,
+                        "Will value (pounds)": null,
+                        "Will value (dollars)": null,
+                        "Will court": null,
+                        "Principal location": null,
+                        "Notes": null,
+                        "id": 1019569,
+                        "Aliases": [
+                          {
+                            "data": {
+                              "Alias": "Hoogkamer, Markus",
+                              "id": 1023737
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023737
+                            }
+                          }
+                        ]
+                      },
+                      "state": "original",
+                      "entityRef": {
+                        "type": "existing",
+                        "schema": "Enslaver",
+                        "id": 1019569
+                      }
+                    },
+                    "id": 1023737
+                  },
+                  "state": "original",
+                  "entityRef": {
+                    "type": "existing",
+                    "schema": "EnslaverAliasWithIdentity",
+                    "id": 1023737
+                  }
+                },
+                "id": 11331,
+                "Roles": [
+                  {
+                    "data": {
+                      "enslaverinrelation_id": 11331,
+                      "Role": {
+                        "data": {
+                          "Enslaver role": "Investor",
+                          "id": 2
+                        },
+                        "state": "original",
+                        "entityRef": {
+                          "type": "existing",
+                          "schema": "EnslaverRole",
+                          "id": 2
+                        }
+                      },
+                      "id": 12231
+                    },
+                    "state": "original",
+                    "entityRef": {
+                      "type": "existing",
+                      "schema": "EnslaverRelationRoleConn",
+                      "id": 12231
+                    }
+                  }
+                ]
+              },
+              "state": "original",
+              "entityRef": {
+                "type": "existing",
+                "schema": "EnslaverInRelation",
+                "id": 11331
+              }
+            },
+            {
+              "data": {
+                "relation_id": 8293,
+                "Enslaver alias": {
+                  "data": {
+                    "Alias": "Cleijn, Evert Mathijsz",
+                    "Identity": {
+                      "data": {
+                        "Principal alias": "Cleijn, Evert Mathijsz",
+                        "Birth year": null,
+                        "Birth month": null,
+                        "Birth day": null,
+                        "Birth place": null,
+                        "Death year": null,
+                        "Death month": null,
+                        "Death day": null,
+                        "Death place": null,
+                        "Father name": null,
+                        "Father occupation": null,
+                        "Mother name": null,
+                        "Probate date": null,
+                        "Will value (pounds)": null,
+                        "Will value (dollars)": null,
+                        "Will court": null,
+                        "Principal location": null,
+                        "Notes": null,
+                        "id": 1001804,
+                        "Aliases": [
+                          {
+                            "data": {
+                              "Alias": "Cleijn, Evert Mathijsz",
+                              "id": 1023071
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023071
+                            }
+                          },
+                          {
+                            "data": {
+                              "Alias": "Cleijn, Evert Mathijsz",
+                              "id": 1023738
+                            },
+                            "state": "original",
+                            "entityRef": {
+                              "type": "existing",
+                              "schema": "EnslaverAlias",
+                              "id": 1023738
+                            }
+                          }
+                        ]
+                      },
+                      "state": "original",
+                      "entityRef": {
+                        "type": "existing",
+                        "schema": "Enslaver",
+                        "id": 1001804
+                      }
+                    },
+                    "id": 1023738
+                  },
+                  "state": "original",
+                  "entityRef": {
+                    "type": "existing",
+                    "schema": "EnslaverAliasWithIdentity",
+                    "id": 1023738
+                  }
+                },
+                "id": 11332,
+                "Roles": [
+                  {
+                    "data": {
+                      "enslaverinrelation_id": 11332,
+                      "Role": {
+                        "data": {
+                          "Enslaver role": "Captain",
+                          "id": 1
+                        },
+                        "state": "original",
+                        "entityRef": {
+                          "type": "existing",
+                          "schema": "EnslaverRole",
+                          "id": 1
+                        }
+                      },
+                      "id": 12232
+                    },
+                    "state": "original",
+                    "entityRef": {
+                      "type": "existing",
+                      "schema": "EnslaverRelationRoleConn",
+                      "id": 12232
+                    }
+                  }
+                ]
+              },
+              "state": "original",
+              "entityRef": {
+                "type": "existing",
+                "schema": "EnslaverInRelation",
+                "id": 11332
+              }
+            }
+          ]
+        },
+        "state": "original",
+        "entityRef": {
+          "type": "existing",
+          "schema": "EnslavementRelation",
+          "id": 8293
+        }
+      }
+    ]
+  },
+  "state": "original",
+  "entityRef": {
+    "type": "existing",
+    "schema": "Voyage",
+    "id": 11586
+  }
+}

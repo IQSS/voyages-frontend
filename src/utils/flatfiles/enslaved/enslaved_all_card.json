@@ -90,16 +90,16 @@
   },
   {
   	"label": {
-  		"en":"Enslavers",
-  		"es":"ES: Enslavers",
-  		"pt":"PT: Enslavers"
+  		"en":"Slave Traders",
+  		"es":"Traficantes de Esclavos",
+  		"pt":"Traficantes de Escravos"
   	},
   	"children":[
   		{
   			"label":{
-  				"en":"Enslavers",
-  				"es":"ES: Enslavers",
-  				"pt":"PT: Enslavers"
+  				"en":"Slave Traders",
+				"es":"Traficantes de Esclavos",
+				"pt":"Traficantes de Escravos"
   			},
   			"cell_type":"literal",
   			"cell_val":{

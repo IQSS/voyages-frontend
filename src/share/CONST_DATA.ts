@@ -1,7 +1,7 @@
 export const VOYAGETILE = 'Voyages';
 export const POPELETILET = 'People Database';
 export const EnslavedTitle = 'Enslaved';
-export const EnslaversTitle = 'Enslavers';
+export const EnslaversTitle = 'Slave Traders';
 export const TRANSATLANTICTABLEFILE = 'voyages_transatlantic_table.json';
 export const INTRAAMERICANTABLEFILE = 'voyages_intraamerican_table.json';
 export const ALLVOYAGESTABLEFILE = 'voyages_all_table.json';
@@ -19,9 +19,9 @@ export const ENSLAVED_TEXAS_CARDFILE = 'enslaved_texas_card.json';
 export const ENSLAVERSCARDFILE = 'enslavers_card.json';
 export const ENSLAVERS_TABLE_FILE = 'enslavers_table.json';
 export const pathFlatFile = '@/utils/flatfiles/';
-export const ENSLAVED_TABLE_FILE = 'enslaved_all_table_menu.json';
+export const ENSLAVED_TABLE_FILE = 'enslaved_all_table.json';
 export const AFRICANORIGINS_TABLE_FILE = 'enslaved_african_origins_table.json';
-export const TEXAS_TABLE_FILE = 'enslaved_texas_table_cell_structure.json';
+export const TEXAS_TABLE_FILE = 'enslaved_texas_table.json';
 
 export const VOYAGESPAGE = 'VoyagesPage';
 export const ALLVOYAGES = 'all-voyages';
@@ -68,9 +68,8 @@ export const INTRAAMERICANTRADS = 'intra-american-trades';
 export const TRANSATLANTICTRADS = 'trans-atlantic-trades';
 export const INDIANOCEANANDASIANTRANDS = 'indian-ocean';
 
-export const mbaccesstoken = `pk.eyJ1IjoiamNtMTAiLCJhIjoiY2xid2VpZmF3MDhsaTN1bGhqMXZ5YmxjZCJ9.eP7ZuC68Q5iBZQa8I13AGw`;
 
-export const mappingSpecialists = `https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png`;
+export const mappingSpecialists = `https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}.png`;
 
 export const MAP_CENTER: [number, number] = [5.486678, -35.59375];
 export const MAXIMUM_NATIVE_ZOOM = 10;
@@ -95,6 +94,8 @@ export const maxRadiusInPixels = 20;
 export const maxRadiusInPixelsNode = 15;
 export const minEdgeInPixels = 3;
 export const maxEdgeInPixels = 10;
+export const EDGES_MAIN_PANE = 'edgesMain';
+export const EDGES_ANIMATED_PANE = 'edgesAnimated';
 
 export const nodeTypeOrigin = 'origin';
 export const nodeTypePostDisembarkation = 'postDisembarkation';
@@ -111,7 +112,7 @@ export const classToColor = {
   enslavement_relations: '#ab47bc',
   voyages: '#F2EE0A',
 };
-export const RADIUSNODE = 17;
+export const RADIUSNODE = 12;
 export const cachenamePivot = `voyage_pivot_tables`;
 // Global search
 export const GlobalSearchVoyagesType = 'voyages';
@@ -151,7 +152,7 @@ export const TransAtlanticTitle = 'Trans-Atlantic';
 export const IntraAmericanTitle = 'Intra-American';
 export const AllVoyagesTitle = 'All Voyages';
 export const IndianOceanAndAsiaSlaveTradesTitle =
-  'Indian Ocean & Asia Slave Trades';
+  'Indian Ocean';
 export const AllEnslavedPeople = 'All Enslaved People';
 export const AfricanOriginsTransAtlantic = 'African Origins/Trans-Atlantic';
 export const TEXBOUND = 'Texas Bound';

@@ -7,6 +7,7 @@ import {
   AppBar,
   Box,
   IconButton,
+  Hidden,
   Divider,
 } from '@mui/material';
 import Toolbar from '@mui/material/Toolbar';
@@ -65,7 +66,6 @@ import {
 } from '@/utils/functions/getColorStyle';
 
 import HeaderLogo from './HeaderLogo';
-import { clearSavedData } from '@/utils/supabase/authStorage';
 
 const HeaderEnslavedNavBar: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -149,7 +149,12 @@ const HeaderEnslavedNavBar: React.FC = () => {
         navigate(styleNameToPathMap[styleName]);
       }
 
-      clearSavedData(['filterObject']);
+      const keysToRemove = Object.keys(localStorage);
+      keysToRemove.forEach((key) => {
+        if (key !== 'filterObject') {
+          localStorage.removeItem(key);
+        }
+      });
     },
     [value, currentPageBlockName, navigate, dispatch],
   );
@@ -169,7 +174,10 @@ const HeaderEnslavedNavBar: React.FC = () => {
     dispatch(resetAll());
     dispatch(resetBlockNameAndPageName());
     dispatch(resetAllStateToInitailState());
-    clearSavedData();
+    const keysToRemove = Object.keys(localStorage);
+    keysToRemove.forEach((key) => {
+      localStorage.removeItem(key);
+    });
   };
 
   return (
@@ -187,17 +195,17 @@ const HeaderEnslavedNavBar: React.FC = () => {
         }}
       >
         <Toolbar sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+          <Hidden mdUp>
             <IconButton
               edge="start"
               color="inherit"
               aria-label="menu"
               onClick={handleMenuOpen}
-              sx={{ mr: 2 }}
+              sx={{ mr: 2, display: { md: 'none' } }}
             >
               <MenuIcon />
             </IconButton>
-          </Box>
+          </Hidden>
           <Typography
             component="div"
             sx={{
@@ -230,7 +238,7 @@ const HeaderEnslavedNavBar: React.FC = () => {
               {inputSearchValue && <GlobalSearchButton />}
             </Typography>
           </Typography>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>{!inputSearchValue && <CascadingMenu />}</Box>
+          <Hidden mdUp>{!inputSearchValue && <CascadingMenu />}</Hidden>
           <Box
             className="menu-nav-bar-select-box"
             sx={{
@@ -266,7 +274,7 @@ const HeaderEnslavedNavBar: React.FC = () => {
             borderClor: 'rgb(0 0 0 / 50%)',
           }}
         />
-        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>{!inputSearchValue && <CascadingMenu />}</Box>
+        <Hidden mdDown>{!inputSearchValue && <CascadingMenu />}</Hidden>
         <Box component="nav">
           <Menu
             anchorEl={anchorEl}

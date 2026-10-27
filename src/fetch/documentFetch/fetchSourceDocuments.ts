@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { AUTHTOKEN, BASEURL } from '../../share/AUTH_BASEURL';
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { SourceDocumentsSearchRequest } from '@/share/InterfaceTypesDocument';
 
 export const fetchSourceDocuments = createAsyncThunk(
   'DocumentData/fetchSourceDocuments',
-  async (dataSend?: any) => {
+  async (dataSend?: SourceDocumentsSearchRequest) => {
     try {
       const response = await axios.post(`${BASEURL}/blog/author/`, dataSend, {
         headers: {

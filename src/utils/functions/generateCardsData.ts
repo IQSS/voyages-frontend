@@ -1,21 +1,23 @@
-import { convertToYYYYMMDD } from './convertToYYYYMMDD';
+import { convertToYYYYMMDD } from "./convertToYYYYMMDD";
 
 export function generateCardsData(data: any, value: any) {
   // Early return if required data is missing
+  // console.log({ data, value })
   if (!data || !value?.cell_val?.fields?.length) {
     return '--';
   }
 
-  const finalData: (string | string)[] = [];
+
+  const finalData: (string | String)[] = [];
   const fields = value.cell_val.fields;
-  const isDateStr = fields[0]?.var_name.includes('date_str');
+  const isDateStr = fields[0]?.var_name.includes('date_str')
   const firstData = data[fields[0].var_name];
 
   const joinDelimiter: string | undefined = value.cell_val.join;
 
   if (value.cell_type === 'literal') {
     const dataDisplay = data[fields[0].var_name];
-    if (isDateStr) {
+    if(isDateStr){
       return dataDisplay ? convertToYYYYMMDD(dataDisplay) : '--';
     }
     return dataDisplay ? dataDisplay : '--';
@@ -36,7 +38,7 @@ export function generateCardsData(data: any, value: any) {
           dataResult.push(String('-'));
         }
       }
-      let item: string | string = dataResult.join(joinDelimiter);
+      let item: string | String = dataResult.join(joinDelimiter);
       if (Object.keys(metadata).length > 0) {
         item = new String(item);
         Object.assign(item, metadata);

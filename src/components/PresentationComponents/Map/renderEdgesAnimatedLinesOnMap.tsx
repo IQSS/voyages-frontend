@@ -1,6 +1,8 @@
 import { LatLng } from '@/share/InterfaceTypesMap';
 import L, { CurveOptions } from 'leaflet';
 
+import { EDGES_ANIMATED_PANE } from '@/share/CONST_DATA';
+
 const renderEdgesAnimatedLinesOnMap = (
   startLatLng: LatLng,
   endLatLng: LatLng,
@@ -23,12 +25,13 @@ const renderEdgesAnimatedLinesOnMap = (
       {
         dashArray: '1 9',
         fill: false,
-        weight: weight / 1.4,
-        color: '#0000ff8c',
-        opacity: 0.8,
+        weight: Math.max(weight * 0.6, 1),
+        color: '#5a86dc',
+        opacity: 1,
         stroke: true,
         fillColor: 'red',
         interactive: false,
+        pane: EDGES_ANIMATED_PANE,
         animate: { duration: 1000, iterations: Infinity },
       } as CurveOptions
     );

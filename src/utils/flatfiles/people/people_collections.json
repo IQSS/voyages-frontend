@@ -56,7 +56,7 @@
       }
     ],
     "filter_menu_flatfile": "enslaved_texas_filter_menu.json",
-    "table_flatfile": "enslaved_texas_table_cell_structure.json",
+    "table_flatfile": "enslaved_texas_table.json",
     "card_flatfile": "enslaved_texas_card.json",
     "style_name": "texasEnslaved",
     "blocks": [
@@ -87,7 +87,7 @@
     },
     "base_filter": [],
     "filter_menu_flatfile": "enslaved_all_filter_menu.json",
-    "table_flatfile": "enslaved_all_table_menu.json",
+    "table_flatfile": "enslaved_all_table.json",
     "card_flatfile": "enslaved_all_card.json",
     "style_name": "all-enslaved",
     "blocks": [

@@ -1,5 +1,5 @@
 import { MouseEventHandler, useState } from 'react';
-import { AppBar, Box, IconButton, Typography } from '@mui/material';
+import { AppBar, Box, IconButton, Hidden, Typography } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import { Button, Menu } from '@mui/material';
@@ -27,7 +27,6 @@ import HeaderLogo from './HeaderLogo';
 import LanguagesDropdown from '@/components/SelectorComponents/DropDown/LanguagesDropdown';
 import { LabelFilterMeneList } from '@/share/InterfaceTypes';
 import { HeaderDrawerMenuPeopleBar } from './HeaderDrawerMenuPeopleBar';
-import { clearSavedData } from '@/utils/supabase/authStorage';
 
 export default function HeaderPeopleNavBar() {
   const navigate = useNavigate();
@@ -46,7 +45,10 @@ export default function HeaderPeopleNavBar() {
 
   const handleSelectMenuItems = (item: string) => {
     dispatch(resetAllStateToInitailState());
-    clearSavedData();
+    const keysToRemove = Object.keys(localStorage);
+    keysToRemove.forEach((key) => {
+      localStorage.removeItem(key);
+    });
     if (
       item === 'Enslaved' ||
       item === 'Esclavizados' ||
@@ -56,9 +58,9 @@ export default function HeaderPeopleNavBar() {
       dispatch(setCurrentEnslavedPage(1));
       dispatch(setPathNameEnslaved(AFRICANORIGINS));
     } else if (
-      item === 'Enslavers' ||
-      item === 'Esclavistas' ||
-      item === 'Escravizadores'
+      item === 'Slave Traders' ||
+      item === 'Traficantes de Esclavos' ||
+      item === 'Traficantes de Escravos'
     ) {
       navigate(`${ENSALVERSPAGE}${TRANSATLANTICENSLAVERS}#people`);
       dispatch(setCurrentEnslaversPage(1));
@@ -81,16 +83,16 @@ export default function HeaderPeopleNavBar() {
         }}
       >
         <Toolbar sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+          <Hidden mdUp>
             <IconButton
               edge="start"
               aria-label="menu"
               onClick={handleMenuOpen}
-              sx={{ mr: 2 }}
+              sx={{ mr: 2, display: { md: 'none' } }}
             >
               <MenuIcon />
             </IconButton>
-          </Box>
+          </Hidden>
           <Typography
             component="div"
             sx={{

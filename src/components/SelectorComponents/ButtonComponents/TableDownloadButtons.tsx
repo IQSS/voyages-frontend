@@ -10,7 +10,7 @@ import {
   FormControlLabel,
   Radio,
 } from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
+import { Download } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 import { usePageRouter } from '@/hooks/usePageRouter';
@@ -165,7 +165,7 @@ const TableDownloadButtons: React.FC<TableDownloadButtonsProps> = ({
       <span style={{ display: 'flex', alignItems: 'center' }}>
         <Button
           onClick={handleOpen}
-          endIcon={<DownloadIcon fontSize="small" />}
+          endIcon={<Download size={14} />}
           sx={{
             fontSize: '0.80rem',
             textTransform: 'unset',
@@ -239,7 +239,7 @@ const TableDownloadButtons: React.FC<TableDownloadButtonsProps> = ({
           <div>
             <Button
               onClick={downloadCSV}
-              endIcon={<DownloadIcon fontSize="small" />}
+              endIcon={<Download size={14} />}
               style={{ marginRight: 4 }}
               sx={{
                 fontSize: '0.80rem',
@@ -261,7 +261,7 @@ const TableDownloadButtons: React.FC<TableDownloadButtonsProps> = ({
             </Button>
             <Button
               onClick={downloadExcel}
-              endIcon={<DownloadIcon fontSize="small" />}
+              endIcon={<Download size={14} />}
               sx={{
                 fontSize: '0.80rem',
                 textTransform: 'unset',

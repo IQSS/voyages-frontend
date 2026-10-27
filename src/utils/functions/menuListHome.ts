@@ -1,3 +1,4 @@
+import { BASE_URL_FRONTEND } from '@/share/AUTH_BASEURL';
 import {
   ACCOUNTS,
   ASSESSMENT,
@@ -65,7 +66,7 @@ export const menuLists: MenuListsProps[] = [
           pt: 'Oceano Índico',
         },
         url: `${BLOGPAGE}/tag/indian-ocean#indian-ocean`,
-      },
+      }
     ],
   },
   {
@@ -150,14 +151,15 @@ export const menuLists: MenuListsProps[] = [
     },
     url: `${BLOGPAGE}/tag/downloads#downloads`,
   },
-  {
-    name: {
-      en: 'Contribute',
-      es: 'Contribuir',
-      pt: 'Contribuir',
-    },
-    url: `${ACCOUNTS}signin/`,
-  },
+  /*** Hide until Contribute finish  */
+  // {
+  //   name: {
+  //     en: 'Contribute',
+  //     es: 'Contribuir',
+  //     pt: 'Contribuir',
+  //   },
+  //   url: `${ACCOUNTS}signin/`,
+  // },
   {
     name: {
       en: 'User Feedback and Report Issues',

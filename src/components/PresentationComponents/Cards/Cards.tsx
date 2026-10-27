@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable indent */
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
 import { Card, Collapse } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +11,7 @@ import { fetchPastEnslavedCard } from '@/fetch/pastEnslavedFetch/fetchPastEnslav
 import { fetchPastEnslaversCard } from '@/fetch/pastEnslaversFetch/fetchPastEnslaversCard';
 import { fetchVoyageCard } from '@/fetch/voyagesFetch/fetchVoyageCard';
 import {
+  openCardTarget,
   setCardDataArray,
   setCardFileName,
   setIsModalCard,
@@ -27,6 +29,7 @@ import {
   ENSLAVEDNODE,
   ENSLAVERSCARDFILE,
   ENSLAVERSNODE,
+  INDIANOCEANANDASIANFILECARD,
   INTRAAMERICANFILECARD,
   TRANSATLANTICFILECARD,
   VOYAGESNODE,
@@ -42,6 +45,7 @@ import CARDS_ALLENSLAVED from '@/utils/flatfiles/enslaved/enslaved_all_card.json
 import CARDS_TEXAS_ENSLAVED from '@/utils/flatfiles/enslaved/enslaved_texas_card.json';
 import CARDS_ENSLAVERS_COLLECTION from '@/utils/flatfiles/enslavers/enslavers_card.json';
 import CARDS_ALLVOYAGES_COLLECTION from '@/utils/flatfiles/voyages/voyages_all_card.json';
+import CARDS_INDIANOCEANANDASIANFILE_COLLECTION from '@/utils/flatfiles/voyages/voyages_indian_ocean_and_asia_slave_trade_database_card.json';
 import CARDS_INTRAAMERICAN_COLLECTION from '@/utils/flatfiles/voyages/voyages_intraamerican_card.json';
 import CARDS_TRANSATLANTIC_COLLECTION from '@/utils/flatfiles/voyages/voyages_transatlantic_card.json';
 import {
@@ -49,9 +53,14 @@ import {
   DocumentViewerContext,
   createDocKey,
 } from '@/utils/functions/documentWorkspace';
+import {
+  getCardTargetKind,
+  normalizeCardTarget,
+} from '@/utils/functions/cardTarget';
 import { numberWithCommas } from '@/utils/functions/numberWithCommas';
 import { processCardData } from '@/utils/functions/processCardData';
 import { translationCard } from '@/utils/functions/translationLanguages';
+import { resolveVoyageCardFileName } from '@/utils/functions/voyageCardConfig';
 
 import PopoverWrapper from './PopoverWrapper';
 
@@ -96,12 +105,29 @@ const getSourceBib = (value: any) => {
   return bib;
 };
 
+const LINKED_VOYAGE_CARD_COLUMN = 'linked_voyages__voyage_id';
+
+const getVoyageCardDataArray = (
+  cardFileName: string,
+): TransatlanticCardProps[] => {
+  switch (cardFileName) {
+    case TRANSATLANTICFILECARD:
+      return CARDS_TRANSATLANTIC_COLLECTION as any;
+    case INTRAAMERICANFILECARD:
+      return CARDS_INTRAAMERICAN_COLLECTION as any;
+    case INDIANOCEANANDASIANFILECARD:
+      return CARDS_INDIANOCEANANDASIANFILE_COLLECTION as any;
+    default:
+      return CARDS_ALLVOYAGES_COLLECTION as any;
+  }
+};
+
 const VoyageCard = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const [globalExpand, setGlobalExpand] = useState(true);
   const [expandedHeaders, setExpandedHeaders] = useState<string[]>([]);
-  const [cardData, setCardData] = useState<Record<string, any>[]>([]);
+  const [cardData, setCardData] = useState<Record<string, any> | any[]>([]);
   const { setDoc } = useContext(DocumentViewerContext);
   const { cardRowID, cardFileName, cardDataArray, nodeTypeClass } = useSelector(
     (state: RootState) => state.getCardFlatObjectData,
@@ -111,10 +137,10 @@ const VoyageCard = () => {
     (state: RootState) => state.getLanguages,
   );
   const translatedCard = translationCard(languageValue);
-  const { networkID } = useSelector(
-    (state: RootState) => state.getPastNetworksGraphData,
+  const cardTarget = useMemo(
+    () => normalizeCardTarget({ id: cardRowID, nodeClass: nodeTypeClass }),
+    [cardRowID, nodeTypeClass],
   );
-  const effectOnce = useRef(false);
 
   useEffect(() => {
     let newCardFileName: string = '';
@@ -130,6 +156,11 @@ const VoyageCard = () => {
         } else if (cardFileName === INTRAAMERICANFILECARD) {
           newCardFileName = INTRAAMERICANFILECARD;
           newCardDataArray.push(...(CARDS_INTRAAMERICAN_COLLECTION as any));
+        } else if (cardFileName === INDIANOCEANANDASIANFILECARD) {
+          newCardFileName = INDIANOCEANANDASIANFILECARD;
+          newCardDataArray.push(
+            ...(CARDS_INDIANOCEANANDASIANFILE_COLLECTION as any),
+          );
         } else {
           newCardFileName = ALLVOYAGESFILECARD;
           newCardDataArray.push(...(CARDS_ALLVOYAGES_COLLECTION as any));
@@ -161,53 +192,72 @@ const VoyageCard = () => {
     }
     dispatch(setCardFileName(newCardFileName));
     dispatch(setCardDataArray(newCardDataArray));
-  }, [nodeTypeClass, cardRowID, dispatch, cardFileName]);
+  }, [nodeTypeClass, dispatch, cardFileName]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const ID = networkID || cardRowID;
+    if (!cardTarget) return;
+    let cancelled = false;
 
+    const fetchData = async () => {
       try {
         let response = null;
 
-        switch (nodeTypeClass || VOYAGESNODE) {
-          case VOYAGESNODECLASS:
-          case VOYAGESNODE:
-            response = await dispatch(fetchVoyageCard(ID)).unwrap();
+        switch (getCardTargetKind(cardTarget.nodeClass)) {
+          case 'voyage':
+            response = await dispatch(fetchVoyageCard(cardTarget.id)).unwrap();
             break;
-          case ENSLAVEDNODE:
-            response = await dispatch(fetchPastEnslavedCard(ID)).unwrap();
+          case 'enslaved':
+            response = await dispatch(
+              fetchPastEnslavedCard(cardTarget.id),
+            ).unwrap();
             break;
-          case ENSLAVERSNODE:
-          case ENSALVERSTYLE:
-            response = await dispatch(fetchPastEnslaversCard(ID)).unwrap();
+          case 'enslaver':
+            response = await dispatch(
+              fetchPastEnslaversCard(cardTarget.id),
+            ).unwrap();
             break;
-          default:
-            response = null;
         }
 
+        if (cancelled) return;
         if (response) {
           setCardData(response.data);
         } else {
           navigate('/404');
         }
       } catch (error) {
+        if (cancelled) return;
         console.log('error', error);
         navigate('/404');
       }
     };
-    if (!effectOnce.current) {
-      fetchData();
-    }
+    fetchData();
     return () => {
+      cancelled = true;
       setCardData([]);
     };
-  }, [dispatch, nodeTypeClass, cardRowID, navigate, networkID]);
+  }, [dispatch, cardTarget, navigate]);
+
+  const cardDataset = Array.isArray(cardData) ? undefined : cardData.dataset;
+
+  const effectiveCardProjection = useMemo(() => {
+    if (!cardTarget || getCardTargetKind(cardTarget.nodeClass) !== 'voyage') {
+      return { cardDataArray, cardFileName };
+    }
+
+    const effectiveCardFileName = resolveVoyageCardFileName(
+      cardFileName,
+      cardDataset,
+    );
+    return {
+      cardDataArray: getVoyageCardDataArray(effectiveCardFileName),
+      cardFileName: effectiveCardFileName,
+    };
+  }, [cardDataArray, cardDataset, cardFileName, cardTarget]);
 
   const newCardData = processCardData(
-    [cardData],
-    cardDataArray,
-    cardFileName,
+    [cardData as Record<string, any>],
+    effectiveCardProjection.cardDataArray,
+    effectiveCardProjection.cardFileName,
     languageValue,
   );
 
@@ -252,9 +302,22 @@ const VoyageCard = () => {
     <div>
       <p className="body-text">
         {translatedCard.title}{' '}
-        <a href="#" onClick={toggleExpandAll}>
+        <button
+          type="button"
+          className="link-button"
+          onClick={toggleExpandAll}
+          style={{
+            color: 'rgb(0, 140, 168)',
+            border: 'none',
+            background: 'transparent',
+            fontSize: '15px',
+            fontWeight: 500,
+            textDecoration: 'underline',
+            cursor: 'pointer',
+          }}
+        >
           {!globalExpand ? translatedCard.expand : translatedCard.collapse}
-        </a>{' '}
+        </button>{' '}
       </p>
       <Card style={{ border: '1px solid rgba(0,0,0,.1)' }}>
         {newCardData.length > 0 &&
@@ -264,7 +327,7 @@ const VoyageCard = () => {
               expandedHeaders.includes(element.header) || globalExpand;
 
             return (
-              <div key={`${element.label}-${uuidv4()}`}>
+              <div key={`${element.header}-${uuidv4()}`}>
                 <CardHeaderCustom
                   style={{ border: '1px solid rgba(0,0,0,.1)' }}
                   onClick={() => toggleExpand(element.header)}
@@ -277,6 +340,7 @@ const VoyageCard = () => {
                   <div className="container-card-body">
                     {childValue.map((child: any) => {
                       const values = child.value;
+                      // console.log({ values })
                       const numberFormat = child.number_format;
                       if (Array.isArray(values)) {
                         const renderedValues = values.map(
@@ -289,6 +353,48 @@ const VoyageCard = () => {
                             const additionalProps: any = {};
                             const additionalStyles: React.CSSProperties = {};
                             const extraElements: JSX.Element[] = [];
+                            const valueCardTarget = child.cardTarget
+                              ? normalizeCardTarget({
+                                  id: value,
+                                  nodeClass: child.cardTarget.nodeClass,
+                                })
+                              : null;
+
+                            if (valueCardTarget) {
+                              if (
+                                child.cardTarget.column ===
+                                LINKED_VOYAGE_CARD_COLUMN
+                              ) {
+                                additionalStyles.borderColor = 'blue';
+                                additionalStyles.borderWidth = 1;
+                                additionalStyles.borderStyle = 'solid';
+                              }
+                              additionalProps.role = 'button';
+                              additionalProps.tabIndex = 0;
+                              additionalProps['data-card-column'] =
+                                child.cardTarget.column;
+                              additionalProps['data-card-target-id'] =
+                                valueCardTarget.id;
+                              additionalProps['data-card-target-class'] =
+                                valueCardTarget.nodeClass;
+                              additionalProps['aria-label'] =
+                                `Open ${valueCardTarget.nodeClass} ${valueCardTarget.id} details`;
+                              additionalProps.onClick = () =>
+                                dispatch(openCardTarget(valueCardTarget));
+                              additionalProps.onKeyDown = (
+                                event: React.KeyboardEvent<HTMLSpanElement>,
+                              ) => {
+                                if (
+                                  event.key === 'Enter' ||
+                                  event.key === ' '
+                                ) {
+                                  event.preventDefault();
+                                  dispatch(openCardTarget(valueCardTarget));
+                                }
+                              };
+                            } else if (child.cardTarget) {
+                              additionalStyles.cursor = 'default';
+                            }
 
                             if (isDocumentReference(value)) {
                               valueToRender += ' ';
@@ -321,9 +427,14 @@ const VoyageCard = () => {
                             // Check if the value is an external reference with a valid URL in the bib
                             if (isExternalReference(value)) {
                               const sourceString = value.sources__bib;
+                              console.log(
+                                'Checking source string for URL:',
+                                sourceString,
+                              );
                               const foundUrl =
                                 sourceString?.match(urlRegex) ?? null;
                               if (foundUrl) {
+                                console.log(foundUrl[0]);
                                 const urlString = foundUrl[0];
                                 try {
                                   new URL(urlString); // Validate the URL

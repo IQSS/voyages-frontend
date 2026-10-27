@@ -11,14 +11,101 @@ export interface DocumentItemInfo {
 
 const UserWorkspaceLocalStorageKey = 'my-workspace';
 
-export const ManifestURLBase =
-  window.__ENV__?.VITE_IIIF_MANIFESTS_BASEURL ||
-  import.meta.env.VITE_IIIF_MANIFESTS_BASEURL;
+export const ManifestURLBase = import.meta.env.VITE_IIIF_MANIFESTS_BASEURL;
+
+const HostedIiifImagePathPrefix = '/iiif/3/';
+const AppServedIiifManifestPathPrefix = '/iiif/manifests/';
+
+type MinimalIiifManifest = {
+  items?: Array<{
+    id?: string | null;
+  }>;
+};
 
 export type DocumentWorkspace = DocumentItemInfo[];
 
 export const createDocKey = (zotero_group_id: string, zotero_item_id: string) =>
   `${zotero_group_id}__${zotero_item_id}.json`;
+
+const currentOrigin = () =>
+  typeof window === 'undefined' ? '' : window.location.origin;
+
+const isAbsoluteHttpUrl = (url: string) => /^https?:\/\//i.test(url);
+
+const resolveUrl = (url: string, baseOrigin: string) => {
+  if (!baseOrigin) {
+    return null;
+  }
+
+  try {
+    return new URL(url, baseOrigin);
+  } catch {
+    return null;
+  }
+};
+
+export const isHostedIiifImageUrl = (
+  url: string | null | undefined,
+  baseOrigin = currentOrigin(),
+) => {
+  if (!url) {
+    return false;
+  }
+
+  const parsed = resolveUrl(url, baseOrigin);
+  const origin = resolveUrl(baseOrigin, baseOrigin);
+  if (!parsed || !origin) {
+    return false;
+  }
+
+  return (
+    parsed.origin === origin.origin &&
+    parsed.pathname.startsWith(HostedIiifImagePathPrefix)
+  );
+};
+
+export const isHostedIiifDocument = (
+  doc: Pick<DocumentItemInfo, 'thumb'>,
+  baseOrigin = currentOrigin(),
+) => isHostedIiifImageUrl(doc.thumb, baseOrigin);
+
+export const isAppServedIiifManifestUrl = (
+  url: string,
+  baseOrigin = currentOrigin(),
+) => {
+  const parsed = resolveUrl(url, baseOrigin);
+  const origin = resolveUrl(baseOrigin, baseOrigin);
+  if (!parsed || !origin) {
+    return false;
+  }
+
+  return (
+    parsed.origin === origin.origin &&
+    parsed.pathname.startsWith(AppServedIiifManifestPathPrefix)
+  );
+};
+
+export const buildDocumentManifestUrl = (
+  manifestUrlBase: string,
+  manifestId: string,
+  baseOrigin = currentOrigin(),
+) => {
+  const path =
+    isAbsoluteHttpUrl(manifestId) || manifestId.startsWith('/')
+      ? manifestId
+      : `${manifestUrlBase.replace(/\/$/, '')}/${manifestId.replace(/^\//, '')}`;
+
+  if (isAppServedIiifManifestUrl(path, baseOrigin)) {
+    return resolveUrl(path, baseOrigin)?.href ?? path;
+  }
+
+  return path;
+};
+
+export const firstCanvasIdFromManifest = (
+  manifest: MinimalIiifManifest | null | undefined,
+  manifestUrl: string,
+) => manifest?.items?.[0]?.id || `${manifestUrl.replace(/\/$/, '')}/canvas1`;
 
 export const getWorkspace = () => {
   const stored = localStorage.getItem(UserWorkspaceLocalStorageKey);

@@ -44,8 +44,7 @@ export default function LanguagesDropdown() {
   if (
     endpointPathEstimate === 'estimates' ||
     endpointPath === 'accounts' ||
-    endpointPath === 'contribute' ||
-    endpointPath === 'admin'
+    endpointPath === 'contribute'
   ) {
     colorText = '#ffffff';
   } else if (styleNameRoute === '' || styleNameRoute === 'PastHomePage') {

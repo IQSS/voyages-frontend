@@ -24,7 +24,6 @@ import { resetBlockNameAndPageName } from '@/redux/resetBlockNameAndPageName';
 import { AppDispatch } from '@/redux/store';
 import jsonDataPEOPLECOLLECTIONS from '@/utils/flatfiles/people/people_collections.json';
 import jsonDataVoyageCollection from '@/utils/flatfiles/voyages/voyages_collections.json';
-import { clearSavedData } from '@/utils/supabase/authStorage';
 
 export default function HeaderLogoEstimate() {
   const dispatch: AppDispatch = useDispatch();
@@ -64,7 +63,10 @@ export default function HeaderLogoEstimate() {
         jsonDataPEOPLECOLLECTIONS[0].table_flatfile,
       ),
     );
-    clearSavedData();
+    const keysToRemove = Object.keys(localStorage);
+    keysToRemove.forEach((key) => {
+      localStorage.removeItem(key);
+    });
   };
   return (
     // eslint-disable-next-line jsx-a11y/anchor-is-valid
