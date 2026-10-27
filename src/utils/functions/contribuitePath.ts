@@ -3,35 +3,43 @@ import { createElement } from 'react';
 
 import { Add, Edit, Merge, Delete, List, Download } from '@mui/icons-material';
 const generateId = '';
+const editorialPlatformPath = '/contribute/editor_main/requests';
 export const getDisplayButtons = (
   translatedContribute: Record<string, string>,
-) => [
-  {
-    nameBtn: translatedContribute.contributeNewVoyage,
-    path: `/contribute/interim/new/${generateId}`,
-    icon: createElement(Add),
-  },
-  {
-    nameBtn: translatedContribute.contributeEditExistingVoyage,
-    path: `/contribute/edit_voyage`,
-    icon: createElement(Edit),
-  },
-  {
-    nameBtn: translatedContribute.contributeMergeVoyages,
-    path: `/contribute/merge_voyages`,
-    icon: createElement(Merge),
-  },
-  {
-    nameBtn: translatedContribute.contributeDeleteVoyage,
-    path: `/contribute/delete_voyage`,
-    icon: createElement(Delete),
-  },
-  {
-    nameBtn: translatedContribute.contributeEditorialPlatform,
-    path: `/contribute/editor_main/requests`,
-    icon: createElement(List),
-  },
-];
+  isEditor: boolean,
+) => {
+  const buttons = [
+    {
+      nameBtn: translatedContribute.contributeNewVoyage,
+      path: `/contribute/interim/new/${generateId}`,
+      icon: createElement(Add),
+    },
+    {
+      nameBtn: translatedContribute.contributeEditExistingVoyage,
+      path: `/contribute/edit_voyage`,
+      icon: createElement(Edit),
+    },
+    {
+      nameBtn: translatedContribute.contributeMergeVoyages,
+      path: `/contribute/merge_voyages`,
+      icon: createElement(Merge),
+    },
+    {
+      nameBtn: translatedContribute.contributeDeleteVoyage,
+      path: `/contribute/delete_voyage`,
+      icon: createElement(Delete),
+    },
+    {
+      nameBtn: translatedContribute.contributeEditorialPlatform,
+      path: editorialPlatformPath,
+      icon: createElement(List),
+    },
+  ];
+
+  return isEditor
+    ? buttons
+    : buttons.filter((button) => button.path !== editorialPlatformPath);
+};
 
 export const getDisplayButtonsEditorial = (
   translatedContribute: Record<string, string>,

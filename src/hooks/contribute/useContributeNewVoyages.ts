@@ -30,6 +30,7 @@ import { usePageRouter } from '@/hooks/usePageRouter';
 import { useSearchEditRequestsFilters } from '@/hooks/useSearchEditRequestsFilters';
 import { useVoyageContribution } from '@/hooks/useVoyageContribution';
 import { RootState } from '@/redux/store';
+import { hasEditorRole } from '@/utils/auth/hasEditorRole';
 import { idsFromGrid, saveNavList } from '@/utils/contribute/contributionNav';
 import { contributionForEdit } from '@/utils/contribute/loadContributionRoot';
 import {
@@ -72,7 +73,7 @@ export const useContributeNewVoyages = () => {
   const translatedContribute = translationLanguagesContribute(languageValue);
   const { contributePath } = usePageRouter();
   const { handleClickSideBar } = useNavigation();
-  const buttons = getDisplayButtons(translatedContribute);
+  const buttons = getDisplayButtons(translatedContribute, hasEditorRole(user));
 
   const [form] = Form.useForm();
   const gridRef = useRef<AgGridReact<TransformedContribution>>(null);

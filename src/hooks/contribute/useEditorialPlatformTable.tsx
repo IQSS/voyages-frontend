@@ -557,7 +557,11 @@ export const useEditorialPlatformTable = () => {
           });
           return;
         }
-        message.error('Failed to update contribution status');
+        message.error(
+          error instanceof Error
+            ? error.message
+            : 'Failed to update contribution status',
+        );
         console.error('Status update error:', error);
       }
     },

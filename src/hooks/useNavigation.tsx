@@ -1,6 +1,8 @@
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { signOut } from '@/redux/getAuthUserSlice';
+import { AppDispatch } from '@/redux/store';
 import { ACCOUNTS, CONTRIBUTE } from '@/share/CONST_DATA';
 
 interface UseNavigationReturn {
@@ -16,6 +18,7 @@ interface UseNavigationReturn {
 
 export const useNavigation = (): UseNavigationReturn => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const handleNavigate = (path: string) => {
     navigate(path);
   };
@@ -39,8 +42,8 @@ export const useNavigation = (): UseNavigationReturn => {
     handleNavigate(`/${ACCOUNTS}logout`);
   };
   const handleConfirmSignOut = () => {
-    signOut();
-    handleNavigate(`/`);
+    void dispatch(signOut());
+    navigate(`/${ACCOUNTS}signin`, { replace: true });
   };
 
   return {

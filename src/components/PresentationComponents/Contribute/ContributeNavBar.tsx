@@ -8,6 +8,7 @@ import ButtonToggle from '@/components/SelectorComponents/ButtonComponents/Butto
 import LanguagesDropdown from '@/components/SelectorComponents/DropDown/LanguagesDropdown';
 import { RootState } from '@/redux/store';
 import { BASEURL } from '@/share/AUTH_BASEURL';
+import { hasEditorRole } from '@/utils/auth/hasEditorRole';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
 
 interface ContributeNavBarProps {
@@ -49,19 +50,21 @@ const ContributeNavBar = ({ handleDrawerOpen }: ContributeNavBarProps) => {
                   {translatedcontribute.contributeContributeHome}
                 </Link>{' '}
                 |
-                {/* Admin Home in the header for every logged-in editor, from
-                    login onward, straight to the Django admin (DD-0547). It is
-                    on the API host, so a plain external link, opened in a new
-                    tab so the contribute session is kept. */}
-                <a
-                  className="navbar-subitem-link"
-                  href={`${BASEURL}/admin/`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {translatedcontribute.adminPage}
-                </a>
-                {' | '}
+                {hasEditorRole(user) && (
+                  <>
+                    {/* Admin Home opens the Django admin on the API host. */}
+                    {' | '}
+                    <a
+                      className="navbar-subitem-link"
+                      href={`${BASEURL}/admin/`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {translatedcontribute.adminPage}
+                    </a>
+                    {' | '}
+                  </>
+                )}
                 <Link
                   className="navbar-subitem-link"
                   to="/accounts/password_change/"

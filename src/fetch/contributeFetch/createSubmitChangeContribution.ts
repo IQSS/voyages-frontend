@@ -29,22 +29,15 @@ export class SubmissionRejectedError extends Error {
   }
 }
 
-// API function for creating/updating contribution
+// Submit an already-saved contribution.
 export const createSubmitChangeContribution = async (
   contribution: Contribution,
 ): Promise<Contribution> => {
-  // The contribution's own id, never `root.id`. `root` names the entity the
-  // contribution is about -- voyage 20 -- and addressing the endpoint with that
-  // asked it to change the status of a contribution called "20". Unsaved, that
-  // is a 404; saved, the endpoint compares the path against the id in the body
-  // and refuses the mismatch. Either way the request never reached the point of
-  // being validated, which is why nothing in the store has ever reached
-  // Submitted through this path.
-  const ID = contribution?.id;
+  const { id, status } = contribution;
   try {
     const response = await axios.patch(
-      `${BASEURLNODE}/contributions/${ID}/change_status`,
-      contribution,
+      `${BASEURLNODE}/contributions/${id}/change_status`,
+      { id, status },
       {
         headers: {
           Authorization: getAuthHeader(),
@@ -55,7 +48,7 @@ export const createSubmitChangeContribution = async (
 
     return response.data;
   } catch (error) {
-    console.error('Error creating contribution:', error);
+    console.error('Error submitting contribution:', error);
 
     if (isAxiosError(error)) {
       const data = error.response?.data ?? {};
@@ -72,9 +65,9 @@ export const createSubmitChangeContribution = async (
           data.error ?? 'This contribution is not ready to submit yet.',
         );
       }
-      throw new Error(
-        `Failed to create contribution: ${data.error || error.message}`,
-      );
+      const reason =
+        [data.error, data.details].filter(Boolean).join(': ') || error.message;
+      throw new Error(`Failed to submit contribution: ${reason}`);
     }
 
     throw error;

@@ -13,3 +13,7 @@ export const hasEditorRole = (user: User | null | undefined): boolean => {
   if (user.role === EDITOR_ROLE) return true;
   return Array.isArray(user.roles) && user.roles.includes(EDITOR_ROLE);
 };
+
+export const isEditorOnlyContributeRoute = (pathname: string): boolean =>
+  pathname.startsWith('/contribute/editor_main/') ||
+  pathname.startsWith('/contribute/enslaver_contribution_review/');
