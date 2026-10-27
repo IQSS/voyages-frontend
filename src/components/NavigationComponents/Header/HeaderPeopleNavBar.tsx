@@ -5,7 +5,8 @@ import {
   AppBar,
   Box,
   IconButton,
-  Hidden,
+  useMediaQuery,
+  useTheme,
   Typography,
   Button,
   Menu,
@@ -40,6 +41,8 @@ import { HeaderDrawerMenuPeopleBar } from './HeaderDrawerMenuPeopleBar';
 import HeaderLogo from './HeaderLogo';
 
 export default function HeaderPeopleNavBar() {
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const dispatch: AppDispatch = useDispatch();
@@ -91,7 +94,7 @@ export default function HeaderPeopleNavBar() {
         }}
       >
         <Toolbar sx={{ display: 'flex', alignItems: 'center' }}>
-          <Hidden mdUp>
+          {!isDesktop && (
             <IconButton
               edge="start"
               aria-label="menu"
@@ -100,7 +103,7 @@ export default function HeaderPeopleNavBar() {
             >
               <MenuIcon />
             </IconButton>
-          </Hidden>
+          )}
           <Typography
             component="div"
             sx={{

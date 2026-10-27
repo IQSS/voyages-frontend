@@ -4,7 +4,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import {
   AppBar,
   Box,
-  Hidden,
+  useMediaQuery,
+  useTheme,
   Divider,
   IconButton,
   Menu,
@@ -67,6 +68,8 @@ import { DrawerMenuBar } from './DrawerMenuBar';
 import HeaderLogo from './HeaderLogo';
 
 const HeaderEnslaversNavBar: React.FC = () => {
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -182,7 +185,7 @@ const HeaderEnslaversNavBar: React.FC = () => {
         }}
       >
         <Toolbar sx={{ display: 'flex', alignItems: 'center' }}>
-          <Hidden mdUp>
+          {!isDesktop && (
             <IconButton
               edge="start"
               color="inherit"
@@ -192,7 +195,7 @@ const HeaderEnslaversNavBar: React.FC = () => {
             >
               <MenuIcon />
             </IconButton>
-          </Hidden>
+          )}
           <Typography
             component="div"
             sx={{
@@ -226,7 +229,7 @@ const HeaderEnslaversNavBar: React.FC = () => {
               {inputSearchValue && <GlobalSearchButton />}
             </Typography>
           </Typography>
-          <Hidden mdUp>{!inputSearchValue && <CascadingMenu />}</Hidden>
+          {!isDesktop && !inputSearchValue && <CascadingMenu />}
           <Box
             className="menu-nav-bar-select-box"
             sx={{
@@ -256,15 +259,17 @@ const HeaderEnslaversNavBar: React.FC = () => {
             <LanguagesDropdown />
           </Box>
         </Toolbar>
-        <Hidden mdDown>
-          <Divider
-            sx={{
-              borderWidth: '0.25px',
-              borderClor: 'rgb(0 0 0 / 50%)',
-            }}
-          />
-          {!inputSearchValue && <CascadingMenu />}
-        </Hidden>
+        {isDesktop && (
+          <>
+            <Divider
+              sx={{
+                borderWidth: '0.25px',
+                borderClor: 'rgb(0 0 0 / 50%)',
+              }}
+            />
+            {!inputSearchValue && <CascadingMenu />}
+          </>
+        )}
         <Box component="nav">
           <Menu
             anchorEl={anchorEl}

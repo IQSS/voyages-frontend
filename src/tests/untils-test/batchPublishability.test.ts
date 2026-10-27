@@ -9,21 +9,23 @@ import {
   summariseBlockers,
 } from '@/utils/contribute/batchPublishability';
 
-/**
- * Only `status` is read, so the contributions are stubbed to that. Casting once
- * here keeps the cast out of every case.
- */
-const batchOf = (...statuses: ContributionStatus[]): BatchWithContributions =>
-  ({
-    id: 1,
-    title: 'Batch',
-    comments: '',
-    published: null,
-    contributions: statuses.map((status, i) => ({
-      id: `c${i}`,
-      status,
-    })),
-  }) as BatchWithContributions;
+// Batch list responses aggregate counts without shipping contribution diffs.
+const batchOf = (
+  ...statuses: ContributionStatus[]
+): BatchWithContributions => ({
+  id: 1,
+  title: 'Batch',
+  comments: '',
+  published: null,
+  contributionCount: statuses.length,
+  statusCounts: statuses.reduce<Partial<Record<ContributionStatus, number>>>(
+    (counts, status) => {
+      counts[status] = (counts[status] ?? 0) + 1;
+      return counts;
+    },
+    {},
+  ),
+});
 
 const { WorkInProgress, Submitted, Accepted, Rejected, Published } =
   ContributionStatus;
@@ -104,8 +106,8 @@ describe('getBatchPublishability', () => {
     expect(result.reason).toBe('Nothing in this batch is accepted yet.');
   });
 
-  it('treats a batch with no contributions field as empty', () => {
-    // Create/update responses carry no contributions; that must not crash.
+  it('treats a create response with no aggregate counts as empty', () => {
+    // Create/update responses carry no aggregate counts; that must not crash.
     const result = getBatchPublishability({
       id: 1,
       title: 'Batch',
