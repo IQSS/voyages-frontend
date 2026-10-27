@@ -1,10 +1,11 @@
 import { useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { signInWithEmail, signInWithOAuth } from '@/redux/getAuthUserSlice';
 import { RootState, AppDispatch } from '@/redux/store';
+import { contributionReturnPath } from '@/utils/auth/contributionReturnPath';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
 import {
   getRememberedEmail,
@@ -27,6 +28,7 @@ export interface SignInFieldErrors {
 export const useSignInForm = (nextPath: string) => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { actionLoading: loading } = useSelector(
     (state: RootState) => state.getAuthUserSlice,
   );
@@ -109,7 +111,10 @@ export const useSignInForm = (nextPath: string) => {
           password: formValues.password,
         }),
       ).unwrap();
-      navigate(nextPath);
+      navigate(contributionReturnPath(location.state?.returnTo, nextPath), {
+        replace: true,
+        state: null,
+      });
     } catch (error: unknown) {
       setAuthError(getFriendlySignInError(error as string));
     }

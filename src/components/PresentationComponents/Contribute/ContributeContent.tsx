@@ -9,8 +9,8 @@ import MergeVoyages from '@/components/PresentationComponents/Contribute/Form/Me
 import NewVoyage from '@/components/PresentationComponents/Contribute/Form/NewVoyage';
 import PasswordChangeForm from '@/components/PresentationComponents/Contribute/Form/PasswordChangeForm';
 import RecommendVoyageDeletion from '@/components/PresentationComponents/Contribute/Form/RecommendVoyageDeletion';
-import SignInForm from '@/components/PresentationComponents/Contribute/Form/SingInForm';
 import SignUpForm from '@/components/PresentationComponents/Contribute/Form/SignUpForm';
+import SignInForm from '@/components/PresentationComponents/Contribute/Form/SingInForm';
 // Editorial Platform Components
 import { useNavigation } from '@/hooks/useNavigation';
 import { usePageRouter } from '@/hooks/usePageRouter';
@@ -77,9 +77,22 @@ const ContributeContent: React.FC<ContributeContentProps> = ({
   // Wait for auth to finish loading before redirecting
   useEffect(() => {
     if (!loading && !user && !isPublicRoute) {
-      navigate('/accounts/signin', { replace: true });
+      navigate('/accounts/signin', {
+        replace: true,
+        state: {
+          returnTo: location.pathname + location.search + location.hash,
+        },
+      });
     }
-  }, [user, loading, isPublicRoute, navigate]);
+  }, [
+    user,
+    loading,
+    isPublicRoute,
+    navigate,
+    location.pathname,
+    location.search,
+    location.hash,
+  ]);
 
   // Route configuration object
   const routeComponents: Record<RouteKey, ComponentRenderer> = {
