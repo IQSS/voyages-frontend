@@ -1,0 +1,47 @@
+[
+  {
+    "name": "original-server-resort",
+    "historicalRef": "03cf141e",
+    "source": "src/hooks/useDataTableProcessingEffect.tsx",
+    "test": "src/tests/untils-test/auditServerOrder.test.tsx",
+    "exitCode": 1,
+    "failedAssertions": 1,
+    "failureNames": [
+      "PR235 retains the exact API order on initial and subsequent table responses"
+    ]
+  },
+  {
+    "name": "original-standalone-map-popup",
+    "historicalRef": "e1159a5c",
+    "source": "src/components/PresentationComponents/Map/handleHoverMarkerCluster.tsx",
+    "test": "src/tests/untils-test/auditMapPopup.test.tsx",
+    "exitCode": 1,
+    "failedAssertions": 2,
+    "failureNames": [
+      "PR237 standalone post-disembarkation marker describes 1 people",
+      "PR237 standalone post-disembarkation marker describes 4 people"
+    ]
+  },
+  {
+    "name": "signin-bootstrap-loading-regression",
+    "source": "src/redux/getAuthUserSlice.ts",
+    "operation": "restore pre-PR12 shared loading flag for auth actions",
+    "test": "src/tests/untils-test/auditSignInState.test.tsx",
+    "exitCode": 1,
+    "failedAssertions": 1,
+    "failureNames": [
+      "upstream PR12 keeps sign-in input and friendly errors while action loading changes"
+    ]
+  },
+  {
+    "name": "original-merged-location-grid-interfaces",
+    "source": "src/share/InterfaceTypes.ts",
+    "historicalRef": "3e49d868",
+    "test": "src/tests/untils-test/auditGridLocationTypes.test.ts",
+    "exitCode": 1,
+    "failedAssertions": 1,
+    "failureNames": [
+      "PR250 keeps contribution locations and existing grid children structurally separate"
+    ]
+  }
+]
