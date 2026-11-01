@@ -40,23 +40,23 @@ const EnslaversHomePage: React.FC = () => {
 
     switch (styleNameRoute) {
       case TRANSATLANTICTRADS:
-        baseTitle = 'Trans-Atlantic Enslaver Names';
+        baseTitle = 'Trans-Atlantic Slave Trader Names';
         baseDescription =
-          'Explore the Trans-Atlantic Enslaver Names database with detailed records of enslavers and their activities.';
+          'Explore the Trans-Atlantic Slave Trader Names database with detailed records of slave traders and their activities.';
         break;
       case INTRAAMERICANTRADS:
-        baseTitle = 'Intra-American Enslaver Names';
+        baseTitle = 'Intra-American Slave Trader Names';
         baseDescription =
-          'Explore the Intra-American Enslaver Names database with detailed historical records and information.';
+          'Explore the Intra-American Slave Trader Names database with detailed historical records and information.';
         break;
       case allEnslavers:
-        baseTitle = 'Enslaver Names';
+        baseTitle = 'Slave Trader Names';
         baseDescription =
-          'Explore the comprehensive database of all enslavers with detailed records and historical information.';
+          'Explore the comprehensive database of all slave traders with detailed records and historical information.';
         break;
       default:
-        baseTitle = 'Enslaver Names';
-        baseDescription = 'Explore the enslavers database.';
+        baseTitle = 'Slave Trader Names';
+        baseDescription = 'Explore the slave traders database.';
     }
 
     if (currentBlockName === 'people') {
