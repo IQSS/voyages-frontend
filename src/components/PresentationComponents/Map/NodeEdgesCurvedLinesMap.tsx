@@ -338,19 +338,22 @@ const NodeEdgesCurvedLinesMap = ({ fitKey }: NodeEdgesCurvedLinesMapProps) => {
               placed,
               ...members.filter((member) => member !== placed),
             ];
-            const memberContent =
+            const clickText =
+              voyageCount > 0
+                ? `<p>Click for tables of ${voyageCount.toLocaleString()} ${voyageCount === 1 ? 'voyage' : 'voyages'}${placesText}</p>`
+                : '';
+            circleMarker.setPopupContent(
               members.length > 1
-                ? orderedMembers
+                ? `<div class="node-cluster-popup-list">${orderedMembers
                     .map((member) =>
                       createTooltipEmbarkDiseEmbarkEdges(member.node),
                     )
-                    .join('') +
-                  createTooltipEmbarkDiseEmbarkEdges(clusterTotalNode(members))
-                : popupContent;
-            circleMarker.setPopupContent(
-              voyageCount > 0
-                ? `${memberContent}<p>Click for tables of ${voyageCount.toLocaleString()} ${voyageCount === 1 ? 'voyage' : 'voyages'}${placesText}</p>`
-                : memberContent,
+                    .join(
+                      '',
+                    )}</div><div class="node-cluster-popup-footer">${createTooltipEmbarkDiseEmbarkEdges(
+                    clusterTotalNode(members),
+                  )}${clickText}</div>`
+                : `${popupContent}${clickText}`,
             );
             circleMarker.openPopup();
             handleHoverCircleMarker(

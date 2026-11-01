@@ -253,3 +253,15 @@
 .post-disembark-location {
   background-color: rgb(246, 193, 60);
 }
+
+.node-cluster-popup-list {
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.node-cluster-popup-footer {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #ddd;
+}
