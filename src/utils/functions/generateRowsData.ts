@@ -20,6 +20,9 @@ export const generateRowsData = (
 
         finalRowObj[varName] = flattenData(output);
       });
+      if ('connections_count' in data) {
+        finalRowObj.connections_count = data.connections_count;
+      }
       finalRowArr.push(finalRowObj);
     });
   }
