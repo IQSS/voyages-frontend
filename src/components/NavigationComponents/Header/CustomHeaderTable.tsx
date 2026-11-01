@@ -39,8 +39,8 @@ const CustomHeaderTable = (props: CustomHeaderTableProps) => {
     (sortOrder: SortOrder, sortingFields: string[]) => {
       if (sortingFields.length === 0) return [];
       return sortOrder === 'desc'
-        ? sortingFields
-        : sortingFields.map((field) => `-${field}`);
+        ? sortingFields.map((field) => `-${field}`)
+        : sortingFields;
     },
     [],
   );
@@ -61,13 +61,11 @@ const CustomHeaderTable = (props: CustomHeaderTableProps) => {
 
     if (isMatch) {
       if (hasDash) {
-        // dash = server ascending (oldest first) → ↑ active
-        setAscSort('active');
-        setDescSort('inactive');
-      } else {
-        // no dash = server descending (newest first) → ↓ active
         setAscSort('inactive');
         setDescSort('active');
+      } else {
+        setAscSort('active');
+        setDescSort('inactive');
       }
     } else {
       setAscSort('inactive');

@@ -121,7 +121,7 @@
       "cell_type": "literal-concat",
       "visible": true,
       "number_format": null,
-      "order_by": ["enslaved_source_connections__source__title"],
+      "order_by": ["enslaver_source_connections__source__title"],
       "col_width_px": 130,
       "colID": "documentary_sources",
       "cell_val": {
@@ -158,7 +158,7 @@
     }
   ],
   "other_properties": {
-    "default_order_by": "birth_year"
+    "default_order_by": "-birth_year"
   },
   "column_selector_tree": [
     {

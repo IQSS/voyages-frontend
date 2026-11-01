@@ -14,6 +14,7 @@ export interface StatePivotRowData {
   aggregation: string;
   rowsPerPage: number;
   totalResultsCount: number;
+  orderBy: string[];
 }
 export interface PivotColumnDef {
   headerName: string;

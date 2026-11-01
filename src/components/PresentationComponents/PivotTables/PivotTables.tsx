@@ -87,6 +87,7 @@ const PivotTables = () => {
     offset,
     pivotValueOptions,
     rowsPerPage,
+    orderBy,
   } = useSelector((state: RootState) => state.getPivotTablesData);
 
   const [rowVars, setSelectRowValues] = useState<PivotRowVar[]>([]);
@@ -196,6 +197,9 @@ const PivotTables = () => {
     if (inputSearchValue) {
       (baseDataSend as any)['global_search'] = inputSearchValue!;
     }
+    if (orderBy.length > 0) {
+      (baseDataSend as any)['order_by'] = orderBy;
+    }
 
     return baseDataSend;
   }, [
@@ -209,7 +213,12 @@ const PivotTables = () => {
     rowsPerPage,
     newFilters,
     inputSearchValue,
+    orderBy,
   ]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [orderBy]);
 
   const processColumnDefs = useCallback((tablestructure: any[]) => {
     return tablestructure.map((structure) => {

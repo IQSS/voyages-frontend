@@ -317,7 +317,7 @@
 			"visible": true,
 			"number_format": null,
 			"order_by": [
-				"cargo"
+				"cargo__cargo__name"
 			],
 			"col_width_px": 184,
 			"colID": "cargo",
@@ -1304,7 +1304,7 @@
 			"visible": true,
 			"number_format": null,
 			"order_by": [
-				"voyage_enslaver_connection__enslaver_alias__alias"
+				"voyage_enslavement_relations__relation_enslavers__enslaver_alias__alias"
 			],
 			"col_width_px": 280,
 			"colID": "voyage_enslavers",
@@ -1552,7 +1552,7 @@
 		}		
 	],
 	"other_properties": {
-		"default_order_by": "voyage_dates__imp_arrival_at_port_of_dis_sparsedate__year"
+		"default_order_by": "-voyage_dates__imp_arrival_at_port_of_dis_sparsedate__year"
 	},
 	"column_selector_tree": [
 		{

@@ -224,7 +224,7 @@
       "visible": true,
       "number_format": null,
       "order_by": [
-        "voyage_itinerary__imp_principal_region_of_slave_purchase__name"
+        "enslaved_relations__relation__voyage__voyage_itinerary__imp_principal_region_of_slave_purchase__name"
       ],
       "col_width_px": 160,
       "colID": "voyages__voyage_itinerary__imp_principal_region_of_slave_purchase__name",
@@ -383,7 +383,7 @@
     }
   ],
   "other_properties": {
-    "default_order_by": "enslaved_relations__relation__voyage__voyage_dates__imp_arrival_at_port_of_dis_sparsedate__year"
+    "default_order_by": "-enslaved_relations__relation__voyage__voyage_dates__imp_arrival_at_port_of_dis_sparsedate__year"
   },
   "column_selector_tree": [
     {

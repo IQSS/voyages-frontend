@@ -25,6 +25,7 @@ const initialState: StatePivotRowData = {
   aggregation: 'sum',
   rowsPerPage: getRowsPerPage(window.innerWidth, window.innerHeight),
   totalResultsCount: 0,
+  orderBy: [],
 };
 const getPivotTablesDataSlice = createSlice({
   name: 'getPivotTablesDataSlice',
@@ -53,6 +54,14 @@ const getPivotTablesDataSlice = createSlice({
     },
     setPivotValueOptions: (state, action: PayloadAction<PivotTablesProps>) => {
       state.pivotValueOptions = action.payload;
+      if (state.orderBy.length > 0) {
+        state.orderBy = [];
+        state.offset = 0;
+      }
+    },
+    setPivotOrderBy: (state, action: PayloadAction<string[]>) => {
+      state.orderBy = action.payload;
+      state.offset = 0;
     },
     setAggregation: (state, action: PayloadAction<string>) => {
       state.aggregation = action.payload;
@@ -75,5 +84,6 @@ export const {
   setPivotTablColumnDefs,
   setOffset,
   setPivotValueOptions,
+  setPivotOrderBy,
 } = getPivotTablesDataSlice.actions;
 export default getPivotTablesDataSlice.reducer;
