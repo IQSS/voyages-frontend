@@ -228,23 +228,7 @@ const PivotTables = () => {
         processedStructure.children = structure.children.map((child: any) => {
           const processedChild = { ...child };
 
-          if (child.field === 'Africa__West Central Africa and St. Helena') {
-            // Simple cell renderer that just shows the value
-            processedChild.cellRenderer = (params: any) => {
-              // Get the value directly from data if params.value is undefined
-              let value = params.value;
-              if (value === undefined || value === null) {
-                value =
-                  params.data?.['Africa__West Central Africa and St. Helena'];
-              }
-              return value !== null && value !== undefined
-                ? Number(value).toLocaleString('en-US')
-                : '0';
-            };
-
-            // Don't use valueFormatter for this column
-            delete processedChild.valueFormatter;
-          } else if (child.field === 'Year range') {
+          if (child.field === 'Year range') {
             processedChild.type = 'leftAligned';
             processedChild.cellClass = 'ag-left-aligned-cell';
             processedChild.pinned = 'left';
@@ -265,29 +249,7 @@ const PivotTables = () => {
         });
       } else {
         // Handle direct columns (not nested in children)
-        if (
-          processedStructure.field ===
-          'Africa__West Central Africa and St. Helena'
-        ) {
-          processedStructure.cellStyle = {
-            textAlign: 'right',
-            color: '#000000',
-            fontWeight: 'bold',
-            padding: '4px 8px',
-          };
-
-          processedStructure.cellRenderer = (params: any) => {
-            let value = params.value;
-            if (value === undefined || value === null) {
-              value =
-                params.data?.['Africa__West Central Africa and St. Helena'];
-            }
-
-            return value !== null && value !== undefined ? String(value) : '0';
-          };
-
-          delete processedStructure.valueFormatter;
-        } else if (processedStructure.field === 'Year range') {
+        if (processedStructure.field === 'Year range') {
           processedStructure.type = 'leftAligned';
           processedStructure.cellClass = 'ag-left-aligned-cell';
           processedStructure.pinned = 'left';
@@ -387,6 +349,7 @@ const PivotTables = () => {
       enableCellTextSelection: true,
       ensureDomOrder: true,
       autoHeaderHeight: true,
+      suppressFieldDotNotation: true,
     }),
     [],
   );
@@ -499,12 +462,6 @@ const PivotTables = () => {
       setTimeout(() => {
         gridApi?.refreshCells({ force: true });
         columnApi?.autoSizeAllColumns();
-
-        // Force specific column width
-        columnApi?.setColumnWidth(
-          'Africa__West Central Africa and St. Helena',
-          200,
-        );
       }, 100);
     }
   }, [newRowsData]);
