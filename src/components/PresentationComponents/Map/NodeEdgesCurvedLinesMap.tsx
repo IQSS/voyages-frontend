@@ -32,13 +32,18 @@ import { createLogNodeValueScale } from '@/utils/functions/createLogNodeValueSca
 import { createTooltipEmbarkDiseEmbarkEdges } from '@/utils/functions/createTooltipClusterEdges';
 import { getNodeColorMapVoyagesStyle } from '@/utils/functions/getNodeColorStyle';
 import '@johnconnor_mulligan/leaflet.curve';
+import { getNodeVoyageIds } from '@/utils/functions/routeVoyageIds';
 import { getNodeSize } from '@/utils/functions/getNodeSize';
 
 import '@/style/map.scss';
 import { handerRenderEdges } from './handerRenderEdges';
 import { handleHoverCircleMarker } from './handleHoverCircleMarker';
 import { handleHoverMarkerCluster } from './handleHoverMarkerCluster';
-import { VoyagesModal } from './VoyagesModal/VoyagesModal';
+import { nodePivots } from './VoyagesModal/nodePivots';
+import {
+  VoyagesModal,
+  VoyagesModalContent,
+} from './VoyagesModal/VoyagesModal';
 
 const FIT_PADDING_PX = 16;
 const FIT_MAX_ZOOM = 7;
@@ -51,8 +56,13 @@ const NodeEdgesCurvedLinesMap = ({ fitKey }: NodeEdgesCurvedLinesMapProps) => {
   const map = useMap();
   const fittedKeyRef = useRef<string | null>(null);
   const dispatch: AppDispatch = useDispatch();
-  const [modalVoyageIds, setModalVoyageIds] = useState<string[] | null>(null);
-  const closeModal = useCallback(() => setModalVoyageIds(null), []);
+  const [modalContent, setModalContent] =
+    useState<VoyagesModalContent | null>(null);
+  const closeModal = useCallback(() => setModalContent(null), []);
+  const openRouteVoyages = useCallback(
+    (voyageIds: string[]) => setModalContent({ voyageIds }),
+    [],
+  );
 
   const { nodesData, edgesData } = useSelector(
     (state: RootState) => state.getNodeEdgesAggroutesMapData,
@@ -134,7 +144,7 @@ const NodeEdgesCurvedLinesMap = ({ fitKey }: NodeEdgesCurvedLinesMapProps) => {
     );
 
     // Render edges when page rendering
-    handerRenderEdges(edgesToRender, nodesData, map, setModalVoyageIds);
+    handerRenderEdges(edgesToRender, nodesData, map, openRouteVoyages);
 
     //  Render originMarkerCluster
     const originMarkerCluster = L.markerClusterGroup({
@@ -270,7 +280,23 @@ const NodeEdgesCurvedLinesMap = ({ fitKey }: NodeEdgesCurvedLinesMapProps) => {
         if (disembarkation !== 0 || embarkation !== 0) {
           const popupContent = createTooltipEmbarkDiseEmbarkEdges(node);
           circleMarker.bindPopup(popupContent).bringToFront();
+          circleMarker.on('click', (event) => {
+            const voyageIds = getNodeVoyageIds(nodeID);
+            if (voyageIds.length === 0) return;
+            L.DomEvent.stopPropagation(event);
+            setModalContent({
+              voyageIds,
+              title: data.name ?? undefined,
+              pivots: nodePivots(node),
+            });
+          });
           circleMarker.on('mouseover', (event) => {
+            const voyageCount = getNodeVoyageIds(nodeID).length;
+            circleMarker.setPopupContent(
+              voyageCount > 0
+                ? `${popupContent}<p>Click for tables of ${voyageCount.toLocaleString()} ${voyageCount === 1 ? 'voyage' : 'voyages'}</p>`
+                : popupContent,
+            );
             circleMarker.openPopup();
             handleHoverCircleMarker(
               event,
@@ -356,9 +382,9 @@ const NodeEdgesCurvedLinesMap = ({ fitKey }: NodeEdgesCurvedLinesMapProps) => {
     fittedKeyRef.current = fitKey;
   }, [fitKey, nodesData, edgesData, map]);
 
-  return modalVoyageIds
+  return modalContent
     ? createPortal(
-        <VoyagesModal voyageIds={modalVoyageIds} onClose={closeModal} />,
+        <VoyagesModal {...modalContent} onClose={closeModal} />,
         document.body,
       )
     : null;

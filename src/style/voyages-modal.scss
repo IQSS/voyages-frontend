@@ -128,3 +128,18 @@
 .voyagesStatusError {
   color: #a00;
 }
+
+.voyagesModalTitle {
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.nodePivot {
+  padding-top: 12px;
+
+  .pivot-html-table-container {
+    max-height: none;
+    min-height: 0;
+  }
+}
