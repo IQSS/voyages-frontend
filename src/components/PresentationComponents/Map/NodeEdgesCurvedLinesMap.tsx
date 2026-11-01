@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import L, { LatLngExpression, Marker } from 'leaflet';
+import { createPortal } from 'react-dom';
 import { useMap } from 'react-leaflet';
 import '@/style/table-popup.scss';
 import 'leaflet.markercluster';
@@ -37,10 +38,21 @@ import '@/style/map.scss';
 import { handerRenderEdges } from './handerRenderEdges';
 import { handleHoverCircleMarker } from './handleHoverCircleMarker';
 import { handleHoverMarkerCluster } from './handleHoverMarkerCluster';
+import { VoyagesModal } from './VoyagesModal/VoyagesModal';
 
-const NodeEdgesCurvedLinesMap = () => {
+const FIT_PADDING_PX = 16;
+const FIT_MAX_ZOOM = 7;
+
+interface NodeEdgesCurvedLinesMapProps {
+  fitKey?: string | null;
+}
+
+const NodeEdgesCurvedLinesMap = ({ fitKey }: NodeEdgesCurvedLinesMapProps) => {
   const map = useMap();
+  const fittedKeyRef = useRef<string | null>(null);
   const dispatch: AppDispatch = useDispatch();
+  const [modalVoyageIds, setModalVoyageIds] = useState<string[] | null>(null);
+  const closeModal = useCallback(() => setModalVoyageIds(null), []);
 
   const { nodesData, edgesData } = useSelector(
     (state: RootState) => state.getNodeEdgesAggroutesMapData,
@@ -122,7 +134,7 @@ const NodeEdgesCurvedLinesMap = () => {
     );
 
     // Render edges when page rendering
-    handerRenderEdges(edgesToRender, nodesData, map);
+    handerRenderEdges(edgesToRender, nodesData, map, setModalVoyageIds);
 
     //  Render originMarkerCluster
     const originMarkerCluster = L.markerClusterGroup({
@@ -320,7 +332,36 @@ const NodeEdgesCurvedLinesMap = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodesData, edgesData, map]);
 
-  return null;
+  useEffect(() => {
+    if (!map || !fitKey || fittedKeyRef.current === fitKey) return;
+    const points: L.LatLngTuple[] = [];
+    nodesData.forEach((node) => {
+      const { lat, lon } = node.data ?? {};
+      if (typeof lat === 'number' && typeof lon === 'number') {
+        points.push([lat, lon]);
+      }
+    });
+    edgesData.forEach((edge: EdgesAggroutes) => {
+      edge.controls?.forEach(([lat, lon]) => {
+        if (Number.isFinite(lat) && Number.isFinite(lon)) {
+          points.push([lat, lon]);
+        }
+      });
+    });
+    if (points.length === 0) return;
+    map.fitBounds(L.latLngBounds(points), {
+      padding: [FIT_PADDING_PX, FIT_PADDING_PX],
+      maxZoom: FIT_MAX_ZOOM,
+    });
+    fittedKeyRef.current = fitKey;
+  }, [fitKey, nodesData, edgesData, map]);
+
+  return modalVoyageIds
+    ? createPortal(
+        <VoyagesModal voyageIds={modalVoyageIds} onClose={closeModal} />,
+        document.body,
+      )
+    : null;
 };
 
 export default NodeEdgesCurvedLinesMap;

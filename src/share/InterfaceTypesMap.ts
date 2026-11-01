@@ -8,7 +8,7 @@ export class CustomMarker extends L.CircleMarker {
     color: string,
     fillColor: string,
     fillOpacity: number,
-    nodeId: string
+    nodeId: string,
   ) {
     super(latlng, {
       radius: radius,
@@ -20,10 +20,15 @@ export class CustomMarker extends L.CircleMarker {
     this.nodeId = nodeId;
   }
 }
+export interface VoyageMapping {
+  nodes: string[];
+  edges: [source: string, target: string][];
+}
 export interface AggroutesData {
   edges: EdgesAggroutes[];
   nodes: NodeAggroutes[];
   paths: PathsAggroutes[];
+  voyage_mappings?: Record<string, VoyageMapping>;
 }
 export interface NodeAggroutes {
   data: DataAggroutes;

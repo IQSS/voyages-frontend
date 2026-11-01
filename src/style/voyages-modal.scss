@@ -1,0 +1,130 @@
+.voyagesModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.voyagesModal {
+  display: flex;
+  flex-direction: column;
+  width: min(1100px, calc(100% - 48px));
+  height: calc(100% - 96px);
+  padding: 16px 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.voyagesModalTabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  border-bottom: 1px solid #d6d6d6;
+}
+
+.voyagesModalTabs .voyagesModalClose {
+  margin-left: auto;
+  align-self: center;
+  padding: 4px 8px;
+  border: none;
+  background: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.voyagesModalTabs .voyagesModalClose:hover {
+  color: red;
+}
+
+.voyagesModalTabs button {
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.voyagesModalTabs button.active {
+  border-color: #d6d6d6;
+  background: #fff;
+  margin-bottom: -1px;
+  font-weight: 600;
+}
+
+.voyagesModalBody {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.voyagesTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.voyagesTable th,
+.voyagesTable td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  vertical-align: top;
+}
+
+.voyagesTable th {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid #d6d6d6;
+  white-space: nowrap;
+}
+
+.voyagesSort {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.voyagesSortArrow {
+  display: inline-block;
+  width: 1em;
+  margin-left: 2px;
+  font-size: 0.7em;
+}
+
+.voyagesTable .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.bibliographyList {
+  margin: 12px 0;
+  padding-left: 1.2em;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.bibliographyList li {
+  margin-bottom: 8px;
+}
+
+.voyagesTableStatus {
+  padding: 12px 8px;
+  min-height: 1px;
+  color: #666;
+}
+
+.voyagesStatusError {
+  color: #a00;
+}
