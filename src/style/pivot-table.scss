@@ -1,0 +1,137 @@
+.pivot-html-table-container {
+  overflow: auto;
+  max-height: calc(100vh - 300px);
+  min-height: 200px;
+  border: 1px solid #dde2eb;
+  background-color: #fff;
+}
+
+.pivot-html-table-empty {
+  padding: 24px;
+  text-align: center;
+  color: #555;
+  border: 1px solid #dde2eb;
+  background-color: #fff;
+}
+
+.pivot-html-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+  min-width: 100%;
+  font-family: sans-serif;
+  font-size: 13px;
+  color: #000;
+
+  th,
+  td {
+    padding: 4px 8px;
+    border-right: 1px solid #dde2eb;
+    border-bottom: 1px solid #dde2eb;
+    background-color: #fff;
+  }
+
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+
+    th {
+      max-width: 180px;
+      background-color: #f8f8f8;
+      color: var(--pivot-header-color, #000);
+      font-weight: 600;
+      text-align: center;
+      vertical-align: bottom;
+      white-space: normal;
+    }
+
+    th.pivot-leaf {
+      text-align: right;
+    }
+
+    th.pivot-row-label {
+      text-align: left;
+    }
+  }
+
+  tbody {
+    th,
+    td {
+      white-space: nowrap;
+    }
+
+    td {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    tr:nth-child(even) th,
+    tr:nth-child(even) td {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover th,
+    tr:hover td {
+      background-color: #eef3fb;
+    }
+  }
+
+  tfoot {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+
+    th,
+    td {
+      background-color: #f1f1f1;
+      font-weight: 600;
+      white-space: nowrap;
+      border-top: 2px solid #c7ccd6;
+    }
+
+    td {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .pivot-row-label {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    font-weight: 600;
+    text-align: left;
+    border-right: 2px solid #c7ccd6;
+  }
+
+  .pivot-total-col {
+    position: sticky;
+    right: 0;
+    z-index: 1;
+    font-weight: 600;
+    border-left: 2px solid #c7ccd6;
+  }
+
+  .pivot-sort-button {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 6px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+    cursor: pointer;
+  }
+
+  .pivot-sort-icon {
+    font-size: 11px;
+    opacity: 0.3;
+
+    &.active {
+      opacity: 1;
+    }
+  }
+}

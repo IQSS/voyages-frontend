@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import {
-  PivotColumnDef,
+  PivotCrosstabResponse,
   StatePivotRowData,
 } from '@/share/InterfaceTypePivotTable';
 import { PivotTablesProps } from '@/share/InterfaceTypes';
@@ -9,10 +9,7 @@ import VOYAGE_PIVOT_OPTIONS from '@/utils/flatfiles/voyages/voyages_pivot_option
 import { getRowsPerPage } from '@/utils/functions/getRowsPerPage';
 
 const initialState: StatePivotRowData = {
-  data: [],
-  rowData: [],
-  columnDefs: [],
-  offset: 0,
+  table: null,
   pivotValueOptions: {
     row_vars: VOYAGE_PIVOT_OPTIONS.row_vars[12].rows,
     rows_label: VOYAGE_PIVOT_OPTIONS.row_vars[12].rows_label,
@@ -24,44 +21,20 @@ const initialState: StatePivotRowData = {
   },
   aggregation: 'sum',
   rowsPerPage: getRowsPerPage(window.innerWidth, window.innerHeight),
-  totalResultsCount: 0,
-  orderBy: [],
 };
+
 const getPivotTablesDataSlice = createSlice({
   name: 'getPivotTablesDataSlice',
   initialState,
   reducers: {
-    setPivotTableData: (
+    setPivotTable: (
       state,
-      action: PayloadAction<Record<string, any>[]>,
+      action: PayloadAction<PivotCrosstabResponse | null>,
     ) => {
-      state.data = action.payload;
-    },
-    setRowPivotTableData: (
-      state,
-      action: PayloadAction<Record<string, any>[]>,
-    ) => {
-      state.rowData = action.payload;
-    },
-    setPivotTablColumnDefs: (
-      state,
-      action: PayloadAction<PivotColumnDef[]>,
-    ) => {
-      state.columnDefs = action.payload;
-    },
-    setOffset: (state, action: PayloadAction<number>) => {
-      state.offset = action.payload;
+      state.table = action.payload;
     },
     setPivotValueOptions: (state, action: PayloadAction<PivotTablesProps>) => {
       state.pivotValueOptions = action.payload;
-      if (state.orderBy.length > 0) {
-        state.orderBy = [];
-        state.offset = 0;
-      }
-    },
-    setPivotOrderBy: (state, action: PayloadAction<string[]>) => {
-      state.orderBy = action.payload;
-      state.offset = 0;
     },
     setAggregation: (state, action: PayloadAction<string>) => {
       state.aggregation = action.payload;
@@ -69,21 +42,13 @@ const getPivotTablesDataSlice = createSlice({
     setRowsPerPage: (state, action: PayloadAction<number>) => {
       state.rowsPerPage = action.payload;
     },
-    setTotalResultsCount: (state, action: PayloadAction<number>) => {
-      state.totalResultsCount = action.payload;
-    },
   },
 });
 
 export const {
-  setTotalResultsCount,
-  setRowsPerPage,
-  setPivotTableData,
-  setRowPivotTableData,
-  setAggregation,
-  setPivotTablColumnDefs,
-  setOffset,
+  setPivotTable,
   setPivotValueOptions,
-  setPivotOrderBy,
+  setAggregation,
+  setRowsPerPage,
 } = getPivotTablesDataSlice.actions;
 export default getPivotTablesDataSlice.reducer;
