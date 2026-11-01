@@ -151,28 +151,6 @@
     },
     {
       "header_label": {
-        "en": "Connections",
-        "es": "Connections ES",
-        "pt": "Connections PT"
-      },
-      "cell_type": "network_modal",
-      "visible": true,
-      "number_format": null,
-      "order_by": [],
-      "col_width_px": 120,
-      "colID": "connections",
-      "cell_val": {
-        "fields": [
-          {
-            "var_name": "id",
-            "cell_fn": "networks",
-            "node_class": "enslaved"
-          }
-        ]
-      }
-    },
-    {
-      "header_label": {
         "en":"Slave Traders",
   		"es":"Traficantes de Esclavos",
   		"pt":"Traficantes de Escravos"
@@ -317,6 +295,28 @@
           {
             "var_name": "post_disembark_location__name",
             "cell_fn": "literal"
+          }
+        ]
+      }
+    },
+    {
+      "header_label": {
+        "en": "Connections",
+        "es": "Connections ES",
+        "pt": "Connections PT"
+      },
+      "cell_type": "network_modal",
+      "visible": true,
+      "number_format": null,
+      "order_by": [],
+      "col_width_px": 120,
+      "colID": "connections",
+      "cell_val": {
+        "fields": [
+          {
+            "var_name": "id",
+            "cell_fn": "networks",
+            "node_class": "enslaved"
           }
         ]
       }

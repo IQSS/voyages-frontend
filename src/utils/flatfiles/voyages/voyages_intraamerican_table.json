@@ -587,29 +587,6 @@
 		},
 		{
 			"header_label": {
-				"en": "Connections",
-				"es": "Conexiones",
-				"pt": "Conexões"
-
-			},
-			"cell_type": "network_modal",
-			"visible": true,
-			"number_format": null,
-			"order_by": [],
-			"col_width_px": 120,
-			"colID": "connections",
-			"cell_val": {
-				"fields": [
-					{
-						"var_name": "id",
-						"cell_fn": "networks",
-						"node_class": "voyages"
-					}
-				]
-			}
-		},
-		{
-			"header_label": {
 				"en": "Total embarked (IMP)",
 				"es": "Total embarcado (IMP)",
 				"pt": "Total embarcado (IMP)"
@@ -1498,6 +1475,29 @@
 					{
 						"var_name": "voyage_outcome__resistance__name",
 						"cell_fn": "literal"
+					}
+				]
+			}
+		},
+		{
+			"header_label": {
+				"en": "Connections",
+				"es": "Conexiones",
+				"pt": "Conexões"
+
+			},
+			"cell_type": "network_modal",
+			"visible": true,
+			"number_format": null,
+			"order_by": [],
+			"col_width_px": 120,
+			"colID": "connections",
+			"cell_val": {
+				"fields": [
+					{
+						"var_name": "id",
+						"cell_fn": "networks",
+						"node_class": "voyages"
 					}
 				]
 			}
