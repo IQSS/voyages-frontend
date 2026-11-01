@@ -39,7 +39,12 @@ import '@/style/map.scss';
 import { handerRenderEdges } from './handerRenderEdges';
 import { handleHoverCircleMarker } from './handleHoverCircleMarker';
 import { handleHoverMarkerCluster } from './handleHoverMarkerCluster';
-import { nodePivots } from './VoyagesModal/nodePivots';
+import {
+  clusterBounds,
+  clusterTotalNode,
+  findNodeCluster,
+  PlacedNode,
+} from './nodeClusters';
 import {
   VoyagesModal,
   VoyagesModalContent,
@@ -55,6 +60,11 @@ interface NodeEdgesCurvedLinesMapProps {
 const NodeEdgesCurvedLinesMap = ({ fitKey }: NodeEdgesCurvedLinesMapProps) => {
   const map = useMap();
   const fittedKeyRef = useRef<string | null>(null);
+  const clusterBoxRef = useRef<L.Rectangle | null>(null);
+  const clearClusterBox = useCallback(() => {
+    clusterBoxRef.current?.remove();
+    clusterBoxRef.current = null;
+  }, []);
   const dispatch: AppDispatch = useDispatch();
   const [modalContent, setModalContent] =
     useState<VoyagesModalContent | null>(null);
@@ -245,6 +255,14 @@ const NodeEdgesCurvedLinesMap = ({ fitKey }: NodeEdgesCurvedLinesMapProps) => {
       );
     });
 
+    clearClusterBox();
+    map.off('zoomstart', clearClusterBox);
+    map.on('zoomstart', clearClusterBox);
+    const placedNodes: PlacedNode[] = [];
+    const clusterVoyageIds = (members: PlacedNode[]) => [
+      ...new Set(members.flatMap((member) => getNodeVoyageIds(member.node.id))),
+    ];
+
     const originNodeMarkersMap = new Map<string, Marker>();
     nodesData.forEach((node) => {
       const { data, weights, id: nodeID } = node;
@@ -280,22 +298,59 @@ const NodeEdgesCurvedLinesMap = ({ fitKey }: NodeEdgesCurvedLinesMapProps) => {
         if (disembarkation !== 0 || embarkation !== 0) {
           const popupContent = createTooltipEmbarkDiseEmbarkEdges(node);
           circleMarker.bindPopup(popupContent).bringToFront();
+          const placed: PlacedNode = { node, latlng: L.latLng(latlon), radius };
+          placedNodes.push(placed);
           circleMarker.on('click', (event) => {
-            const voyageIds = getNodeVoyageIds(nodeID);
+            const members = findNodeCluster(map, placed, placedNodes);
+            const voyageIds = clusterVoyageIds(members);
             if (voyageIds.length === 0) return;
             L.DomEvent.stopPropagation(event);
             setModalContent({
               voyageIds,
-              title: data.name ?? undefined,
-              pivots: nodePivots(node),
+              places: [
+                placed,
+                ...members.filter((member) => member !== placed),
+              ].map((member) => ({
+                id: member.node.id,
+                name: member.node.data.name ?? 'Unnamed place',
+                voyageIds: getNodeVoyageIds(member.node.id),
+                weights: member.node.weights,
+              })),
             });
           });
           circleMarker.on('mouseover', (event) => {
-            const voyageCount = getNodeVoyageIds(nodeID).length;
+            const members = findNodeCluster(map, placed, placedNodes);
+            clearClusterBox();
+            if (members.length > 1) {
+              clusterBoxRef.current = L.rectangle(clusterBounds(map, members), {
+                className: 'node-cluster-box',
+                color: 'rgb(214, 40, 40)',
+                opacity: 0.75,
+                weight: 1.5,
+                fill: false,
+                interactive: false,
+              }).addTo(map);
+            }
+            const voyageCount = clusterVoyageIds(members).length;
+            const placesText =
+              members.length > 1 ? ` across ${members.length} places` : '';
+            const orderedMembers = [
+              placed,
+              ...members.filter((member) => member !== placed),
+            ];
+            const memberContent =
+              members.length > 1
+                ? orderedMembers
+                    .map((member) =>
+                      createTooltipEmbarkDiseEmbarkEdges(member.node),
+                    )
+                    .join('') +
+                  createTooltipEmbarkDiseEmbarkEdges(clusterTotalNode(members))
+                : popupContent;
             circleMarker.setPopupContent(
               voyageCount > 0
-                ? `${popupContent}<p>Click for tables of ${voyageCount.toLocaleString()} ${voyageCount === 1 ? 'voyage' : 'voyages'}</p>`
-                : popupContent,
+                ? `${memberContent}<p>Click for tables of ${voyageCount.toLocaleString()} ${voyageCount === 1 ? 'voyage' : 'voyages'}${placesText}</p>`
+                : memberContent,
             );
             circleMarker.openPopup();
             handleHoverCircleMarker(
@@ -310,6 +365,7 @@ const NodeEdgesCurvedLinesMap = ({ fitKey }: NodeEdgesCurvedLinesMapProps) => {
               map,
             );
           });
+          circleMarker.on('mouseout', clearClusterBox);
           circleMarker.addTo(map).bringToFront();
         } else if (origin && origin > 0) {
           const popupContent = createTooltipEmbarkDiseEmbarkEdges(node);

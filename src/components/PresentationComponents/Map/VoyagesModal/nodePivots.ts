@@ -1,4 +1,4 @@
-import { NodeAggroutes } from '@/share/InterfaceTypesMap';
+import { Weights } from '@/share/InterfaceTypesMap';
 
 import { VoyagesModalPivot } from './VoyagesModal';
 
@@ -8,8 +8,8 @@ const YEAR_ROWS = {
   binsize: 25,
 };
 
-export const nodePivots = (node: NodeAggroutes): VoyagesModalPivot[] => {
-  const { embarkation, disembarkation } = node.weights;
+export const nodePivots = (weights: Weights): VoyagesModalPivot[] => {
+  const { embarkation, disembarkation } = weights;
   const pivots: VoyagesModalPivot[] = [];
   if (embarkation) {
     pivots.push({

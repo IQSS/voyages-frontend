@@ -143,3 +143,55 @@
     min-height: 0;
   }
 }
+
+.voyagesModalPlaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 40px 10px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.voyagesModalPlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid #c7ccd6;
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  &.selected {
+    border-color: rgb(26, 95, 208);
+    background: rgba(26, 95, 208, 0.06);
+  }
+
+  &.deselected {
+    color: #888;
+    font-weight: 400;
+    text-decoration: line-through;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.voyagesModalPlaceMark {
+  flex: none;
+  width: 0.8em;
+  height: 0.8em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  .selected & {
+    color: rgb(26, 95, 208);
+  }
+}
