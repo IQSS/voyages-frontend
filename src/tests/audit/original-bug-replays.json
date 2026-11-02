@@ -43,5 +43,29 @@
     "failureNames": [
       "PR250 keeps contribution locations and existing grid children structurally separate"
     ]
+  },
+  {
+    "name": "original-source-bibliography-dereference",
+    "source": "src/components/PresentationComponents/Tables/GenerateCellTableRenderer.tsx",
+    "operation": "restore the unguarded sources__bib[index] expression from before PR231",
+    "test": "src/tests/untils-test/auditHistoricalNavigation.test.tsx",
+    "exitCode": 1,
+    "failedAssertions": 1,
+    "failureNames": [
+      "PR231 renders a source without a bibliography array"
+    ]
+  },
+  {
+    "name": "original-menu-without-indian-ocean",
+    "source": "src/utils/functions/menuListHome.ts",
+    "historicalRef": "8f85cb77b808976a4c84de26afb0a6aeea4698da",
+    "test": "src/tests/untils-test/auditHistoricalNavigation.test.tsx",
+    "exitCode": 1,
+    "failedAssertions": 3,
+    "failureNames": [
+      "PR233 exposes the Indian Ocean essay link in en",
+      "PR233 exposes the Indian Ocean essay link in es",
+      "PR233 exposes the Indian Ocean essay link in pt"
+    ]
   }
 ]
