@@ -367,8 +367,7 @@ export const GenerateCellTableRenderer = (
     );
   } else if (cellFN === 'networks' && nodeClass) {
     const connectionsCount: unknown = params.data.connections_count;
-    const hasCount = typeof connectionsCount === 'number';
-    if (hasCount && connectionsCount < 2) {
+    if (typeof connectionsCount !== 'number' || connectionsCount < 2) {
       return null;
     }
     const networkId = normalizeCardTargetId(ID);
@@ -386,9 +385,7 @@ export const GenerateCellTableRenderer = (
         tabIndex={networkId !== null ? 0 : undefined}
         aria-label={
           networkId !== null
-            ? hasCount
-              ? `Open ${connectionsCount} connections for ${networkId}`
-              : `Open connections for ${networkId}`
+            ? `Open ${connectionsCount} connections for ${networkId}`
             : undefined
         }
         onClick={networkId !== null ? openNetwork : undefined}
@@ -404,9 +401,7 @@ export const GenerateCellTableRenderer = (
           src={NETWORKICON}
           style={{ cursor: networkId !== null ? 'pointer' : 'default' }}
         />
-        {hasCount && (
-          <span className="network-icon-count">{connectionsCount}</span>
-        )}
+        <span className="network-icon-count">{connectionsCount}</span>
       </span>
     );
   } else {

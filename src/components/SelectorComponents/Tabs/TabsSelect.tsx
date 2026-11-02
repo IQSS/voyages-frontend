@@ -44,10 +44,12 @@ const TabsSelect = () => {
 
   const [pageTitle, setPageTitle] = useState(initialTitle);
   const [pageDescription, setPageDescription] = useState(initialDescription);
-  const [connectionsCount, setConnectionsCount] = useState<number | null>(
-    null,
-  );
-  const hideNetwork = connectionsCount !== null && connectionsCount < 2;
+  const [connectionsCount, setConnectionsCount] = useState<
+    number | null | undefined
+  >(undefined);
+  const hideNetwork =
+    connectionsCount !== undefined &&
+    (connectionsCount === null || connectionsCount < 2);
   const navigate = useNavigate();
   console.log({pageTitle , pageDescription})
 
@@ -86,7 +88,7 @@ const TabsSelect = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setConnectionsCount(null);
+      setConnectionsCount(undefined);
       const targetID = cardRowID || ID;
       if (!targetID) return;
       
@@ -117,6 +119,7 @@ const TabsSelect = () => {
           setPageDescription(description);
         }
       } catch (error) {
+        setConnectionsCount(null);
         console.log('Error fetching page data:', error);
       }
     };
