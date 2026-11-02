@@ -67,5 +67,19 @@
       "PR233 exposes the Indian Ocean essay link in es",
       "PR233 exposes the Indian Ocean essay link in pt"
     ]
+  },
+  {
+    "name": "deployed-male-filter-uses-female-field",
+    "source": "src/utils/flatfiles/voyages/voyages_transatlantic_filter_menu.json",
+    "historicalRef": "228ea05e95cab43bce93ce6ad28215bfff09e686",
+    "test": "src/tests/flat-files/percentageFilterBindings.test.ts",
+    "failingTestCommit": "3ce0c9df",
+    "fixCommit": "ce3da623",
+    "exitCode": 1,
+    "failedAssertions": 1,
+    "passingControls": 3,
+    "failureNames": [
+      "Trans-Atlantic Percent men filters men, not women"
+    ]
   }
 ]

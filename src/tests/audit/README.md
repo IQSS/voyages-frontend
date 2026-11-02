@@ -2,8 +2,16 @@
 
 These tests were added after independently auditing deployed commit
 `228ea05e95cab43bce93ce6ad28215bfff09e686`. They exercise existing application
-functions and components. This change contains no application, dependency,
-build, discovery, or deployment changes.
+functions and components. The audit also identified the one-field application
+correction below.
+
+The deployed Trans-Atlantic **Percent men** filter sent the women's API field.
+The original contract before `bf4eba6c` used `percentage_men`, as do the other
+three voyage datasets. `percentageFilterBindings.test.ts` first failed on that
+deployed mapping (one failure, three passing controls). The application fix
+changes only that male filter field; the existing women's field, current
+styling, layout, and dependency upgrades are preserved. The test and source
+fix are separate commits (`3ce0c9df` and `ce3da623`).
 
 | Original contract | New regression | Red control |
 | --- | --- | --- |
@@ -14,9 +22,10 @@ build, discovery, or deployment changes.
 | [IQSS PR231](https://github.com/IQSS/voyages-frontend/pull/231): a missing bibliography array must not crash a source cell | `auditHistoricalNavigation.test.tsx` renders the real table cell without the optional array | Restoring the original unguarded dereference fails the render. |
 | [IQSS PR230](https://github.com/IQSS/voyages-frontend/pull/230): external sources navigate externally while published manifests open the document viewer | The same test invokes the real source cell and verifies both destinations | The controls distinguish the external URL, enclosing person, and document viewer. |
 | [IQSS PR233](https://github.com/IQSS/voyages-frontend/pull/233): the Essays submenu exposes Indian Ocean posts in all three languages | The same test renders and expands the actual menu | Restoring the menu from `8f85cb77` fails all three language cases. |
+| [IQSS PR219](https://github.com/IQSS/voyages-frontend/pull/219): male percentage filters retain their male data meaning | `percentageFilterBindings.test.ts` checks the actual menus in all four voyage datasets | The deployed mapping fails the Trans-Atlantic case; schema-membership tests alone cannot distinguish two valid but semantically different API fields. |
 
-`original-bug-replays.json` records all six red runs. Each exited 1 because of
-the stated assertion; all twelve new cases pass on the unchanged deployed source.
+`original-bug-replays.json` records the seven red runs. Each exited 1 because of
+the stated assertion; all sixteen new cases pass after the one-field correction.
 Historical source was substituted only in a disposable local checkout and
 restored immediately after each replay.
 
@@ -24,13 +33,14 @@ Run the new tests with:
 
 ```sh
 npx vitest run src/tests/untils-test/audit*.test.*
+npx vitest run src/tests/flat-files/percentageFilterBindings.test.ts
 ```
 
 Validation used the genuine locked `@slavevoyages/voyages-contribute` 0.6.12
 package, verified against the lockfile tarball integrity and installed files.
-The frontend suite plus all 18 control-owned spec files passed 721 tests across
-62 files. Two existing Redux TODOs remain unchanged. The Vite production build
-passed; the six new TypeScript test/fixture files pass ESLint with zero errors
+The frontend suite plus all 18 control-owned spec files passed 725 tests across
+63 files. Two existing Redux TODOs remain unchanged. The Vite production build
+passed; the new TypeScript test/fixture files pass ESLint with zero errors
 or warnings.
 
 Repository-wide lint and standalone type-checking remain non-green. The
