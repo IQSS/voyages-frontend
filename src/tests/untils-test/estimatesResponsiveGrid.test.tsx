@@ -1,6 +1,6 @@
 import { act } from 'react';
-import { createRoot } from 'react-dom/client';
 
+import { createRoot } from 'react-dom/client';
 import { afterEach, expect, test, vi } from 'vitest';
 
 import Estimates from '@/components/PresentationComponents/Assessment/Estimates/Estimates';
