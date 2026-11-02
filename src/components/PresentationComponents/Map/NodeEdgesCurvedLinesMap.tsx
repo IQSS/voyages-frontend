@@ -37,10 +37,13 @@ import '@/style/map.scss';
 import { handerRenderEdges } from './handerRenderEdges';
 import { handleHoverCircleMarker } from './handleHoverCircleMarker';
 import { handleHoverMarkerCluster } from './handleHoverMarkerCluster';
+import { keepMapPopupsVisible } from './keepMapPopupsVisible';
 
 const NodeEdgesCurvedLinesMap = () => {
   const map = useMap();
   const dispatch: AppDispatch = useDispatch();
+
+  useEffect(() => keepMapPopupsVisible(map), [map]);
 
   const { nodesData, edgesData } = useSelector(
     (state: RootState) => state.getNodeEdgesAggroutesMapData,
