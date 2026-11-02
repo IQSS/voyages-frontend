@@ -44,6 +44,12 @@ const TabsSelect = () => {
 
   const [pageTitle, setPageTitle] = useState(initialTitle);
   const [pageDescription, setPageDescription] = useState(initialDescription);
+  const [connectionsCount, setConnectionsCount] = useState<
+    number | null | undefined
+  >(undefined);
+  const hideNetwork =
+    connectionsCount !== undefined &&
+    (connectionsCount === null || connectionsCount < 2);
   const navigate = useNavigate();
   console.log({pageTitle , pageDescription})
 
@@ -82,6 +88,7 @@ const TabsSelect = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setConnectionsCount(undefined);
       const targetID = cardRowID || ID;
       if (!targetID) return;
       
@@ -93,6 +100,8 @@ const TabsSelect = () => {
         const response = await dispatch(fetchFn(numericID)).unwrap();
 
         if (response?.data) {
+          const count = response.data.connections_count;
+          setConnectionsCount(typeof count === 'number' ? count : null);
           // Get the appropriate generators for this entity type
           const titleGenerator = titleGenerators[pageEntityClass];
           const descriptionGenerator = descriptionGenerators[pageEntityClass];
@@ -110,12 +119,20 @@ const TabsSelect = () => {
           setPageDescription(description);
         }
       } catch (error) {
+        setConnectionsCount(null);
         console.log('Error fetching page data:', error);
       }
     };
 
     fetchData();
   }, [dispatch, pageEntityClass, cardRowID, ID]);
+
+  useEffect(() => {
+    if (!hideNetwork || currentBlockName !== 'network') return;
+    dispatch(setValueVariable('variables'));
+    dispatch(setCurrentBlockName('variables'));
+    navigate(`/${pageEntityClass}/${ID}#variables`, { replace: true });
+  }, [hideNetwork, currentBlockName, dispatch, navigate, pageEntityClass, ID]);
 
   const onChange = (key: string) => {
     dispatch(setValueVariable(key));
@@ -129,7 +146,7 @@ const TabsSelect = () => {
     navigate(`/${pageEntityClass}/${ID}#${key.toLowerCase()}`);
   };
 
-  const items: TabsProps['items'] = [
+  const allItems: NonNullable<TabsProps['items']> = [
     {
       key: 'variables',
       label: 'Variables',
@@ -167,6 +184,9 @@ const TabsSelect = () => {
     //   ),
     // },
   ];
+  const items = hideNetwork
+    ? allItems.filter((item) => item.key !== 'network')
+    : allItems;
 
   return (
     <div>

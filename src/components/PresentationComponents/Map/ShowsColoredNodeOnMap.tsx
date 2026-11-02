@@ -1,31 +1,52 @@
+import { useLayoutEffect, useRef, useState } from 'react';
+
 import { usePageRouter } from '@/hooks/usePageRouter';
-import {
-  ESTIMATES,
-  TRANSATLANTIC,
-  INTRAAMERICAN,
-  ALLVOYAGES,
-} from '@/share/CONST_DATA';
+import { ESTIMATES } from '@/share/CONST_DATA';
 import '@/style/map.scss';
+
+const LEGEND_BUFFER_PX = 12;
+
+const clippingAncestors = (frame: HTMLElement) => {
+  const ancestors: HTMLElement[] = [];
+  for (let el = frame.parentElement; el; el = el.parentElement) {
+    if (getComputedStyle(el).overflowY !== 'visible') ancestors.push(el);
+  }
+  return ancestors;
+};
 
 const ShowsColoredNodeOnMap = () => {
   const { styleName } = usePageRouter();
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const [hiddenBelow, setHiddenBelow] = useState(0);
 
-  let classNameMap = 'leaflet-bottom';
-  if (styleName === ESTIMATES) {
-    classNameMap = 'leaflet-bottom-voyages';
-  } else if (
-    styleName === TRANSATLANTIC ||
-    styleName === INTRAAMERICAN ||
-    styleName === ALLVOYAGES
-  ) {
-    classNameMap = 'leaflet-bottom-voyages';
-  } else {
-    classNameMap = 'leaflet-bottom';
-  }
+  useLayoutEffect(() => {
+    const frame = anchorRef.current?.offsetParent as HTMLElement | null;
+    if (!frame) return;
+    const ancestors = clippingAncestors(frame);
+    const update = () => {
+      const frameBottom = frame.getBoundingClientRect().bottom;
+      const clipBottom = Math.min(
+        frameBottom,
+        ...ancestors.map((el) => el.getBoundingClientRect().bottom),
+      );
+      setHiddenBelow(Math.max(0, Math.round(frameBottom - clipBottom)));
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(frame);
+    ancestors.forEach((el) => observer.observe(el));
+    window.addEventListener('resize', update);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', update);
+    };
+  }, []);
 
   return (
     <div
-      className={`${classNameMap} leaflet-left __web-inspector-hide-shortcut__`}
+      ref={anchorRef}
+      className="map-legend-anchor"
+      style={{ bottom: LEGEND_BUFFER_PX + hiddenBelow }}
     >
       <div className="legend leaflet-control">
         <table className="legendtable">

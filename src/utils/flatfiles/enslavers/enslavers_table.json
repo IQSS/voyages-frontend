@@ -114,28 +114,6 @@
     },
     {
       "header_label": {
-        "en": "Documentary Sources",
-        "es": "Documentary Sources ES",
-        "pt": "Documentary Sources PT"
-      },
-      "cell_type": "literal-concat",
-      "visible": true,
-      "number_format": null,
-      "order_by": ["enslaved_source_connections__source__title"],
-      "col_width_px": 130,
-      "colID": "documentary_sources",
-      "cell_val": {
-        "fields": [
-          {
-            "var_name": "sources__short_ref__name",
-            "cell_fn": "literal"
-          }
-        ],
-        "join": ": "
-      }
-    },
-    {
-      "header_label": {
         "en": "Connections",
         "es": "Connections ES",
         "pt": "Connections PT"
@@ -155,10 +133,32 @@
           }
         ]
       }
+    },
+    {
+      "header_label": {
+        "en": "Documentary Sources",
+        "es": "Documentary Sources ES",
+        "pt": "Documentary Sources PT"
+      },
+      "cell_type": "literal-concat",
+      "visible": true,
+      "number_format": null,
+      "order_by": ["enslaver_source_connections__source__title"],
+      "col_width_px": 130,
+      "colID": "documentary_sources",
+      "cell_val": {
+        "fields": [
+          {
+            "var_name": "sources__short_ref__name",
+            "cell_fn": "literal"
+          }
+        ],
+        "join": ": "
+      }
     }
   ],
   "other_properties": {
-    "default_order_by": "birth_year"
+    "default_order_by": "-birth_year"
   },
   "column_selector_tree": [
     {

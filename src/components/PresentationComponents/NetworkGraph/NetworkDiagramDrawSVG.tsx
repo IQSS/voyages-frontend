@@ -1,6 +1,8 @@
 import * as d3 from 'd3';
 import { forceLink, zoomIdentity } from 'd3';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { IconButton, Tooltip } from '@mui/material';
+import FitScreenIcon from '@mui/icons-material/FitScreen';
 import { Edges, Nodes } from '@/share/InterfaceTypePastNetworks';
 import { ENSLAVEMENTNODE, RADIUSNODE } from '@/share/CONST_DATA';
 import ShowsAcoloredNodeKey from './ShowsAcoloredNodeKey';
@@ -34,6 +36,10 @@ const CALLOUT_RING_STROKE_WIDTH = '1';
 const CALLOUT_RING_COLOR = '#e01e37';
 const CALLOUT_COLOR = '#fff';
 const CALLOUT_LABEL_HALO = 'rgba(0, 0, 0, 0.65)';
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 3.5;
+const FIT_PADDING = 40;
+const FIT_DURATION_MS = 500;
 
 const endpointId = (endpoint: string | Nodes): string =>
   typeof endpoint === 'string' ? endpoint : endpoint?.uuid;
@@ -63,6 +69,22 @@ export const NetworkDiagramDrawSVG = ({
   const dispatch: AppDispatch = useDispatch();
   const svgRef = useRef<SVGSVGElement | null>(null);
   const transformRef = useRef<d3.ZoomTransform>(zoomIdentity);
+  const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(
+    null,
+  );
+  const pendingFitRef = useRef(true);
+  const networkGroupRef = useRef<d3.Selection<
+    SVGGElement,
+    unknown,
+    null,
+    undefined
+  > | null>(null);
+  const hoverLabelRef = useRef<d3.Selection<
+    SVGGElement,
+    unknown,
+    null,
+    undefined
+  > | null>(null);
   const simulationRef = useRef<d3.Simulation<Nodes, Edges> | null>(null);
   const isDraggingRef = useRef(false);
   const clickCoordinator = useRef(createNetworkNodeClickCoordinator());
@@ -172,6 +194,7 @@ export const NetworkDiagramDrawSVG = ({
       edges: [...graph.current.edges, ...newEdges],
     };
 
+    pendingFitRef.current = true;
     updateNetwork();
   };
 
@@ -191,35 +214,68 @@ export const NetworkDiagramDrawSVG = ({
       .attr('y', (node) => node.y!);
   }
 
+  const zoomToFit = useCallback(
+    (duration = FIT_DURATION_MS) => {
+      const zoomBehavior = zoomRef.current;
+      if (!svgRef.current || !zoomBehavior) return;
+      const placed = graph.current.nodes.filter(
+        (node) => Number.isFinite(node.x) && Number.isFinite(node.y),
+      );
+      if (placed.length === 0) return;
+      const xs = placed.map((node) => node.x!);
+      const ys = placed.map((node) => node.y!);
+      const minX = Math.min(...xs) - RADIUSNODE;
+      const maxX = Math.max(...xs) + RADIUSNODE;
+      const minY = Math.min(...ys) - RADIUSNODE;
+      const maxY = Math.max(...ys) + RADIUSNODE;
+      const boxWidth = Math.max(maxX - minX, 1);
+      const boxHeight = Math.max(maxY - minY, 1);
+      const scale = Math.min(
+        MAX_ZOOM,
+        (width - 2 * FIT_PADDING) / boxWidth,
+        (height - 2 * FIT_PADDING) / boxHeight,
+      );
+      zoomBehavior.scaleExtent([Math.min(MIN_ZOOM, scale), MAX_ZOOM]);
+      const target = zoomIdentity
+        .translate(
+          width / 2 - scale * ((minX + maxX) / 2),
+          height / 2 - scale * ((minY + maxY) / 2),
+        )
+        .scale(scale);
+      const svg = d3.select<SVGSVGElement, unknown>(svgRef.current);
+      if (duration > 0) {
+        svg
+          .transition()
+          .duration(duration)
+          .call(zoomBehavior.transform as any, target);
+      } else {
+        svg.call(zoomBehavior.transform as any, target);
+      }
+    },
+    [width, height],
+  );
+
   const updateNetwork = useCallback(() => {
     if (!svgRef.current) return;
     const svg = d3.select<SVGSVGElement, unknown>(svgRef.current);
 
     let networkGroup: d3.Selection<SVGGElement, unknown, null, undefined> =
-      svg.select<SVGGElement>('#networkGroup');
+      svg.select<SVGGElement>('g.network-group');
     if (networkGroup.empty()) {
-      networkGroup = svg.append('g').attr('id', 'networkGroup');
+      networkGroup = svg.append('g').attr('class', 'network-group');
     }
+    networkGroupRef.current = networkGroup;
 
-    let link = networkGroup.select<SVGGElement>('#edges');
-    if (link.empty()) {
-      link = networkGroup.append('g').attr('id', 'edges');
-    }
-
-    let node = networkGroup.select<SVGGElement>('#nodes');
-    if (node.empty()) {
-      node = networkGroup.append('g').attr('id', 'nodes');
-    }
-
-    let labels = networkGroup.select<SVGGElement>('#labels');
-    if (labels.empty()) {
-      labels = networkGroup.append('g').attr('id', 'labels');
-    }
-
-    let callouts = networkGroup.select<SVGGElement>('#callouts');
-    if (callouts.empty()) {
-      callouts = networkGroup.append('g').attr('id', 'callouts');
-    }
+    const layer = (name: string) => {
+      const existing = networkGroup.select<SVGGElement>(`g.network-${name}`);
+      return existing.empty()
+        ? networkGroup.append('g').attr('class', `network-${name}`)
+        : existing;
+    };
+    const link = layer('edges');
+    const node = layer('nodes');
+    const labels = layer('labels');
+    const callouts = layer('callouts');
 
     const seed = seedNodeRef.current;
     if (seed.id !== null && seed.nodeClass) {
@@ -317,11 +373,18 @@ export const NetworkDiagramDrawSVG = ({
       );
     });
 
+    const clearHoverLabel = () => {
+      hoverLabelRef.current?.remove();
+      hoverLabelRef.current = null;
+    };
+
     nodesGraphRef.current.on('mouseover', (event: MouseEvent, d: Nodes) => {
       event.preventDefault();
+      clearHoverLabel();
       const labelNode = createdLabelNodeHover(d);
       const [x, y] = [d.x!, d.y!];
       const group = labels.append('g').attr('class', 'label-group');
+      hoverLabelRef.current = group;
       const textElement = group
         .append('text')
         .attr('class', 'label-hover')
@@ -356,8 +419,7 @@ export const NetworkDiagramDrawSVG = ({
 
     nodesGraphRef.current.on('mouseout', (event: MouseEvent) => {
       event.preventDefault();
-      d3.select('.label-hover').remove();
-      d3.select('.background-rect').remove();
+      clearHoverLabel();
     });
 
     // Label
@@ -408,14 +470,6 @@ export const NetworkDiagramDrawSVG = ({
            nodeLabels = newNodeLabels.merge(nodeLabels);
            */
 
-    function handleZoom(event: d3.D3ZoomEvent<SVGSVGElement, any>) {
-      transformRef.current = event.transform;
-      if (svgRef.current && transformRef.current) {
-        const transformString = `translate(${event.transform.x}, ${event.transform.y}) scale(${event.transform.k})`;
-        d3.select('#networkGroup').attr('transform', transformString);
-      }
-    }
-
     const dragStarted = (event: d3.D3DragEvent<SVGGElement, Nodes, Nodes>) => {
       isDraggingRef.current = false;
       event.sourceEvent.stopPropagation();
@@ -454,15 +508,22 @@ export const NetworkDiagramDrawSVG = ({
         .on('end', dragEnded),
     );
 
-    const zoomBehavior = d3
-      .zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.5, 3.5])
-      .on('zoom', handleZoom);
-
-    svg
-      .call(zoomBehavior as any)
-      .on('dblclick.zoom', null)
-      .on('click.zoom', null);
+    if (!zoomRef.current) {
+      zoomRef.current = d3
+        .zoom<SVGSVGElement, unknown>()
+        .scaleExtent([MIN_ZOOM, MAX_ZOOM])
+        .on('zoom', (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+          transformRef.current = event.transform;
+          networkGroupRef.current?.attr(
+            'transform',
+            event.transform.toString(),
+          );
+        });
+      svg
+        .call(zoomRef.current)
+        .on('dblclick.zoom', null)
+        .on('click.zoom', null);
+    }
 
     if (!simulationRef.current) {
       simulationRef.current = d3
@@ -498,8 +559,13 @@ export const NetworkDiagramDrawSVG = ({
     }
 
     simulationRef.current.on('tick', ticked);
+    simulationRef.current.on('end', () => {
+      if (!pendingFitRef.current) return;
+      pendingFitRef.current = false;
+      zoomToFit();
+    });
     simulationRef.current.alpha(1).restart();
-  }, [svgRef, width, height]);
+  }, [svgRef, width, height, zoomToFit]);
 
   useEffect(() => {
     updateNetwork();
@@ -512,6 +578,7 @@ export const NetworkDiagramDrawSVG = ({
     seedNodeRef.current = { id: networkID, nodeClass: networkKEY };
     simulationRef.current?.stop();
     simulationRef.current = null;
+    pendingFitRef.current = true;
     graph.current = { nodes: nodes, edges: validEdges };
     updateNetwork();
   }, [netWorkData, updateNetwork, networkID, networkKEY]);
@@ -519,9 +586,11 @@ export const NetworkDiagramDrawSVG = ({
   useEffect(() => {
     const svgCleanup = () => {
       if (svgRef.current) {
-        const svg = d3.select<SVGSVGElement, unknown>(svgRef.current);
-        svg.on('zoom', null);
+        d3.select<SVGSVGElement, unknown>(svgRef.current).on('.zoom', null);
       }
+      zoomRef.current = null;
+      networkGroupRef.current = null;
+      hoverLabelRef.current = null;
       transformRef.current = zoomIdentity;
       simulationRef.current?.stop();
       simulationRef.current = null;
@@ -533,13 +602,24 @@ export const NetworkDiagramDrawSVG = ({
 
   return (
     <>
-      <svg
-        ref={svgRef}
-        className="svg-network"
-        width={width}
-        height={height}
-        id="networkCanvas labelsContainer"
-      ></svg>
+      <div className="network-canvas-wrapper" style={{ width, height }}>
+        <svg
+          ref={svgRef}
+          className="svg-network"
+          width={width}
+          height={height}
+        ></svg>
+        <Tooltip title="Zoom to fit">
+          <IconButton
+            className="network-fit-button"
+            size="small"
+            aria-label="Zoom to fit"
+            onClick={() => zoomToFit()}
+          >
+            <FitScreenIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </div>
       <ShowsAcoloredNodeKey edgeRoles={edgeRoles} nodeClasses={nodeClasses} />
     </>
   );

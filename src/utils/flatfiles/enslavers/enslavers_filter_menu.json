@@ -1,9 +1,9 @@
 [
   {
     "label": {
-      "en": "Enslaver Names",
-      "es": "Nomes dos Escravizadores",
-      "pt": "Nomes dos Escravizadores"
+      "en": "Trader Names",
+      "es": "Nombres de los Traficantes",
+      "pt": "Nomes dos Traficantes"
     },
     "var_name": "aliases__alias",
     "type": "CharField",
@@ -76,9 +76,9 @@
   },
   {
     "label": {
-      "en": "Slave Trader Details",
-      "es": "Detalles de los Traficantes de Esclavos",
-      "pt": "Detalhes dos Traficantes de Escravos"
+      "en": "Trader Details",
+      "es": "Detalles de los Traficantes",
+      "pt": "Detalhes dos Traficantes"
     },
     "children": [
       {

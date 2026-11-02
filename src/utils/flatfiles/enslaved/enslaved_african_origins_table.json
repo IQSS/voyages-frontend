@@ -192,28 +192,6 @@
     },
     {
       "header_label": {
-        "en": "Connections",
-        "es": "Connections ES",
-        "pt": "Connections PT"
-      },
-      "cell_type": "network_modal",
-      "visible": true,
-      "number_format": null,
-      "order_by": [],
-      "col_width_px": 120,
-      "colID": "connections",
-      "cell_val": {
-        "fields": [
-          {
-            "var_name": "id",
-            "cell_fn": "networks",
-            "node_class": "enslaved"
-          }
-        ]
-      }
-    },
-    {
-      "header_label": {
         "en": "Slave Traders",
         "es": "Traficantes de Esclavos",
         "pt": "Traficantes de Escravos"
@@ -245,7 +223,7 @@
       "visible": true,
       "number_format": null,
       "order_by": [
-        "voyage_itinerary__imp_principal_region_of_slave_purchase__name"
+        "enslaved_relations__relation__voyage__voyage_itinerary__imp_principal_region_of_slave_purchase__name"
       ],
       "col_width_px": 160,
       "colID": "voyages__voyage_itinerary__imp_principal_region_of_slave_purchase__name",
@@ -258,7 +236,7 @@
         ]
       }
     },
- 	{
+    {
       "header_label": {
         "en": "Disembarkation port",
         "es": "Disembarkation port ES",
@@ -268,7 +246,7 @@
       "visible": true,
       "number_format": null,
       "order_by": [
-        "voyages__voyage_itinerary__imp_principal_port_slave_dis__name"
+        "enslaved_relations__relation__voyage__voyage_itinerary__imp_principal_port_slave_dis__name"
       ],
       "col_width_px": 160,
       "colID": "voyages__voyage_itinerary__imp_principal_port_slave_dis__name",
@@ -358,6 +336,28 @@
     },
     {
       "header_label": {
+        "en": "Connections",
+        "es": "Connections ES",
+        "pt": "Connections PT"
+      },
+      "cell_type": "network_modal",
+      "visible": true,
+      "number_format": null,
+      "order_by": [],
+      "col_width_px": 120,
+      "colID": "connections",
+      "cell_val": {
+        "fields": [
+          {
+            "var_name": "id",
+            "cell_fn": "networks",
+            "node_class": "enslaved"
+          }
+        ]
+      }
+    },
+    {
+      "header_label": {
         "en": "Sources",
         "es": "Fuentes",
         "pt": "Fontes"
@@ -404,7 +404,7 @@
     }
   ],
   "other_properties": {
-    "default_order_by": "enslaved_relations__relation__voyage__voyage_dates__imp_arrival_at_port_of_dis_sparsedate__year"
+    "default_order_by": "-enslaved_relations__relation__voyage__voyage_dates__imp_arrival_at_port_of_dis_sparsedate__year"
   },
   "column_selector_tree": [
     {
