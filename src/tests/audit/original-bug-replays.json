@@ -1,0 +1,85 @@
+[
+  {
+    "name": "original-server-resort",
+    "historicalRef": "03cf141e",
+    "source": "src/hooks/useDataTableProcessingEffect.tsx",
+    "test": "src/tests/untils-test/auditServerOrder.test.tsx",
+    "exitCode": 1,
+    "failedAssertions": 1,
+    "failureNames": [
+      "PR235 retains the exact API order on initial and subsequent table responses"
+    ]
+  },
+  {
+    "name": "original-standalone-map-popup",
+    "historicalRef": "e1159a5c",
+    "source": "src/components/PresentationComponents/Map/handleHoverMarkerCluster.tsx",
+    "test": "src/tests/untils-test/auditMapPopup.test.tsx",
+    "exitCode": 1,
+    "failedAssertions": 2,
+    "failureNames": [
+      "PR237 standalone post-disembarkation marker describes 1 people",
+      "PR237 standalone post-disembarkation marker describes 4 people"
+    ]
+  },
+  {
+    "name": "signin-bootstrap-loading-regression",
+    "source": "src/redux/getAuthUserSlice.ts",
+    "operation": "restore pre-PR12 shared loading flag for auth actions",
+    "test": "src/tests/untils-test/auditSignInState.test.tsx",
+    "exitCode": 1,
+    "failedAssertions": 1,
+    "failureNames": [
+      "upstream PR12 keeps sign-in input and friendly errors while action loading changes"
+    ]
+  },
+  {
+    "name": "original-merged-location-grid-interfaces",
+    "source": "src/share/InterfaceTypes.ts",
+    "historicalRef": "3e49d868",
+    "test": "src/tests/untils-test/auditGridLocationTypes.test.ts",
+    "exitCode": 1,
+    "failedAssertions": 1,
+    "failureNames": [
+      "PR250 keeps contribution locations and existing grid children structurally separate"
+    ]
+  },
+  {
+    "name": "original-source-bibliography-dereference",
+    "source": "src/components/PresentationComponents/Tables/GenerateCellTableRenderer.tsx",
+    "operation": "restore the unguarded sources__bib[index] expression from before PR231",
+    "test": "src/tests/untils-test/auditHistoricalNavigation.test.tsx",
+    "exitCode": 1,
+    "failedAssertions": 1,
+    "failureNames": [
+      "PR231 renders a source without a bibliography array"
+    ]
+  },
+  {
+    "name": "original-menu-without-indian-ocean",
+    "source": "src/utils/functions/menuListHome.ts",
+    "historicalRef": "8f85cb77b808976a4c84de26afb0a6aeea4698da",
+    "test": "src/tests/untils-test/auditHistoricalNavigation.test.tsx",
+    "exitCode": 1,
+    "failedAssertions": 3,
+    "failureNames": [
+      "PR233 exposes the Indian Ocean essay link in en",
+      "PR233 exposes the Indian Ocean essay link in es",
+      "PR233 exposes the Indian Ocean essay link in pt"
+    ]
+  },
+  {
+    "name": "deployed-male-filter-uses-female-field",
+    "source": "src/utils/flatfiles/voyages/voyages_transatlantic_filter_menu.json",
+    "historicalRef": "228ea05e95cab43bce93ce6ad28215bfff09e686",
+    "test": "src/tests/flat-files/percentageFilterBindings.test.ts",
+    "failingTestCommit": "3ce0c9df",
+    "fixCommit": "ce3da623",
+    "exitCode": 1,
+    "failedAssertions": 1,
+    "passingControls": 3,
+    "failureNames": [
+      "Trans-Atlantic Percent men filters men, not women"
+    ]
+  }
+]
