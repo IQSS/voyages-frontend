@@ -104,14 +104,10 @@ test.each([
       </Provider>,
     );
     // PR215 made Essays an expandable heading, not a link to every essay.
-    expect(
-      screen.queryByRole('link', { name: essays }),
-    ).toBeNull();
+    expect(screen.queryByRole('link', { name: essays })).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: essays }));
-    expect(
-      screen
-        .getByRole('link', { name: ocean })
-        .getAttribute('href'),
-    ).toBe('/blog/tag/indian-ocean#indian-ocean');
+    expect(screen.getByRole('link', { name: ocean }).getAttribute('href')).toBe(
+      '/blog/tag/indian-ocean#indian-ocean',
+    );
   },
 );
