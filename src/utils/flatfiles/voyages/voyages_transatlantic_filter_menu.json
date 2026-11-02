@@ -505,7 +505,7 @@
 				},
 				"children": [
 					{
-						"var_name": "voyage_slaves_numbers__percentage_women_among_embarked_slaves",
+						"var_name": "voyage_slaves_numbers__percentage_men",
 						"type": "FloatField",
 						"label": {
 							"en": "Percent men",
