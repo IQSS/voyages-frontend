@@ -137,6 +137,17 @@ test('a failed filter request clears the old pivot instead of presenting old tot
     (screen.getByRole('button', { name: /Download/ }) as HTMLButtonElement)
       .disabled,
   ).toBe(true);
+  mocks.fetch.mockResolvedValueOnce({
+    data: {
+      ...table,
+      rows: ['Recovered filter'],
+      values: [[8, 8]],
+      totals: [8, 8],
+    },
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+  await screen.findByText('Recovered filter');
+  expect(screen.queryByRole('alert')).toBeNull();
 });
 test('an unmounted pivot response cannot replace the next page’s results', async () => {
   const old = deferred();

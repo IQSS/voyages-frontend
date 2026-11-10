@@ -33,7 +33,7 @@ const data = (id: string): AggroutesData => ({
   paths: [],
   voyage_mappings: { '848382733': { nodes: [id], edges: [] } },
 });
-function mount(fetchMap: ReturnType<typeof vi.fn>) {
+function mount(fetchMap: Parameters<typeof useCachedMapData>[0]['fetchMap']) {
   const store = configureStore({
     reducer: { getNodeEdgesAggroutesMapData: mapReducer },
   });
@@ -89,6 +89,11 @@ test('a failed dataset switch never exposes the previous dataset or voyage index
   expect(view.nodes()).toEqual([]);
   expect(getNodeVoyageIds('old')).toEqual([]);
   expect(view.result.current.loading).toBe(false);
+  expect(view.result.current.error).toBe('Could not load map data.');
+  fetch.mockResolvedValueOnce(data('recovered'));
+  act(() => view.result.current.retry());
+  await waitFor(() => expect(view.nodes()[0]?.id).toBe('recovered'));
+  expect(view.result.current.error).toBeNull();
 });
 
 test('disabling or unmounting a map invalidates its outstanding response', async () => {
