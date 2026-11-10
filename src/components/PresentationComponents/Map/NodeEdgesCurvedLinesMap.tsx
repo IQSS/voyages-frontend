@@ -49,6 +49,7 @@ import {
   VoyagesModal,
   VoyagesModalContent,
 } from './VoyagesModal/VoyagesModal';
+import { keepMapPopupsVisible } from './keepMapPopupsVisible';
 
 const FIT_PADDING_PX = 16;
 const FIT_MAX_ZOOM = 7;
@@ -73,6 +74,8 @@ const NodeEdgesCurvedLinesMap = ({ fitKey }: NodeEdgesCurvedLinesMapProps) => {
     (voyageIds: string[]) => setModalContent({ voyageIds }),
     [],
   );
+
+  useEffect(() => keepMapPopupsVisible(map), [map]);
 
   const { nodesData, edgesData } = useSelector(
     (state: RootState) => state.getNodeEdgesAggroutesMapData,
