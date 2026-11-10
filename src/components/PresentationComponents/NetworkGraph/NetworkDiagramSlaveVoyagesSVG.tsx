@@ -11,6 +11,11 @@ import { NetworkDiagramDrawSVG } from './NetworkDiagramDrawSVG';
 export const NetworkDiagramSlaveVoyagesSVG = ({
   widthPercentage = 92,
   heigthPercentage = 85,
+  seed,
+}: {
+  widthPercentage?: number;
+  heigthPercentage?: number;
+  seed?: { networkID: number; networkKEY: string };
 }) => {
 
   const dispatch: AppDispatch = useDispatch();
@@ -25,7 +30,7 @@ export const NetworkDiagramSlaveVoyagesSVG = ({
   const { networkID, networkKEY } = useSelector(
     (state: RootState) => state.getPastNetworksGraphData
   );
-  const rootNodeRef = useRef({ networkID, networkKEY });
+  const rootNodeRef = useRef(seed ?? { networkID, networkKEY });
 
   const modalWidth = window.innerWidth;
   const modalHeight = window.innerHeight;
