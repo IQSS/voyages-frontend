@@ -49,6 +49,7 @@ afterEach(() => {
   cleanup();
   mocks.fetch.mockReset();
   mocks.route.voyageURLID = '848382733';
+  mocks.route.currentBlockName = 'variables';
 });
 function store() {
   return configureStore({
@@ -91,11 +92,14 @@ test.each([undefined, null, 0, 1])(
     expect(screen.queryByRole('button')).toBeNull();
   },
 );
-test('connection cells show the exact count and open the public voyage identity by keyboard', () => {
+test('connection cells show the exact count and open the database network identity by keyboard', () => {
   const state = store();
   const Cell = () =>
     GenerateCellTableRenderer(
-      { value: '', data: { id: 848382733, connections_count: 7 } } as never,
+      {
+        value: '',
+        data: { id: 900239, voyage_id: 848382733, connections_count: 7 },
+      } as never,
       'networks',
       'connections',
       null,
@@ -113,10 +117,10 @@ test('connection cells show the exact count and open the public voyage identity 
     </Provider>,
   );
   fireEvent.keyDown(
-    screen.getByRole('button', { name: 'Open 7 connections for 848382733' }),
+    screen.getByRole('button', { name: 'Open 7 connections for 900239' }),
     { key: 'Enter' },
   );
-  expect(state.getState().getPastNetworksGraphData.networkID).toBe(848382733);
+  expect(state.getState().getPastNetworksGraphData.networkID).toBe(900239);
   expect(state.getState().getPastNetworksGraphData.networkKEY).toBe('voyages');
 });
 test.each([0, 1, null])(
@@ -158,4 +162,24 @@ test('an old record response cannot hide a newer record’s network tab', async 
   await waitFor(() => expect(mocks.fetch).toHaveBeenLastCalledWith(848382734));
   await act(async () => resolveOld({ data: { connections_count: 0 } }));
   expect(screen.getByRole('tab', { name: 'Network graph' })).toBeTruthy();
+});
+
+test('a voyage record’s network uses its database PK rather than its public URL ID', async () => {
+  mocks.route.currentBlockName = 'network';
+  mocks.fetch.mockResolvedValue({
+    data: { id: 900239, voyage_id: 848382733, connections_count: 7 },
+  });
+  const state = store();
+  render(
+    <Provider store={state}>
+      <MemoryRouter>
+        <TabsSelect />
+      </MemoryRouter>
+    </Provider>,
+  );
+  await waitFor(() => expect(mocks.fetch).toHaveBeenCalledWith(848382733));
+  await waitFor(() =>
+    expect(state.getState().getPastNetworksGraphData.networkID).toBe(900239),
+  );
+  expect(state.getState().getPastNetworksGraphData.networkKEY).toBe('voyages');
 });
