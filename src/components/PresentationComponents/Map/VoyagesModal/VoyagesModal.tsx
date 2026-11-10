@@ -34,6 +34,10 @@ interface VoyagesModalProps extends VoyagesModalContent {
 }
 
 const sumWeights = (places: VoyagesModalPlace[]): Weights => ({
+  post_disembarkation: places.reduce(
+    (sum, place) => sum + (place.weights.post_disembarkation ?? 0),
+    0,
+  ),
   embarkation: places.reduce(
     (sum, place) => sum + (place.weights.embarkation ?? 0),
     0,
@@ -133,6 +137,7 @@ export const VoyagesModal = ({
                     type="button"
                     className={`voyagesModalPlace ${selected ? 'selected' : 'deselected'}`}
                     aria-pressed={selected}
+                    data-voyage-node-id={place.id}
                     disabled={locked}
                     title={
                       locked

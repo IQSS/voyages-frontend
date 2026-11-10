@@ -83,6 +83,8 @@ const PivotTables = () => {
   const [page, setPage] = useState<number>(1);
   const [sort, setSort] = useState<PivotSort | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const VoyagePivotTableOptions = useCallback(() => {
     Object.entries(VOYAGE_PIVOT_OPTIONS).forEach(([key, value]) => {
@@ -163,6 +165,9 @@ const PivotTables = () => {
 
   const fetchData = useCallback(async () => {
     const requestId = ++latestRequest.current;
+    dispatch(setPivotTable(null));
+    setLoading(true);
+    setError(null);
     try {
       const response = await dispatch(
         fetchPivotCrosstabsTables(dataSend),
@@ -170,8 +175,11 @@ const PivotTables = () => {
       if (response && requestId === latestRequest.current) {
         dispatch(setPivotTable(response.data as PivotCrosstabResponse));
       }
-    } catch (error) {
-      console.log('error', error);
+    } catch {
+      if (requestId === latestRequest.current)
+        setError('Could not load pivot table.');
+    } finally {
+      if (requestId === latestRequest.current) setLoading(false);
     }
   }, [dispatch, dataSend]);
 
@@ -192,6 +200,7 @@ const PivotTables = () => {
 
     window.addEventListener('resize', handleResize);
     return () => {
+      latestRequest.current += 1;
       window.removeEventListener('resize', handleResize);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -352,6 +361,7 @@ const PivotTables = () => {
               icon={<DownloadOutlined />}
               onClick={handleButtonExportCSV}
               loading={downloading}
+              disabled={loading || !table}
               style={{
                 backgroundColor: getColorBTNVoyageDatasetBackground(styleName!),
                 borderColor: getColorBTNVoyageDatasetBackground(styleName!),
@@ -372,6 +382,15 @@ const PivotTables = () => {
           </div>
         </span>
 
+        {loading && <div role="status">Loading pivot table…</div>}
+        {error && (
+          <div role="alert">
+            {error}{' '}
+            <button type="button" onClick={fetchData}>
+              Retry
+            </button>
+          </div>
+        )}
         {table && (
           <>
             <PivotHtmlTable

@@ -92,7 +92,7 @@ export const LeafletMapURL = ({ setZoomLevel, zoomLevel }: LeafletMapProps) => {
     return Promise.resolve(undefined);
   };
 
-  const { loading, shownBaseKey } = useCachedMapData({
+  const { loading, shownBaseKey, error, retry } = useCachedMapData({
     scope: `url|${styleNamePage ?? ''}`,
     request,
     level,
@@ -121,10 +121,16 @@ export const LeafletMapURL = ({ setZoomLevel, zoomLevel }: LeafletMapProps) => {
       className="map-legend-frame"
       style={{ backgroundColor: getMapBackgroundColor(backgroundColor) }}
     >
-      {loading || nodesData?.length === 0 ? (
+      {error ? (
+        <div role="alert">
+          {error} <button type="button" onClick={retry}>Retry</button>
+        </div>
+      ) : loading ? (
         <div className="loading-logo">
           <img src={LOADINGLOGO} alt="loading" />
         </div>
+      ) : nodesData?.length === 0 ? (
+        <div role="status">No map results.</div>
       ) : (
         <>
           <MapContainer

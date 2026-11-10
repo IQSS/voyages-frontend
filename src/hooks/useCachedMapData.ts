@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDispatch } from 'react-redux';
 
@@ -40,6 +40,9 @@ export const useCachedMapData = ({
 }: UseCachedMapDataOptions) => {
   const dispatch: AppDispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const retry = useCallback(() => setAttempt((previous) => previous + 1), []);
   const [shownBaseKey, setShownBaseKey] = useState<string | null>(null);
   const fetchMapRef = useRef(fetchMap);
   fetchMapRef.current = fetchMap;
@@ -48,7 +51,14 @@ export const useCachedMapData = ({
   const baseKey = JSON.stringify([scope, request]);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      latestKeyRef.current = '';
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    setError(null);
 
     const load = (zoomlevel: string) =>
       loadMapData(`${baseKey}|${zoomlevel}`, () =>
@@ -67,6 +77,16 @@ export const useCachedMapData = ({
       setLoading(false);
     };
 
+    if (shownBaseKeyRef.current !== baseKey) {
+      setRouteVoyageIndex(undefined);
+      dispatch(setMapData({ nodes: [], edges: [], paths: [] }));
+      dispatch(setNodesDataRegion([]));
+      dispatch(setEdgesDataRegion([]));
+      dispatch(setPathsData([]));
+      shownBaseKeyRef.current = null;
+      setShownBaseKey(null);
+    }
+
     const key = `${baseKey}|${level}`;
     latestKeyRef.current = key;
     const cached = getCachedMapData(key);
@@ -76,28 +96,40 @@ export const useCachedMapData = ({
       if (shownBaseKeyRef.current !== baseKey) setLoading(true);
       load(level)
         .then((entry) => {
-          if (latestKeyRef.current !== key) return;
+          if (cancelled || latestKeyRef.current !== key) return;
           if (entry) show(entry);
-          else setLoading(false);
+          else {
+            setError('Could not load map data.');
+            setLoading(false);
+          }
         })
         .catch(() => {
-          if (latestKeyRef.current === key) setLoading(false);
+          if (!cancelled && latestKeyRef.current === key) {
+            setError('Could not load map data.');
+            setLoading(false);
+          }
         });
     }
 
-    if (!prefetchLevel || prefetchLevel === level) return;
-    const prefetchKey = `${baseKey}|${prefetchLevel}`;
-    if (getCachedMapData(prefetchKey)) return;
-    const timer = setTimeout(() => {
-      load(prefetchLevel)
-        .then((entry) => {
-          if (entry && latestKeyRef.current === prefetchKey) show(entry);
-        })
-        .catch(() => undefined);
-    }, PREFETCH_DELAY_MS);
-    return () => clearTimeout(timer);
+    if (prefetchLevel && prefetchLevel !== level) {
+      const prefetchKey = `${baseKey}|${prefetchLevel}`;
+      if (!getCachedMapData(prefetchKey)) {
+        timer = setTimeout(() => {
+          load(prefetchLevel)
+            .then((entry) => {
+              if (!cancelled && entry && latestKeyRef.current === prefetchKey)
+                show(entry);
+            })
+            .catch(() => undefined);
+        }, PREFETCH_DELAY_MS);
+      }
+    }
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseKey, level, prefetchLevel, enabled]);
+  }, [baseKey, level, prefetchLevel, enabled, attempt]);
 
-  return { loading, shownBaseKey };
+  return { loading, shownBaseKey, error, retry };
 };

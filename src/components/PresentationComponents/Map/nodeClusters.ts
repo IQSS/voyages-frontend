@@ -52,6 +52,10 @@ export const clusterBounds = (
 };
 
 export const clusterWeights = (members: PlacedNode[]): Weights => ({
+  post_disembarkation: members.reduce(
+    (sum, member) => sum + (member.node.weights.post_disembarkation ?? 0),
+    0,
+  ),
   embarkation: members.reduce(
     (sum, member) => sum + (member.node.weights.embarkation ?? 0),
     0,

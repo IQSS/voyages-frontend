@@ -46,6 +46,8 @@ export const handerRenderEdges = (
       );
       if (curveAnimated && curveLine) {
         curveLine.addTo(map);
+        curveLine.getElement()?.setAttribute('data-voyage-route-source', edge.source);
+        curveLine.getElement()?.setAttribute('data-voyage-route-target', edge.target);
         curveAnimated.addTo(map);
         const tooltipContent = () => {
           const voyageCount = onEdgeClick

@@ -373,6 +373,7 @@ const NodeEdgesCurvedLinesMap = ({ fitKey }: NodeEdgesCurvedLinesMapProps) => {
           });
           circleMarker.on('mouseout', clearClusterBox);
           circleMarker.addTo(map).bringToFront();
+          circleMarker.getElement()?.setAttribute('data-voyage-node-id', nodeID);
         } else if (origin && origin > 0) {
           const popupContent = createTooltipEmbarkDiseEmbarkEdges(node);
           circleMarker.bindPopup(popupContent).bringToFront();

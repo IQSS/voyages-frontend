@@ -87,6 +87,7 @@ const TabsSelect = () => {
   }, [dispatch, currentBlockName, ID, pageEntityClass]);
 
   useEffect(() => {
+    let cancelled = false;
     const fetchData = async () => {
       setConnectionsCount(undefined);
       const targetID = cardRowID || ID;
@@ -98,6 +99,7 @@ const TabsSelect = () => {
       try {
         const numericID = typeof targetID === 'string' ? parseInt(targetID) : targetID;
         const response = await dispatch(fetchFn(numericID)).unwrap();
+        if (cancelled) return;
 
         if (response?.data) {
           const count = response.data.connections_count;
@@ -119,12 +121,14 @@ const TabsSelect = () => {
           setPageDescription(description);
         }
       } catch (error) {
+        if (cancelled) return;
         setConnectionsCount(null);
         console.log('Error fetching page data:', error);
       }
     };
 
     fetchData();
+    return () => { cancelled = true; };
   }, [dispatch, pageEntityClass, cardRowID, ID]);
 
   useEffect(() => {
