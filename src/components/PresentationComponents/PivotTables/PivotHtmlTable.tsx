@@ -32,10 +32,6 @@ const isTotalColumn = (path: string[], index: number, count: number) =>
 const numberFormat = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2,
 });
-const collator = new Intl.Collator(undefined, {
-  numeric: true,
-  sensitivity: 'base',
-});
 
 const buildHeaderRows = (columns: string[][], levels: number) => {
   const rows: HeaderCell[][] = Array.from({ length: levels }, () => []);
@@ -125,10 +121,17 @@ const PivotHtmlTable: React.FC<PivotHtmlTableProps> = ({
           );
     if (sort.column !== null && columnIndex < 0) return indices;
     return indices.sort((a, b) => {
+      if (columnIndex < 0) {
+        // The full JSON response is already in canonical ascending row order.
+        // Use those ranks so local sorting matches CSV, including numeric bins
+        // and text labels, without depending on the browser's locale.
+        const missing =
+          Number(table.rows[a] === 'Undefined') -
+          Number(table.rows[b] === 'Undefined');
+        return missing || (a - b) * direction;
+      }
       const compared =
-        columnIndex < 0
-          ? collator.compare(table.rows[a], table.rows[b])
-          : table.values[a][columnIndex] - table.values[b][columnIndex];
+        table.values[a][columnIndex] - table.values[b][columnIndex];
       return compared * direction || a - b;
     });
   }, [table, sort]);
