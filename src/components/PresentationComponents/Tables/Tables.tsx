@@ -61,6 +61,7 @@ ModuleRegistry.registerModules([
 const Tables: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const latestRequest = useRef(0);
   const { styleName: styleNameRoute, currentBlockName } = usePageRouter();
   const { rangeSliderMinMax } = useSelector(
     (state: RootState) => state.rangeSlider as FilterObjectsState,
@@ -238,6 +239,7 @@ const Tables: React.FC = () => {
   ]);
 
   const fetchDataTable = useCallback(async () => {
+    const requestId = ++latestRequest.current;
     try {
       setLoading(true);
       let response;
@@ -250,15 +252,16 @@ const Tables: React.FC = () => {
         response = await dispatch(fetchEnslaversOptionsList(dataSend)).unwrap();
       }
 
-      if (response) {
+      if (response && requestId === latestRequest.current) {
         const { count, results } = response.data;
         setTotalResultsCount(Number(count));
         setDataTable(results);
       }
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      if (requestId === latestRequest.current)
+        console.error('Failed to fetch data:', error);
     } finally {
-      setLoading(false);
+      if (requestId === latestRequest.current) setLoading(false);
     }
   }, [dispatch, dataSend, styleNameRoute]);
 
@@ -266,6 +269,7 @@ const Tables: React.FC = () => {
   useEffect(() => {
     fetchDataTable();
     return () => {
+      latestRequest.current += 1;
       if (!textFilter) {
         dispatch(setData([]));
       }
