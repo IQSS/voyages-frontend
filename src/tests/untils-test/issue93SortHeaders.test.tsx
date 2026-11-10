@@ -26,7 +26,7 @@ test('table headers send standard sort signs without enabling a client-side reor
           displayName: 'Voyage ID',
           enableSorting: true,
           setSort,
-        } as never)}
+        } as unknown as React.ComponentProps<typeof CustomHeaderTable>)}
       />
     </Provider>,
   );
@@ -46,7 +46,7 @@ test('non-sortable connection headers do not expose sort controls', () => {
           column: { colDef: { context: { fieldToSort: [] } } },
           displayName: 'Connections',
           enableSorting: false,
-        } as never)}
+        } as unknown as React.ComponentProps<typeof CustomHeaderTable>)}
       />
     </Provider>,
   );

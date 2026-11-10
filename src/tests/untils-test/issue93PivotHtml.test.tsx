@@ -100,3 +100,54 @@ test('empty and normalized pivot responses render without invented data', () => 
     '1751–17750.330.6701',
   );
 });
+
+test.each([
+  ['asc', ['2', '10', '100', 'Undefined']],
+  ['desc', ['100', '10', '2', 'Undefined']],
+] as const)(
+  'row-label %s matches canonical numeric API/CSV order with Undefined last',
+  (direction, expected) => {
+    const view = render(
+      <PivotHtmlTable
+        {...props}
+        table={{
+          ...table,
+          rows: ['2', '10', '100', 'Undefined'],
+          values: [[1], [2], [3], [4]],
+          columns: [['All']],
+          column_labels: ['Region'],
+          totals: [10],
+        }}
+        pageSize={10}
+        sort={{ column: null, direction }}
+      />,
+    );
+    expect(
+      [...view.container.querySelectorAll('tbody th')].map(
+        (node) => node.textContent,
+      ),
+    ).toEqual(expected);
+  },
+);
+
+test.each([
+  ['asc', ['Port 10', 'Port 2', 'Undefined']],
+  ['desc', ['Port 2', 'Port 10', 'Undefined']],
+] as const)(
+  'row-label %s uses canonical server ranks rather than browser-dependent text collation',
+  (direction, expected) => {
+    const view = render(
+      <PivotHtmlTable
+        {...props}
+        table={{ ...table, rows: ['Port 10', 'Port 2', 'Undefined'] }}
+        pageSize={10}
+        sort={{ column: null, direction }}
+      />,
+    );
+    expect(
+      [...view.container.querySelectorAll('tbody th')].map(
+        (node) => node.textContent,
+      ),
+    ).toEqual(expected);
+  },
+);
