@@ -44,39 +44,23 @@
 .leaflet-container {
   position: relative;
   font-family: sans-serif;
+}
 
-  .leaflet-bottom-voyages,
-  .leaflet-bottom {
-    position: absolute; 
-    left: 0;
-  }
+.map-legend-frame {
+  position: relative;
+}
 
-  .leaflet-bottom-voyages {
-    bottom: 50px !important;
-    @include breakpoint-standard(7) {
-      bottom: 58px !important;
-    }
-    @include breakpoint-standard(6) {
-      bottom: 125px !important
-    }
-    @include breakpoint-standard(5) {
-      bottom:125px !important
-    }
-    @include breakpoint-standard(4) {
-      bottom: 110px !important;
-    }
-    @include breakpoint-standard(3) {
-      bottom: 70px !important
-    }
-    @include breakpoint-standard(2) {
-      bottom: 70px !important
-    }
-    @include breakpoint-standard(1) {
-      bottom: 70px !important
-    }
-    @include breakpoint-standard(0) {
-      bottom: 70px !important
-    }
+.map-legend-anchor {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 1000;
+  pointer-events: none;
+
+  .legend {
+    float: none;
+    margin: 0;
+    pointer-events: auto;
   }
 }
 
@@ -268,4 +252,16 @@
 
 .post-disembark-location {
   background-color: rgb(246, 193, 60);
+}
+
+.node-cluster-popup-list {
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.node-cluster-popup-footer {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #ddd;
 }

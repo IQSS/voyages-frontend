@@ -3,9 +3,9 @@
     "header": [
       {
         "label": {
-          "en": "Enslaved",
-          "es": "Esclavizados",
-          "pt": "Escravizados"
+          "en": "Enslaved People",
+          "es": "Personas Esclavizadas",
+          "pt": "Pessoas Escravizadas"
         }
       },
       {
@@ -17,14 +17,14 @@
       }
     ],
     "text_introuduce": {
-      "en": "The People Database allows visitors to search for names of individuals, enslaved and enslavers, connected with the slaving voyages available on this website. It started with data from the African Origins project, which sought to retrace the inland origins of Africans rescued from slave ships during the suppression of the trans-Atlantic trade in the nineteenth century. However, the database subsequently expanded to include information from other sources, notably the Slave Manifests collection of the U.S. National Archives and Records Administration as well as SlaveVoyages’ Trans-Atlantic and Intra-American databases.",
-      "es": "La Base de Datos de Personas permite a los visitantes buscar nombres de individuos, esclavizados y esclavizadores, relacionados con los viajes de esclavitud disponibles en este sitio web. Comenzó con datos del proyecto Orígenes Africanos, que pretendía rastrear los orígenes en tierra de los africanos rescatados de los barcos negreros durante la supresión del comercio transatlántico en el siglo XIX. Sin embargo, la base de datos se amplió posteriormente para incluir información de otras fuentes, en particular la colección de Manifiestos de Esclavitud de la Administración Nacional de Archivos y Registros de Estados Unidos, así como las bases de datos Transatlántica e Intraamericana de SlaveVoyages.",
-      "pt": "A Base de Dados de Pessoas permite aos visitantes pesquisar nomes de indivíduos, escravizados e escravizadores, relacionados com as viagens de escravatura disponíveis neste sítio Web. Começou com dados do projeto Origens Africanas, que procurou reconstituir as origens terrestres dos africanos resgatados dos navios negreiros durante a supressão do comércio transatlântico no século XIX. No entanto, a base de dados expandiu-se subsequentemente para incluir informação de outras fontes, nomeadamente a coleção Slave Manifests da Administração Nacional de Arquivos e Registos dos EUA, bem como as bases de dados Trans-Atlântica e Intra-Americana da SlaveVoyages."
+      "en": "The People Database allows visitors to search for names of individuals, whether enslaved people or slave traders, connected with documented slaving voyages. The People Database started with data from the African Origins project, which sought to retrace the inland origins of Africans rescued from slave ships during the suppression of the trans-Atlantic trade in the nineteenth century. The database subsequently expanded to include the names of individuals associated with a much wider range of slave-trading voyages in many different roles.",
+      "es": "La Base de Datos de Personas permite a los visitantes buscar nombres de individuos, ya sean personas esclavizadas o traficantes de esclavos, relacionados con viajes de esclavitud documentados. La Base de Datos de Personas comenzó con datos del proyecto Orígenes Africanos, que pretendía rastrear los orígenes en tierra de los africanos rescatados de los barcos negreros durante la supresión del comercio transatlántico en el siglo XIX. Posteriormente, la base de datos se amplió para incluir los nombres de individuos asociados con una gama mucho más amplia de viajes de comercio de esclavos, en muchos papeles diferentes.",
+      "pt": "A Base de Dados de Pessoas permite aos visitantes pesquisar nomes de indivíduos, sejam pessoas escravizadas ou traficantes de escravos, relacionados com viagens de escravatura documentadas. A Base de Dados de Pessoas começou com dados do projeto Origens Africanas, que procurou reconstituir as origens terrestres dos africanos resgatados dos navios negreiros durante a supressão do comércio transatlântico no século XIX. Posteriormente, a base de dados expandiu-se para incluir os nomes de indivíduos associados a um leque muito mais vasto de viagens de tráfico de escravos, em muitos papéis diferentes."
     },
     "text_description": {
-      "en": "The names of enslaved and enslavers are searchable through the two portals below.",
-      "es": "Los nombres de los esclavizados y los esclavizadores se pueden buscar en los dos portales siguientes.",
-      "pt": "Os nomes dos escravizados e dos escravizadores podem ser pesquisados nos dois portais abaixo."
+      "en": "The names of enslaved people and slave traders are searchable through the two portals below.",
+      "es": "Los nombres de las personas esclavizadas y de los traficantes de esclavos se pueden buscar en los dos portales siguientes.",
+      "pt": "Os nomes das pessoas escravizadas e dos traficantes de escravos podem ser pesquisados nos dois portais abaixo."
     },
     "title": {
       "label": {

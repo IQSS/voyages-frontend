@@ -816,7 +816,7 @@
         "cell_val": {
           "fields": [
             {
-              "var_name": "voyage_slaves_numbers__total_num_slaves_purchased",
+              "var_name": "voyage_slaves_numbers__total_num_slaves_dep_last_slaving_port",
               "cell_fn": "literal"
             }
           ]

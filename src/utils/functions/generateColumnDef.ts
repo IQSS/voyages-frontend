@@ -24,7 +24,7 @@ export const generateColumnDef = (
     field: value.colID,
     colId: value.colID,
     width: value.col_width_px,
-    sortable: true,
+    sortable: !(Array.isArray(value.order_by) && value.order_by.length === 0),
     autoHeight: true,
     wrapText: true,
     resizable: true,

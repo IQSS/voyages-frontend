@@ -3,7 +3,7 @@ import path from 'node:path';
 import ts from 'typescript';
 import { expect, test } from 'vitest';
 
-test('PR250 keeps contribution locations and existing grid children structurally separate', () => {
+test('PR250 keeps contribution locations and PR252 pivot columns structurally separate', () => {
   const program = ts.createProgram(
     [path.resolve('src/tests/type-fixtures/gridLocationIsolation.ts')],
     {

@@ -587,29 +587,6 @@
 		},
 		{
 			"header_label": {
-				"en": "Connections",
-				"es": "Conexiones",
-				"pt": "Conexões"
-
-			},
-			"cell_type": "network_modal",
-			"visible": true,
-			"number_format": null,
-			"order_by": [],
-			"col_width_px": 120,
-			"colID": "connections",
-			"cell_val": {
-				"fields": [
-					{
-						"var_name": "id",
-						"cell_fn": "networks",
-						"node_class": "voyages"
-					}
-				]
-			}
-		},
-		{
-			"header_label": {
 				"en": "Total embarked (IMP)",
 				"es": "Total embarcado (IMP)",
 				"pt": "Total embarcado (IMP)"
@@ -642,14 +619,14 @@
 			"visible": false,
 			"number_format": "comma",
 			"order_by": [
-				"voyage_slaves_numbers__total_num_slaves_purchased"
+				"voyage_slaves_numbers__total_num_slaves_dep_last_slaving_port"
 			],
 			"col_width_px": 110,
-			"colID": "voyage_slaves_numbers__total_num_slaves_purchased",
+			"colID": "voyage_slaves_numbers__total_num_slaves_dep_last_slaving_port",
 			"cell_val": {
 				"fields": [
 					{
-						"var_name": "voyage_slaves_numbers__total_num_slaves_purchased",
+						"var_name": "voyage_slaves_numbers__total_num_slaves_dep_last_slaving_port",
 						"cell_fn": "literal"
 					}
 				]
@@ -1121,7 +1098,7 @@
 				]
 			}
 		},
-				{
+		{
 			"header_label": {
 				"en": "Date vessel's voyage began",
 				"es": "Fecha de inicio del viaje del buque",
@@ -1281,7 +1258,7 @@
 			"visible": true,
 			"number_format": null,
 			"order_by": [
-				"voyage_enslaver_connection__enslaver_alias__alias"
+				"voyage_enslavement_relations__relation_enslavers__enslaver_alias__alias"
 			],
 			"col_width_px": 280,
 			"colID": "voyage_enslavers",
@@ -1481,6 +1458,29 @@
 		},
 		{
 			"header_label": {
+				"en": "Connections",
+				"es": "Conexiones",
+				"pt": "Conexões"
+
+			},
+			"cell_type": "network_modal",
+			"visible": true,
+			"number_format": null,
+			"order_by": [],
+			"col_width_px": 120,
+			"colID": "connections",
+			"cell_val": {
+				"fields": [
+					{
+						"var_name": "id",
+						"cell_fn": "networks",
+						"node_class": "voyages"
+					}
+				]
+			}
+		},
+		{
+			"header_label": {
 				"en": "Sources",
 				"es": "Fuentes",
 				"pt": "Fontes"
@@ -1529,7 +1529,7 @@
 		}		
 	],
 	"other_properties": {
-		"default_order_by": "voyage_dates__imp_arrival_at_port_of_dis_sparsedate__year"
+		"default_order_by": "-voyage_dates__imp_arrival_at_port_of_dis_sparsedate__year"
 	},
 	"column_selector_tree": [
 		{
@@ -1863,7 +1863,7 @@
 				},
 				{
 					"col_width_px": 100,
-					"colID": "voyage_slaves_numbers__total_num_slaves_purchased",
+					"colID": "voyage_slaves_numbers__total_num_slaves_dep_last_slaving_port",
 					"label": {
 						"en": "Total embarked",
 						"es": "Total embarcados",

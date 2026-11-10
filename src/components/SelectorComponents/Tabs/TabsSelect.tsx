@@ -44,6 +44,19 @@ const TabsSelect = () => {
 
   const [pageTitle, setPageTitle] = useState(initialTitle);
   const [pageDescription, setPageDescription] = useState(initialDescription);
+  const [connectionsCount, setConnectionsCount] = useState<
+    number | null | undefined
+  >(undefined);
+  const recordKey = `${pageEntityClass}:${cardRowID || ID}`;
+  const [networkRecord, setNetworkRecord] = useState<{
+    key: string;
+    id: number | null;
+  } | null>(null);
+  const recordNetworkID = networkRecord?.key === recordKey ? networkRecord.id : null;
+  const hideNetwork =
+    networkRecord?.key === recordKey &&
+    connectionsCount !== undefined &&
+    (connectionsCount === null || connectionsCount < 2);
   const navigate = useNavigate();
   console.log({pageTitle , pageDescription})
 
@@ -71,17 +84,20 @@ const TabsSelect = () => {
   };
 
   useEffect(() => {
-    if (currentBlockName !== 'network') return;
-    dispatch(setNetWorksID(Number(ID)));
+    if (currentBlockName !== 'network' || recordNetworkID === null) return;
+    dispatch(setNetWorksID(recordNetworkID));
     dispatch(
       setNetWorksKEY(
         pageEntityClass === 'voyage' ? 'voyages' : pageEntityClass,
       ),
     );
-  }, [dispatch, currentBlockName, ID, pageEntityClass]);
+  }, [dispatch, currentBlockName, recordNetworkID, pageEntityClass]);
 
   useEffect(() => {
+    let cancelled = false;
     const fetchData = async () => {
+      setConnectionsCount(undefined);
+      setNetworkRecord(null);
       const targetID = cardRowID || ID;
       if (!targetID) return;
       
@@ -91,8 +107,13 @@ const TabsSelect = () => {
       try {
         const numericID = typeof targetID === 'string' ? parseInt(targetID) : targetID;
         const response = await dispatch(fetchFn(numericID)).unwrap();
+        if (cancelled) return;
 
         if (response?.data) {
+          const count = response.data.connections_count;
+          const databaseID = response.data.id;
+          setNetworkRecord({ key: recordKey, id: Number.isInteger(databaseID) && databaseID > 0 ? databaseID : null });
+          setConnectionsCount(typeof count === 'number' ? count : null);
           // Get the appropriate generators for this entity type
           const titleGenerator = titleGenerators[pageEntityClass];
           const descriptionGenerator = descriptionGenerators[pageEntityClass];
@@ -110,18 +131,29 @@ const TabsSelect = () => {
           setPageDescription(description);
         }
       } catch (error) {
+        if (cancelled) return;
+        setNetworkRecord({ key: recordKey, id: null });
+        setConnectionsCount(null);
         console.log('Error fetching page data:', error);
       }
     };
 
     fetchData();
-  }, [dispatch, pageEntityClass, cardRowID, ID]);
+    return () => { cancelled = true; };
+  }, [dispatch, pageEntityClass, cardRowID, ID, recordKey]);
+
+  useEffect(() => {
+    if (!hideNetwork || currentBlockName !== 'network') return;
+    dispatch(setValueVariable('variables'));
+    dispatch(setCurrentBlockName('variables'));
+    navigate(`/${pageEntityClass}/${ID}#variables`, { replace: true });
+  }, [hideNetwork, currentBlockName, dispatch, navigate, pageEntityClass, ID]);
 
   const onChange = (key: string) => {
     dispatch(setValueVariable(key));
     dispatch(setCurrentBlockName(key));
-    if (key === 'network') {
-      dispatch(setNetWorksID(Number(ID)));
+    if (key === 'network' && recordNetworkID !== null) {
+      dispatch(setNetWorksID(recordNetworkID));
       const networkKEY =
         pageEntityClass === 'voyage' ? 'voyages' : pageEntityClass;
       dispatch(setNetWorksKEY(networkKEY));
@@ -129,7 +161,7 @@ const TabsSelect = () => {
     navigate(`/${pageEntityClass}/${ID}#${key.toLowerCase()}`);
   };
 
-  const items: TabsProps['items'] = [
+  const allItems: NonNullable<TabsProps['items']> = [
     {
       key: 'variables',
       label: 'Variables',
@@ -153,7 +185,14 @@ const TabsSelect = () => {
       label: 'Network graph',
       children: (
         <Box sx={styleTapNetWorkGraph}>
-          <NetworkDiagramSlaveVoyagesSVG />
+          {recordNetworkID === null ? (
+            <div role="status">Loading network details…</div>
+          ) : (
+            <NetworkDiagramSlaveVoyagesSVG
+              key={`${pageEntityClass}:${recordNetworkID}`}
+              seed={{ networkID: recordNetworkID, networkKEY: pageEntityClass === 'voyage' ? 'voyages' : pageEntityClass }}
+            />
+          )}
         </Box>
       ),
     },
@@ -167,6 +206,9 @@ const TabsSelect = () => {
     //   ),
     // },
   ];
+  const items = hideNetwork
+    ? allItems.filter((item) => item.key !== 'network')
+    : allItems;
 
   return (
     <div>

@@ -6,6 +6,7 @@ import {
 import { createNodeDict } from '@/utils/functions/createNodeDict';
 import { createLogWeihtValueScale } from '@/utils/functions/createLogNodeValueScale';
 import { getEdgesSize } from '@/utils/functions/getNodeSize';
+import { getRouteVoyageIds } from '@/utils/functions/routeVoyageIds';
 import renderEdgesAnimatedLinesOnMap from './renderEdgesAnimatedLinesOnMap';
 import renderEdgesLinesOnMap from './renderEdgesLinesOnMap';
 import L from 'leaflet';
@@ -13,7 +14,8 @@ import L from 'leaflet';
 export const handerRenderEdges = (
   edgesToRender: EdgesAggroutes[],
   nodesData: NodeAggroutes[],
-  map: L.Map
+  map: L.Map,
+  onEdgeClick?: (voyageIds: string[]) => void,
 ) => {
   const edgeLogValueScale = createLogWeihtValueScale(edgesToRender);
   const nodesDict = createNodeDict(nodesData);
@@ -33,31 +35,49 @@ export const handerRenderEdges = (
         startLatLng,
         endLatLng,
         weightEddg,
-        controls
+        controls,
       );
       const curveLine = renderEdgesLinesOnMap(
         startLatLng,
         endLatLng,
         weightEddg,
         controls,
-        type
+        type,
       );
       if (curveAnimated && curveLine) {
         curveLine.addTo(map);
+        curveLine.getElement()?.setAttribute('data-voyage-route-source', edge.source);
+        curveLine.getElement()?.setAttribute('data-voyage-route-target', edge.target);
         curveAnimated.addTo(map);
-        const tooltipContent = `${weight} people transported`;
+        const tooltipContent = () => {
+          const voyageCount = onEdgeClick
+            ? getRouteVoyageIds(edge.source, edge.target).length
+            : 0;
+          return voyageCount > 0
+            ? `${weight} people transported<br/>Click to see ${voyageCount.toLocaleString()} ${voyageCount === 1 ? 'voyage' : 'voyages'}`
+            : `${weight} people transported`;
+        };
         const tooltip = L.tooltip({
           direction: 'top',
           permanent: false,
           opacity: 0.9,
-        }).setContent(tooltipContent);
+        }).setContent(tooltipContent());
 
         curveLine.bindTooltip(tooltip);
         curveLine.on('mouseover', (event) => {
+          tooltip.setContent(tooltipContent());
           curveLine.openTooltip();
           tooltip.setLatLng(event.latlng);
           map.closePopup();
         });
+        if (onEdgeClick) {
+          curveLine.on('click', (event) => {
+            const voyageIds = getRouteVoyageIds(edge.source, edge.target);
+            if (voyageIds.length === 0) return;
+            L.DomEvent.stopPropagation(event);
+            onEdgeClick(voyageIds);
+          });
+        }
       }
     }
   });
