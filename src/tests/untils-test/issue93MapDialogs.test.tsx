@@ -10,9 +10,9 @@ import {
 } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
 
-import { VoyagesModal } from '@/components/PresentationComponents/Map/VoyagesModal/VoyagesModal';
 import { NodePivot } from '@/components/PresentationComponents/Map/VoyagesModal/NodePivot';
 import { nodePivots } from '@/components/PresentationComponents/Map/VoyagesModal/nodePivots';
+import { VoyagesModal } from '@/components/PresentationComponents/Map/VoyagesModal/VoyagesModal';
 import {
   buildRouteVoyageIndex,
   getRouteVoyageIds,

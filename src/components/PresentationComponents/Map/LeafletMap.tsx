@@ -123,7 +123,10 @@ export const LeafletMap = ({ setZoomLevel, zoomLevel }: LeafletMapProps) => {
     >
       {error ? (
         <div role="alert">
-          {error} <button type="button" onClick={retry}>Retry</button>
+          {error}{' '}
+          <button type="button" onClick={retry}>
+            Retry
+          </button>
         </div>
       ) : loading ? (
         <div className="loading-logo">
