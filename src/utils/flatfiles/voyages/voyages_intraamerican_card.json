@@ -1127,7 +1127,7 @@
       },
       {
         "cell_type": "literal",
-        "number_format": "comma",
+        "number_format": "percent",
         "cell_val": {
           "fields": [
             {
