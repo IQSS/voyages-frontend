@@ -89,6 +89,18 @@ test('a popup first opened on a narrow map fits its complete bubble', () => {
   expect(popup.getElement()?.offsetWidth).toBeLessThanOrEqual(width - 10);
 });
 
+test('a narrow popup leaves its top-left zoom buttons outside the text area', () => {
+  width = 326;
+  map.invalidateSize({ pan: false });
+  const zoom = mapElement.querySelector<HTMLElement>('.leaflet-control-zoom')!;
+  vi.spyOn(mapElement, 'getBoundingClientRect').mockReturnValue(new DOMRect(10, 100, 326, 600));
+  vi.spyOn(zoom, 'getBoundingClientRect').mockReturnValue(new DOMRect(20, 110, 34, 64));
+  const popup = openPopup();
+  const padding = L.point(popup.options.autoPanPaddingTopLeft || popup.options.autoPanPadding!);
+  expect(padding.y).toBeGreaterThanOrEqual(74);
+  expect(padding.x).toBe(5);
+});
+
 test('a custom popup keeps its original width cap after narrow and wide resizing', () => {
   width = 240;
   map.invalidateSize({ pan: false });
