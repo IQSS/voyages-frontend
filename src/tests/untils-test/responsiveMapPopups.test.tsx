@@ -93,10 +93,16 @@ test('a narrow popup leaves its top-left zoom buttons outside the text area', ()
   width = 326;
   map.invalidateSize({ pan: false });
   const zoom = mapElement.querySelector<HTMLElement>('.leaflet-control-zoom')!;
-  vi.spyOn(mapElement, 'getBoundingClientRect').mockReturnValue(new DOMRect(10, 100, 326, 600));
-  vi.spyOn(zoom, 'getBoundingClientRect').mockReturnValue(new DOMRect(20, 110, 34, 64));
+  vi.spyOn(mapElement, 'getBoundingClientRect').mockReturnValue(
+    new DOMRect(10, 100, 326, 600),
+  );
+  vi.spyOn(zoom, 'getBoundingClientRect').mockReturnValue(
+    new DOMRect(20, 110, 34, 64),
+  );
   const popup = openPopup();
-  const padding = L.point(popup.options.autoPanPaddingTopLeft || popup.options.autoPanPadding!);
+  const padding = L.point(
+    popup.options.autoPanPaddingTopLeft || popup.options.autoPanPadding!,
+  );
   expect(padding.y).toBeGreaterThanOrEqual(74);
   expect(padding.x).toBe(5);
 });
