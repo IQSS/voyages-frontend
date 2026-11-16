@@ -82,7 +82,22 @@ function MAPComponents() {
   }
 
   return (
-    <div className={classNameMap}>
+    <div
+      className={classNameMap}
+      onMouseDownCapture={(event) => {
+        const target = event.target;
+        if (event.button !== 0 || !(target instanceof Element)) return;
+        if (
+          target.closest('[data-voyage-route-source], [data-voyage-node-id]')
+        ) {
+          // Leaflet focuses on mousedown. Scrolling a nested page here would
+          // move the selected route or marker before the browser sends mouseup.
+          target
+            .closest<HTMLElement>('.lealfetMap-container')
+            ?.focus({ preventScroll: true });
+        }
+      }}
+    >
       <MapContainer
         style={{
           width:
@@ -91,6 +106,7 @@ function MAPComponents() {
               : '94%',
         }}
         className="map-container"
+        keyboard={false}
         ref={mapRef}
       >
         {nameIdURL ? (
