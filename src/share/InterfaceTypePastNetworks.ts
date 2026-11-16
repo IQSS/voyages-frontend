@@ -7,10 +7,10 @@ export interface Nodes extends d3.SimulationNodeDatum {
 }
 export interface NodesData {
   principal_alias?: string;
-  voyage_dates__imp_arrival_at_port_of_dis_sparsedate__year?: number;
-  voyage_itinerary__imp_principal_place_of_slave_purchase__name?: string;
-  voyage_itinerary__imp_principal_port_slave_dis__name?: string;
-  voyage_ship__ship_name?: string;
+  voyage_dates__imp_arrival_at_port_of_dis_sparsedate__year?: number | null;
+  voyage_itinerary__imp_principal_place_of_slave_purchase__name?: string | null;
+  voyage_itinerary__imp_principal_port_slave_dis__name?: string | null;
+  voyage_ship__ship_name?: string | null;
   age?: number;
   documented_name?: string;
   gender?: number;
