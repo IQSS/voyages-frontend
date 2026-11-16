@@ -1110,11 +1110,11 @@
       },
       {
         "cell_type": "literal",
-        "number_format": "comma",
+        "number_format": "percent",
         "cell_val": {
           "fields": [
             {
-              "var_name": "voyage_slaves_numbers__imp_mortality_during_voyage",
+              "var_name": "voyage_slaves_numbers__imp_mortality_ratio",
               "cell_fn": "literal"
             }
           ]
