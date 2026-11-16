@@ -11,7 +11,7 @@ let map: L.Map;
 vi.mock(
   '@/components/PresentationComponents/Map/NodeEdgesCurvedLinesMap',
   () => ({
-    default: () => {
+    default: function CaptureMap() {
       map = useMap();
       return null;
     },
