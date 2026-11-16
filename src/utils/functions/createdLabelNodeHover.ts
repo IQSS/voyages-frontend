@@ -35,7 +35,7 @@ export const createdLabelNodeHover = (node: Nodes) => {
     voyage_ship__ship_name: shipName,
     voyage_dates__imp_arrival_at_port_of_dis_sparsedate__year: year,
     voyage_itinerary__imp_principal_place_of_slave_purchase__name:
-      purhcaseLocation,
+      purchaseLocation,
     voyage_itinerary__imp_principal_port_slave_dis__name:
       disembarkationLocation,
     principal_alias: alias,
@@ -49,9 +49,13 @@ export const createdLabelNodeHover = (node: Nodes) => {
   } else if (node_class === ENSLAVEMENTNODE) {
     LableNode = relation_type__name;
   } else if (node_class === VOYAGESNODECLASS || node_class === VOYAGESNODE) {
-    LableNode = `${shipName ?? shipName}, ${
-      purhcaseLocation ? purhcaseLocation : 'unknown'
-    } to ${disembarkationLocation} ${year}`;
+    const route =
+      purchaseLocation || disembarkationLocation
+        ? `${purchaseLocation || 'unknown'} to ${disembarkationLocation || 'unknown'}`
+        : '';
+    const details = [route, year?.toString()].filter(Boolean).join(' ');
+    LableNode =
+      [shipName, details].filter(Boolean).join(', ') || 'Unknown voyage';
   }
   return LableNode;
 };
