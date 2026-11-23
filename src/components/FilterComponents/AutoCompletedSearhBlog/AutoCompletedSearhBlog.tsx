@@ -15,11 +15,11 @@ import { AppDispatch, RootState } from '@/redux/store';
 import { BLOGPAGE } from '@/share/CONST_DATA';
 import { Filter, IRootFilterObject } from '@/share/InterfaceTypes';
 import { ResultAutoList } from '@/share/InterfaceTypesBlog';
-import { formatTextURL } from '@/utils/functions/formatText';
 import {
   blogTagNameFromRouteSlug,
   blogTagSlugFromName,
 } from '@/utils/functions/blogRoutes';
+import { formatTextURL } from '@/utils/functions/formatText';
 
 import SelectBlogDropdown from '../../SelectorComponents/SelectDrowdown/SelectBlogDropdown';
 
@@ -150,7 +150,17 @@ const AutoCompletedSearhBlog = () => {
       if (tagID) {
         navigate(`/${BLOGPAGE}`);
       }
+      if (newValue && searchAutoKey !== 'tags__name') {
+        setLocalSearchValue(newValue.value);
+        dispatch(setSearchAutoValue(newValue.value));
+        if (blogURL) {
+          navigate(`/${BLOGPAGE}`);
+        }
+        return;
+      }
       if (newValue) {
+        setLocalSearchValue(newValue.value);
+        dispatch(setSearchAutoValue(newValue.value));
         if (newValue.value === 'Introductory Maps') {
           navigate(
             `/${BLOGPAGE}/tag/${formatTextURL('all Intro Maps')}#${formatTextURL('all Intro Maps')}`,
@@ -162,7 +172,7 @@ const AutoCompletedSearhBlog = () => {
         }
       }
     },
-    [tagID, navigate],
+    [tagID, navigate, searchAutoKey, blogURL, dispatch],
   );
 
   const handleReset = useCallback(() => {

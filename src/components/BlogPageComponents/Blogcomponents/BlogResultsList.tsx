@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -8,6 +8,7 @@ import defaultImage from '@/assets/voyage-blog.png';
 import MetaTag from '@/components/MetaTag/MetaTag';
 import NoDataState from '@/components/NoResultComponents/NoDataState';
 import BlogPageButton from '@/components/SelectorComponents/ButtonComponents/BlogPageButton';
+import { fetchBlogAutoCompleted } from '@/fetch/blogFetch/fetchBlogAutoCompleted';
 import { fetchBlogData } from '@/fetch/blogFetch/fetchBlogData';
 import { usePageRouter } from '@/hooks/usePageRouter';
 import { setBlogData, setBlogPost } from '@/redux/getBlogDataSlice';
@@ -19,9 +20,13 @@ import {
   BlogDataPropsRequest,
   BlogFilter,
   InitialStateBlogProps,
+  ResultAutoList,
 } from '@/share/InterfaceTypesBlog';
+import {
+  blogTagNameFromRouteSlug,
+  blogTagSlugFromName,
+} from '@/utils/functions/blogRoutes';
 import { formatTextURL } from '@/utils/functions/formatText';
-import { blogTagNameFromRouteSlug } from '@/utils/functions/blogRoutes';
 import '@/style/blogs.scss';
 
 const IMAGES_PER_PAGE = 12;
@@ -35,16 +40,63 @@ const BlogResultsList: React.FC = () => {
     data: BlogData,
     searchAutoKey,
     searchAutoValue,
+    blogAutoLists,
   } = useSelector(
     (state: RootState) => state.getBlogData as InitialStateBlogProps,
   );
-  const routeSearchValue = useMemo(
-    () => blogTagNameFromRouteSlug(blogURL),
-    [blogURL],
-  );
+  const routeSlug = blogURL?.trim() || '';
   const { languageValue } = useSelector(
     (state: RootState) => state.getLanguages,
   );
+  const [resolvedTag, setResolvedTag] = useState({ slug: '', name: '' });
+  const isTagResolved = !routeSlug || resolvedTag.slug === routeSlug;
+  const routeSearchValue = isTagResolved ? resolvedTag.name : '';
+
+  useEffect(() => {
+    if (!routeSlug) {
+      setResolvedTag({ slug: '', name: '' });
+      return;
+    }
+    const matchSlug = (items: ResultAutoList[] = []) =>
+      items.find((item) => blogTagSlugFromName(item.value) === routeSlug);
+
+    const known = matchSlug(blogAutoLists);
+    if (known) {
+      setResolvedTag({ slug: routeSlug, name: known.value });
+      return;
+    }
+    if (resolvedTag.slug === routeSlug) {
+      return;
+    }
+
+    const fallbackName = blogTagNameFromRouteSlug(routeSlug);
+    const queryWord = fallbackName
+      .split(' ')
+      .reduce(
+        (longest, word) => (word.length > longest.length ? word : longest),
+        '',
+      );
+    let cancelled = false;
+
+    fetchBlogAutoCompleted({
+      varName: 'tags__name',
+      querystr: queryWord,
+      offset: 0,
+      limit: 100,
+      filter: [{ op: 'exact', varName: 'language', searchTerm: languageValue }],
+    })
+      .then((response) => matchSlug(response?.suggested_values)?.value)
+      .catch(() => undefined)
+      .then((name) => {
+        if (!cancelled) {
+          setResolvedTag({ slug: routeSlug, name: name || fallbackName });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [routeSlug, blogAutoLists, languageValue, resolvedTag.slug]);
   const { inputSearchValue } = useSelector(
     (state: RootState) => state.getCommonGlobalSearch,
   );
@@ -82,16 +134,14 @@ const BlogResultsList: React.FC = () => {
     }
 
     return filters;
-  }, [
-    languageValue,
-    searchAutoValue,
-    searchAutoKey,
-    routeSearchValue,
-  ]);
+  }, [languageValue, searchAutoValue, searchAutoKey, routeSearchValue]);
 
   // Fetch blog data
   const fetchDataBlog = useCallback(async () => {
     setLoading(true);
+    if (!isTagResolved) {
+      return;
+    }
 
     try {
       const filters = buildFilters();
@@ -121,7 +171,7 @@ const BlogResultsList: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [dispatch, buildFilters, page, inputSearchValue]);
+  }, [dispatch, buildFilters, page, inputSearchValue, isTagResolved]);
 
   // Reset to first page when filters change
   const resetToFirstPage = useCallback(() => {
