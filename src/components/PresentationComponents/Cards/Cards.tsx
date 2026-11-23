@@ -528,7 +528,8 @@ const VoyageCard = () => {
                             values === '--' ? values : `${percent.toFixed(1)}%`;
                         }
                         return (
-                          values && (
+                          (values ||
+                            (numberFormat === 'percent' && values === 0)) && (
                             <div
                               className="grid-container-card-body"
                               key={`${child.label}-${index}-${uuidv4()}`}

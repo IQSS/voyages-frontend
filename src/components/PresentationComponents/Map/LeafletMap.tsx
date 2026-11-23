@@ -15,7 +15,6 @@ import '@/style/map.scss';
 import {
   MAP_CENTER,
   MAXIMUM_ZOOM,
-  MINIMUM_ZOOM,
   ZOOM_LEVEL_THRESHOLD,
   ZOOM_LEVEL_REGION_ESTIMATE_MIN,
   mappingSpecialists,
@@ -142,7 +141,6 @@ export const LeafletMap = ({ setZoomLevel, zoomLevel }: LeafletMapProps) => {
             zoom={zoomLevel}
             className="lealfetMap-container"
             maxZoom={MAXIMUM_ZOOM}
-            minZoom={MINIMUM_ZOOM}
             zoomSnap={0.25}
             zoomDelta={1}
             attributionControl={false}

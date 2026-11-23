@@ -17,6 +17,7 @@ export function generateCardsData(data: any, value: any) {
 
   if (value.cell_type === 'literal') {
     const dataDisplay = data[fields[0].var_name];
+    if (dataDisplay === 0 && value.number_format === 'percent') return 0;
     if(isDateStr){
       return dataDisplay ? convertToYYYYMMDD(dataDisplay) : '--';
     }
