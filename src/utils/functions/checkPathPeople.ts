@@ -10,7 +10,10 @@ export const checkPathPeople = (title: string) => {
   if (
     title === 'Enslaved' ||
     title === 'Esclavizados' ||
-    title === 'Escravizados'
+    title === 'Escravizados' ||
+    title === 'Enslaved People' ||
+    title === 'Personas Esclavizadas' ||
+    title === 'Pessoas Escravizadas'
   ) {
     url = `${ENSALVEDPAGE}${AFRICANORIGINSPAGE}#people`;
   } else if (
